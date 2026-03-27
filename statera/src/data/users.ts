@@ -9,8 +9,8 @@ export type User = {
 export const users: User[] = [
   {
     id: 1,
-    email: 'worker1@statera.com',
-    password: 'demo1234',
+    email: 'w',
+    password: 'd1',
     name: 'Worker One',
     role: 'worker',
   },

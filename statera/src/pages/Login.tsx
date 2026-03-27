@@ -1,42 +1,42 @@
 import { useState, type JSX } from 'react';
 import { users } from '../data/users';
+import { useNavigate } from 'react-router-dom';
+
 
 export default function Login(): JSX.Element {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const handleSignIn = (): void => {
+    const handleSignIn = (): void => {
     const matchedUser = users.find(
-      (user) => user.email === email && user.password === password
+        (user) => user.email === email && user.password === password
     );
 
     if (!matchedUser) {
-      setError('Invalid email or password');
-      return;
+        setError('Invalid email or password');
+        return;
     }
 
     localStorage.setItem('statera-user', JSON.stringify(matchedUser));
     setError('');
-    alert(`Signed in as ${matchedUser.name}`);
-  };
+
+    navigate('/dashboard');
+    };
 
   return (
     <div className="min-h-screen bg-[#f5f6f8] flex flex-col px-6">
-      
-      {/* Brand */}
       <div className="pt-8">
         <div className="text-2xl font-black tracking-tight text-slate-900">
           STATERA
         </div>
       </div>
 
-      {/* Center */}
       <div className="flex flex-1 items-center justify-center">
         <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white px-8 py-10 shadow-sm">
           
           <div className="space-y-8">
-            {/* Header */}
             <div className="space-y-2">
               <p className="text-sm font-medium text-slate-400">
                 Please enter your details
@@ -46,10 +46,7 @@ export default function Login(): JSX.Element {
                 Welcome back
               </h1>
             </div>
-
-            {/* Fields */}
             <div className="space-y-6">
-              {/* Email */}
               <div className="space-y-2">
                 <div className="text-sm font-medium text-slate-700">
                   Email address
@@ -62,7 +59,6 @@ export default function Login(): JSX.Element {
                 />
               </div>
 
-              {/* Password */}
               <div className="space-y-2">
                 <div className="text-sm font-medium text-slate-700">
                   Password
@@ -76,14 +72,12 @@ export default function Login(): JSX.Element {
               </div>
             </div>
 
-            {/* Error */}
             {error && (
               <div className="text-sm font-medium text-red-500">
                 {error}
               </div>
             )}
 
-            {/* Button */}
             <button
               type="button"
               onClick={handleSignIn}

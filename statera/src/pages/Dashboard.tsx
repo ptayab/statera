@@ -58,7 +58,10 @@ export default function Dashboard(): JSX.Element {
             </aside>
 
             <main className="flex-1 p-6">
+<<<<<<< HEAD
             {/* Top bar */}
+=======
+>>>>>>> a45e6c7 (completed basic home page)
             <div className="flex justify-end mb-6">
                 <div className="flex items-center gap-3">
                 <div className="text-right">
@@ -69,13 +72,19 @@ export default function Dashboard(): JSX.Element {
                         {user ? user.role : 'No Role'}
                     </div>
                 </div>
+<<<<<<< HEAD
 
                 {/* Avatar circle */}
+=======
+>>>>>>> a45e6c7 (completed basic home page)
                 <div className="w-10 h-10 rounded-full border border-slate-300 bg-white" />
                 </div>
             </div>
 
+<<<<<<< HEAD
             {/* Main content placeholder */}
+=======
+>>>>>>> a45e6c7 (completed basic home page)
             <div className="rounded-xl bg-white p-6 shadow-sm">
                 Main content
             </div>

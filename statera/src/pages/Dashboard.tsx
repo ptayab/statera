@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { JSX } from "react";
+import { AddIssueModal } from "../components/AddIssueModal";
 
 type MenuItem = {
   label: string;
@@ -14,14 +15,24 @@ type User = {
 type PriorityItem = {
   id: string;
   assetId: string;
-  category:
-    | "Inspection"
-    | "Reported Issue"
-    | "Corrective Action"
-    | "Health Warning";
+  category: "Inspection" | "Reported Issue" | "Corrective Action" | "Health Warning";
   title: string;
   detail: string;
   priority: "High" | "Medium" | "Low";
+};
+
+type Asset = {
+  id: string;
+  name: string;
+};
+
+type NewIssueInput = {
+  assetId: string;
+  issueType: string;
+  severity: string;
+  note: string;
+  photoName?: string;
+  reportedBy: string;
 };
 
 const menuItems: MenuItem[] = [
@@ -33,6 +44,12 @@ const menuItems: MenuItem[] = [
   { label: "Health Warnings" },
   { label: "Reports" },
   { label: "Settings" },
+];
+
+const assets: Asset[] = [
+  { id: "LB-12", name: "Lifting Beam LB-12" },
+  { id: "LB-18", name: "Lifting Beam LB-18" },
+  { id: "LB-21", name: "Lifting Beam LB-21" },
 ];
 
 const priorityItems: PriorityItem[] = [
@@ -72,6 +89,9 @@ const priorityItems: PriorityItem[] = [
 
 export default function Dashboard(): JSX.Element {
   const [user, setUser] = useState<User | null>(null);
+  const [isAddIssueOpen, setIsAddIssueOpen] = useState(false);
+  const [selectedAssetId, setSelectedAssetId] = useState<string>("LB-12");
+  const [items, setItems] = useState<PriorityItem[]>(priorityItems);
 
   useEffect(() => {
     const stored = localStorage.getItem("statera-user");
@@ -79,6 +99,25 @@ export default function Dashboard(): JSX.Element {
       setUser(JSON.parse(stored));
     }
   }, []);
+
+  const handleAddIssue = (issue: NewIssueInput) => {
+    const newItem: PriorityItem = {
+      id: String(Date.now()),
+      assetId: issue.assetId,
+      category: "Reported Issue",
+      title: issue.issueType.split("_").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" "),
+      detail: issue.note || "New reported issue.",
+      priority: issue.severity === "high" ? "High" : issue.severity === "medium" ? "Medium" : "Low",
+    };
+
+    setItems((prev) => {
+      const newList = [newItem, ...prev];
+      const weight = { High: 3, Medium: 2, Low: 1 };
+      return newList.sort((a, b) => weight[b.priority] - weight[a.priority]);
+    });
+
+    setIsAddIssueOpen(false);
+  };
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900">
@@ -93,11 +132,10 @@ export default function Dashboard(): JSX.Element {
               <button
                 key={item.label}
                 type="button"
-                className={`w-full rounded-lg px-4 py-3 text-left text-sm font-medium ${
-                  item.active
-                    ? "bg-slate-900 text-white"
-                    : "text-slate-700 hover:bg-slate-100"
-                }`}
+                className={`w-full rounded-lg px-4 py-3 text-left text-sm font-medium ${item.active
+                  ? "bg-slate-900 text-white"
+                  : "text-slate-700 hover:bg-slate-100"
+                  }`}
               >
                 {item.label}
               </button>
@@ -118,6 +156,10 @@ export default function Dashboard(): JSX.Element {
               <button
                 type="button"
                 className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
+                onClick={() => {
+                  setSelectedAssetId("LB-12");
+                  setIsAddIssueOpen(true);
+                }}
               >
                 Add Issue
               </button>
@@ -137,16 +179,15 @@ export default function Dashboard(): JSX.Element {
           </div>
 
           <div className="space-y-4">
-            {priorityItems.map((item) => (
+            {items.map((item) => (
               <div
                 key={item.id}
-                className={`rounded-xl p-5 shadow-sm ring-1 ${
-                  item.priority === "High"
-                    ? "bg-red-100 ring-red-500"
-                    : item.priority === "Medium"
-                      ? "bg-amber-100 ring-amber-400"
-                      : "bg-white ring-slate-200"
-                }`}
+                className={`rounded-xl p-5 shadow-sm ring-1 ${item.priority === "High"
+                  ? "bg-red-100 ring-red-500"
+                  : item.priority === "Medium"
+                    ? "bg-amber-100 ring-amber-400"
+                    : "bg-white ring-slate-200"
+                  }`}
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
@@ -174,6 +215,16 @@ export default function Dashboard(): JSX.Element {
           </div>
         </main>
       </div>
+
+      {isAddIssueOpen && (
+        <AddIssueModal
+          open={true}
+          assets={assets}
+          defaultAssetId={selectedAssetId}
+          onClose={() => setIsAddIssueOpen(false)}
+          onSubmit={handleAddIssue}
+        />
+      )}
     </div>
   );
 }

@@ -11,8 +11,8 @@ export const users: User[] = [
     id: 1,
     email: 'w',
     password: 'd1',
-    name: 'Worker One',
-    role: 'worker',
+    name: 'Worker Two',
+    role: 'miner',
   },
   {
     id: 2,
@@ -23,9 +23,9 @@ export const users: User[] = [
   },
   {
     id: 3,
-    email: 'manager@statera.com',
-    password: 'manager1234',
-    name: 'Manager',
-    role: 'admin',
+    email: 's',
+    password: 's1',
+    name: 'Supervisor One',
+    role: 'supervisor',
   },
 ];

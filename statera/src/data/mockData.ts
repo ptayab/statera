@@ -1,6 +1,16 @@
 import type { Asset, Issue } from '../types';
 
 export const initialAssets: Asset[] = [
+    // {
+    //     id: 'LB-30',
+    //     name: 'Lifting Beam LB-30',
+    //     inspectionStatus: 'due',
+    //     openIssueCount: 0,
+    //     location: 'Ore Pass 4',
+    //     lastInspectionDate: '2026-03-02',
+    //     nextInspectionDue: '2026-03-29',
+    //     openIssues: 0,
+    // },
     {
         id: 'LB-12',
         name: 'Lifting Beam LB-12',
@@ -31,16 +41,7 @@ export const initialAssets: Asset[] = [
         nextInspectionDue: '2026-03-29',
         openIssues: 0,
     },
-    {
-        id: 'LB-30',
-        name: 'Lifting Beam LB-30',
-        inspectionStatus: 'due',
-        openIssueCount: 0,
-        location: 'Ore Pass 4',
-        lastInspectionDate: '2026-03-02',
-        nextInspectionDue: '2026-03-29',
-        openIssues: 0,
-    },
+
 ];
 
 export const initialIssues: Issue[] = [

@@ -20,7 +20,7 @@ export type PriorityItem = {
   category: "Inspection" | "Reported Issue" | "Corrective Action" | "Health Warning";
   title: string;
   detail: string;
-  severity: "high" | "medium" | "low";
+  severity: "high" | "medium" | "low" | "none";
   status?: "Open" | "In Progress" | "Closed" | "Resolved";
   assignedTo?: string;
   reportedBy?: string;
@@ -40,11 +40,11 @@ type NewIssueInput = {
 };
 
 const menuItems: MenuItem[] = [
-  { label: "Dashboard", active: true },
+  { label: "Home", active: true },
+  { label: "Assigned Actions" },
   { label: "Assets" },
   { label: "Inspections" },
   { label: "Issues" },
-  { label: "Corrective Actions" },
   { label: "Health Warnings" },
   { label: "Reports" },
   { label: "Settings" },
@@ -54,17 +54,30 @@ const menuItems: MenuItem[] = [
 
 const priorityItems: PriorityItem[] = [
   {
-    id: "2",
-    assetId: "LB-12",
-    category: "Inspection",
-    title: "Inspection overdue",
-    detail: "Inspection overdue by 4 days.",
+    id: "3",
+    assetId: "LB-30",
+    category: "Reported Issue",
+    title: "crack",
+    detail: "Two separate incidents reported - corrosion and cracking. Escalating risk.",
     severity: "high",
     status: "Open",
-    assignedTo: "Inspector One",
+    assignedTo: "Maintenance Team One",
+    reportedBy: "Worker Two",
+    reportedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+    dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+  },
+  {
+    id: "4",
+    assetId: "LB-18",
+    category: "Inspection",
+    title: "Inspection due 5 days ago",
+    detail: "Scheduled monthly lifting beam inspection.",
+    severity: "high",
+    status: "In Progress",
+    assignedTo: "Maintenance Team Two",
     reportedBy: "System",
-    reportedAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
-    dueDate: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+    reportedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+    dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toLocaleDateString(),
   },
   {
     id: "3",
@@ -79,19 +92,33 @@ const priorityItems: PriorityItem[] = [
     reportedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
     dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toLocaleDateString(),
   },
+  // {
+  //   id: "3",
+  //   assetId: "LB-30",
+  //   category: "Reported Issue",
+  //   title: "crack",
+  //   detail: "small crack in the center of the beam",
+  //   severity: "low",
+  //   status: "Open",
+  //   assignedTo: "Maintenance Team One",
+  //   reportedBy: "Worker Two",
+  //   reportedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+  //   dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+  // },
   {
-    id: "4",
-    assetId: "LB-18",
+    id: "2",
+    assetId: "LB-12",
     category: "Inspection",
-    title: "Inspection due tomorrow",
-    detail: "Scheduled monthly lifting beam inspection.",
-    severity: "low",
-    status: "In Progress",
-    assignedTo: "Mike Ross",
+    title: "Inspection completed",
+    detail: "Maintenance Team One completed the inspection 10 days ago.",
+    severity: "none",
+    status: "Resolved",
+    assignedTo: "Inspector One",
     reportedBy: "System",
-    reportedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-    dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+    reportedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+    dueDate: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toLocaleDateString(),
   },
+
 ];
 
 export default function Dashboard(): JSX.Element {
@@ -100,6 +127,8 @@ export default function Dashboard(): JSX.Element {
   const [selectedAssetId, setSelectedAssetId] = useState<string>("LB-12");
   const [items, setItems] = useState<PriorityItem[]>(priorityItems);
   const [selectedItem, setSelectedItem] = useState<PriorityItem | null>(null);
+  // Track per-asset status overrides (e.g. out_of_service)
+  const [assetStatuses, setAssetStatuses] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const stored = localStorage.getItem("statera-user");
@@ -107,6 +136,19 @@ export default function Dashboard(): JSX.Element {
       setUser(JSON.parse(stored));
     }
   }, []);
+
+  const handleMarkInProgress = (itemId: string) => {
+    setItems((prev) =>
+      prev.map((i) => (i.id === itemId ? { ...i, status: "In Progress" } : i))
+    );
+    setSelectedItem((prev) =>
+      prev?.id === itemId ? { ...prev, status: "In Progress" } : prev
+    );
+  };
+
+  const handleMarkAssetOutOfService = (assetId: string) => {
+    setAssetStatuses((prev) => ({ ...prev, [assetId]: "out_of_service" }));
+  };
 
   const handleAddIssue = (issue: NewIssueInput) => {
     const newItem: PriorityItem = {
@@ -124,7 +166,7 @@ export default function Dashboard(): JSX.Element {
 
     setItems((prev) => {
       const newList = [newItem, ...prev];
-      const weight = { high: 3, medium: 2, low: 1 };
+      const weight = { high: 3, medium: 2, low: 1, none: 0 };
       return newList.sort((a, b) => weight[b.severity] - weight[a.severity]);
     });
 
@@ -191,51 +233,64 @@ export default function Dashboard(): JSX.Element {
           </div>
 
           <div className="space-y-4">
-            {items.map((item) => (
-              <div
-                key={item.id}
-                onClick={() => setSelectedItem(item)}
-                className={`cursor-pointer transition-all hover:shadow-md hover:-translate-y-0.5 rounded-xl p-5 shadow-sm ring-1 ${item.severity === "high"
-                  ? "bg-red-100 ring-red-500"
-                  : item.severity === "medium"
-                    ? "bg-amber-100 ring-amber-400"
-                    : "bg-white ring-slate-200"
+            {items.map((item) => {
+              const isOutOfService = assetStatuses[item.assetId] === "out_of_service";
+              return (
+                <div
+                  key={item.id}
+                  onClick={() => setSelectedItem(item)}
+                  className={`cursor-pointer transition-all hover:shadow-md hover:-translate-y-0.5 rounded-xl p-5 shadow-sm ring-1 ${
+                    isOutOfService
+                      ? "bg-slate-800 ring-slate-700"
+                      : item.severity === "high"
+                        ? "bg-red-100 ring-red-500"
+                        : item.severity === "medium"
+                          ? "bg-amber-100 ring-amber-400"
+                          : "bg-white ring-slate-200"
                   }`}
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <div className="flex items-center gap-3">
-                      <h3 className="text-lg font-bold text-slate-900">
-                        {item.assetId}
-                      </h3>
-
-                      <span className="rounded-full bg-white px-2 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
-                        {item.category}
-                      </span>
-                    </div>
-
-                    <div className="mt-2 text-base font-semibold text-slate-800">
-                      {item.title}
-                    </div>
-
-                    <div className="mt-1 text-sm text-slate-600">
-                      {item.detail}
-                    </div>
-                  </div>
-                  {item.status && (
-                    <div className="flex-shrink-0">
-                      <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${item.status === 'Open' ? 'bg-blue-50 text-blue-800 ring-blue-700/20' :
-                        item.status === 'In Progress' ? 'bg-yellow-50 text-yellow-800 ring-yellow-600/20' :
-                          item.status === 'Resolved' ? 'bg-green-50 text-green-800 ring-green-600/20' :
-                            'bg-gray-50 text-gray-800 ring-gray-600/20'
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <div className="flex items-center gap-3">
+                        <h3 className={`text-lg font-bold ${isOutOfService ? "text-white" : "text-slate-900"}`}>
+                          {item.assetId}
+                        </h3>
+                        <span className={`rounded-full px-2 py-1 text-xs font-semibold ring-1 ${
+                          isOutOfService
+                            ? "bg-slate-700 text-slate-200 ring-slate-600"
+                            : "bg-white text-slate-700 ring-slate-200"
                         }`}>
-                        {item.status}
-                      </span>
+                          {item.category}
+                        </span>
+                        {isOutOfService && (
+                          <span className="rounded-full bg-red-900/60 px-2 py-1 text-xs font-bold text-red-300 ring-1 ring-red-700">
+                            OUT OF SERVICE
+                          </span>
+                        )}
+                      </div>
+                      <div className={`mt-2 text-base font-semibold ${isOutOfService ? "text-slate-200" : "text-slate-800"}`}>
+                        {item.title}
+                      </div>
+                      <div className={`mt-1 text-sm ${isOutOfService ? "text-slate-400" : "text-slate-600"}`}>
+                        {item.detail}
+                      </div>
                     </div>
-                  )}
+                    {item.status && (
+                      <div className="flex-shrink-0">
+                        <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${
+                          item.status === 'Open' ? 'bg-blue-50 text-blue-800 ring-blue-700/20' :
+                          item.status === 'In Progress' ? 'bg-yellow-50 text-yellow-800 ring-yellow-600/20' :
+                          item.status === 'Resolved' ? 'bg-green-50 text-green-800 ring-green-600/20' :
+                          'bg-gray-50 text-gray-800 ring-gray-600/20'
+                        }`}>
+                          {item.status}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </main>
       </div>
@@ -253,7 +308,10 @@ export default function Dashboard(): JSX.Element {
       {selectedItem && (
         <IssueDetailModal
           item={selectedItem}
+          assetStatus={assetStatuses[selectedItem.assetId]}
           onClose={() => setSelectedItem(null)}
+          onMarkInProgress={() => handleMarkInProgress(selectedItem.id)}
+          onMarkAssetOutOfService={() => handleMarkAssetOutOfService(selectedItem.assetId)}
         />
       )}
     </div>

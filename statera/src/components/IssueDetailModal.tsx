@@ -3,11 +3,23 @@ import type { PriorityItem } from '../pages/Dashboard';
 
 interface IssueDetailModalProps {
   item: PriorityItem;
+  assetStatus?: string;
   onClose: () => void;
+  onMarkInProgress: () => void;
+  onMarkAssetOutOfService: () => void;
 }
 
-export function IssueDetailModal({ item, onClose }: IssueDetailModalProps): JSX.Element | null {
+export function IssueDetailModal({
+  item,
+  assetStatus,
+  onClose,
+  onMarkInProgress,
+  onMarkAssetOutOfService,
+}: IssueDetailModalProps): JSX.Element | null {
   if (!item) return null;
+
+  const isInProgress = item.status === 'In Progress';
+  const isOutOfService = assetStatus === 'out_of_service';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
@@ -19,6 +31,11 @@ export function IssueDetailModal({ item, onClose }: IssueDetailModalProps): JSX.
               <span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">
                 {item.category}
               </span>
+              {isOutOfService && (
+                <span className="rounded-full bg-red-100 px-2 py-1 text-xs font-bold text-red-700 ring-1 ring-red-300">
+                  Out of Service
+                </span>
+              )}
             </div>
             <h3 className="text-lg font-medium text-slate-800">{item.title}</h3>
           </div>
@@ -104,6 +121,34 @@ export function IssueDetailModal({ item, onClose }: IssueDetailModalProps): JSX.
                     <p className="text-xs text-slate-500">To {item.assignedTo || 'Unassigned'}</p>
                 </li>
             </ol>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-wrap gap-3 pt-1 border-t border-slate-100">
+            <button
+              type="button"
+              disabled={isInProgress}
+              onClick={onMarkInProgress}
+              className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors ${
+                isInProgress
+                  ? 'bg-yellow-50 text-yellow-600 ring-1 ring-yellow-200 cursor-default'
+                  : 'bg-yellow-500 text-white hover:bg-yellow-600 active:bg-yellow-700'
+              }`}
+            >
+              {isInProgress ? '✓ In Progress' : 'Mark as In Progress'}
+            </button>
+            <button
+              type="button"
+              disabled={isOutOfService}
+              onClick={onMarkAssetOutOfService}
+              className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors ${
+                isOutOfService
+                  ? 'bg-slate-100 text-slate-400 ring-1 ring-slate-200 cursor-default'
+                  : 'bg-slate-900 text-white hover:bg-slate-700 active:bg-slate-800'
+              }`}
+            >
+              {isOutOfService ? '✓ Asset Out of Service' : 'Mark Asset Out of Service'}
+            </button>
           </div>
         </div>
       </div>

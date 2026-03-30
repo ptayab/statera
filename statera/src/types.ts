@@ -1,4 +1,4 @@
-export type InspectionStatus = "up_to_date" | "due" | "overdue";
+export type InspectionStatus = "up_to_date" | "due" | "overdue" | "out_of_service";
 
 export type IssueType =
     | "visible wear"
@@ -8,7 +8,7 @@ export type IssueType =
     | "damaged tag"
     | "other";
 
-export type Severity = "low" | "medium" | "high";
+export type Severity = "low" | "medium" | "high" | "none";
 
 export interface Asset {
     openIssues: number;

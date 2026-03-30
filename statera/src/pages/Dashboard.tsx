@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { JSX } from "react";
 import { AddIssueModal } from "../components/AddIssueModal";
+import { IssueDetailModal } from "../components/IssueDetailModal";
 
 type MenuItem = {
   label: string;
@@ -12,13 +13,18 @@ type User = {
   role: string;
 };
 
-type PriorityItem = {
+export type PriorityItem = {
   id: string;
   assetId: string;
   category: "Inspection" | "Reported Issue" | "Corrective Action" | "Health Warning";
   title: string;
   detail: string;
   priority: "High" | "Medium" | "Low";
+  status?: "Open" | "In Progress" | "Closed" | "Resolved";
+  assignedTo?: string;
+  reportedBy?: string;
+  reportedAt?: string;
+  dueDate?: string;
 };
 
 type Asset = {
@@ -54,28 +60,17 @@ const assets: Asset[] = [
 
 const priorityItems: PriorityItem[] = [
   {
-    id: "1",
-    assetId: "LB-12",
-    category: "Reported Issue",
-    title: "Visible wear near left lifting point",
-    detail: "Reported twice in 21 days. Photo attached.",
-    priority: "High",
-  },
-  {
     id: "2",
     assetId: "LB-12",
     category: "Inspection",
     title: "Inspection overdue",
     detail: "Inspection overdue by 12 days.",
     priority: "High",
-  },
-  {
-    id: "3",
-    assetId: "LB-21",
-    category: "Reported Issue",
-    title: "Corrosion near tag plate",
-    detail: "Single low-severity report.",
-    priority: "Medium",
+    status: "Open",
+    assignedTo: "Jane Smith",
+    reportedBy: "System",
+    reportedAt: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
+    dueDate: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toLocaleDateString(),
   },
   {
     id: "4",
@@ -84,6 +79,11 @@ const priorityItems: PriorityItem[] = [
     title: "Inspection due tomorrow",
     detail: "Scheduled monthly lifting beam inspection.",
     priority: "Low",
+    status: "In Progress",
+    assignedTo: "Mike Ross",
+    reportedBy: "System",
+    reportedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+    dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toLocaleDateString(),
   },
 ];
 
@@ -92,6 +92,7 @@ export default function Dashboard(): JSX.Element {
   const [isAddIssueOpen, setIsAddIssueOpen] = useState(false);
   const [selectedAssetId, setSelectedAssetId] = useState<string>("LB-12");
   const [items, setItems] = useState<PriorityItem[]>(priorityItems);
+  const [selectedItem, setSelectedItem] = useState<PriorityItem | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("statera-user");
@@ -108,6 +109,10 @@ export default function Dashboard(): JSX.Element {
       title: issue.issueType.split("_").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" "),
       detail: issue.note || "New reported issue.",
       priority: issue.severity === "high" ? "High" : issue.severity === "medium" ? "Medium" : "Low",
+      status: "Open",
+      assignedTo: "Unassigned",
+      reportedBy: issue.reportedBy || "A. Worker",
+      reportedAt: new Date().toISOString(),
     };
 
     setItems((prev) => {
@@ -182,7 +187,8 @@ export default function Dashboard(): JSX.Element {
             {items.map((item) => (
               <div
                 key={item.id}
-                className={`rounded-xl p-5 shadow-sm ring-1 ${item.priority === "High"
+                onClick={() => setSelectedItem(item)}
+                className={`cursor-pointer transition-all hover:shadow-md hover:-translate-y-0.5 rounded-xl p-5 shadow-sm ring-1 ${item.priority === "High"
                   ? "bg-red-100 ring-red-500"
                   : item.priority === "Medium"
                     ? "bg-amber-100 ring-amber-400"
@@ -209,6 +215,17 @@ export default function Dashboard(): JSX.Element {
                       {item.detail}
                     </div>
                   </div>
+                  {item.status && (
+                    <div className="flex-shrink-0">
+                      <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${item.status === 'Open' ? 'bg-blue-50 text-blue-800 ring-blue-700/20' :
+                        item.status === 'In Progress' ? 'bg-yellow-50 text-yellow-800 ring-yellow-600/20' :
+                          item.status === 'Resolved' ? 'bg-green-50 text-green-800 ring-green-600/20' :
+                            'bg-gray-50 text-gray-800 ring-gray-600/20'
+                        }`}>
+                        {item.status}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -223,6 +240,13 @@ export default function Dashboard(): JSX.Element {
           defaultAssetId={selectedAssetId}
           onClose={() => setIsAddIssueOpen(false)}
           onSubmit={handleAddIssue}
+        />
+      )}
+
+      {selectedItem && (
+        <IssueDetailModal
+          item={selectedItem}
+          onClose={() => setSelectedItem(null)}
         />
       )}
     </div>

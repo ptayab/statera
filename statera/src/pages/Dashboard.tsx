@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { JSX } from "react";
 import { AddIssueModal } from "../components/AddIssueModal";
 import { IssueDetailModal } from "../components/IssueDetailModal";
+import { initialAssets as assets } from "../data/mockData";
 
 type MenuItem = {
   label: string;
@@ -19,7 +20,7 @@ export type PriorityItem = {
   category: "Inspection" | "Reported Issue" | "Corrective Action" | "Health Warning";
   title: string;
   detail: string;
-  priority: "High" | "Medium" | "Low";
+  severity: "high" | "medium" | "low";
   status?: "Open" | "In Progress" | "Closed" | "Resolved";
   assignedTo?: string;
   reportedBy?: string;
@@ -27,10 +28,6 @@ export type PriorityItem = {
   dueDate?: string;
 };
 
-type Asset = {
-  id: string;
-  name: string;
-};
 
 type NewIssueInput = {
   assetId: string;
@@ -39,6 +36,7 @@ type NewIssueInput = {
   note: string;
   photoName?: string;
   reportedBy: string;
+  assignedTo?: string;
 };
 
 const menuItems: MenuItem[] = [
@@ -52,11 +50,7 @@ const menuItems: MenuItem[] = [
   { label: "Settings" },
 ];
 
-const assets: Asset[] = [
-  { id: "LB-12", name: "Lifting Beam LB-12" },
-  { id: "LB-18", name: "Lifting Beam LB-18" },
-  { id: "LB-21", name: "Lifting Beam LB-21" },
-];
+
 
 const priorityItems: PriorityItem[] = [
   {
@@ -64,13 +58,26 @@ const priorityItems: PriorityItem[] = [
     assetId: "LB-12",
     category: "Inspection",
     title: "Inspection overdue",
-    detail: "Inspection overdue by 12 days.",
-    priority: "High",
+    detail: "Inspection overdue by 4 days.",
+    severity: "high",
     status: "Open",
-    assignedTo: "Jane Smith",
+    assignedTo: "Inspector One",
     reportedBy: "System",
-    reportedAt: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
+    reportedAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
     dueDate: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+  },
+  {
+    id: "3",
+    assetId: "LB-21",
+    category: "Reported Issue",
+    title: "Visible wear on shackle",
+    detail: "Visible wear on shackle.",
+    severity: "medium",
+    status: "In Progress",
+    assignedTo: "Maintenance Team One",
+    reportedBy: "Worker Two",
+    reportedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+    dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toLocaleDateString(),
   },
   {
     id: "4",
@@ -78,7 +85,7 @@ const priorityItems: PriorityItem[] = [
     category: "Inspection",
     title: "Inspection due tomorrow",
     detail: "Scheduled monthly lifting beam inspection.",
-    priority: "Low",
+    severity: "low",
     status: "In Progress",
     assignedTo: "Mike Ross",
     reportedBy: "System",
@@ -108,17 +115,17 @@ export default function Dashboard(): JSX.Element {
       category: "Reported Issue",
       title: issue.issueType.split("_").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" "),
       detail: issue.note || "New reported issue.",
-      priority: issue.severity === "high" ? "High" : issue.severity === "medium" ? "Medium" : "Low",
+      severity: (issue.severity === "high" || issue.severity === "medium" || issue.severity === "low") ? issue.severity : "low",
       status: "Open",
-      assignedTo: "Unassigned",
-      reportedBy: issue.reportedBy || "A. Worker",
+      assignedTo: issue.assignedTo || "Unassigned",
+      reportedBy: issue.reportedBy || "Worker One",
       reportedAt: new Date().toISOString(),
     };
 
     setItems((prev) => {
       const newList = [newItem, ...prev];
-      const weight = { High: 3, Medium: 2, Low: 1 };
-      return newList.sort((a, b) => weight[b.priority] - weight[a.priority]);
+      const weight = { high: 3, medium: 2, low: 1 };
+      return newList.sort((a, b) => weight[b.severity] - weight[a.severity]);
     });
 
     setIsAddIssueOpen(false);
@@ -188,9 +195,9 @@ export default function Dashboard(): JSX.Element {
               <div
                 key={item.id}
                 onClick={() => setSelectedItem(item)}
-                className={`cursor-pointer transition-all hover:shadow-md hover:-translate-y-0.5 rounded-xl p-5 shadow-sm ring-1 ${item.priority === "High"
+                className={`cursor-pointer transition-all hover:shadow-md hover:-translate-y-0.5 rounded-xl p-5 shadow-sm ring-1 ${item.severity === "high"
                   ? "bg-red-100 ring-red-500"
-                  : item.priority === "Medium"
+                  : item.severity === "medium"
                     ? "bg-amber-100 ring-amber-400"
                     : "bg-white ring-slate-200"
                   }`}

@@ -1,11 +1,11 @@
 export type InspectionStatus = "up_to_date" | "due" | "overdue";
 
 export type IssueType =
-    | "visible_wear"
+    | "visible wear"
     | "crack"
     | "deformation"
     | "corrosion"
-    | "damaged_tag"
+    | "damaged tag"
     | "other";
 
 export type Severity = "low" | "medium" | "high";
@@ -32,4 +32,5 @@ export interface Issue {
     photoName?: string;
     reportedBy: string;
     status: "open" | "closed";
+    assignedTo?: string;
 }

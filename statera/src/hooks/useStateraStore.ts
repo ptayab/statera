@@ -10,6 +10,7 @@ export interface NewIssueInput {
     note: string;
     photoName?: string;
     reportedBy: string;
+    assignedTo?: string;
 }
 
 export function useStateraStore() {
@@ -28,6 +29,7 @@ export function useStateraStore() {
             reportedBy: input.reportedBy,
             createdAt: new Date().toISOString(),
             status: 'open',
+            assignedTo: input.assignedTo,
         };
 
         setIssues((current) => [newIssue, ...current]);

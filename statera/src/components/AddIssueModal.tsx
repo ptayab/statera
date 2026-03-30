@@ -11,11 +11,11 @@ interface AddIssueModalProps {
 }
 
 const issueTypes: IssueType[] = [
-  "visible_wear",
+  "visible wear",
   "crack",
   "deformation",
   "corrosion",
-  "damaged_tag",
+  "damaged tag",
   "other",
 ];
 
@@ -30,11 +30,14 @@ export function AddIssueModal({
 }: AddIssueModalProps) {
   const firstAssetId = useMemo(() => assets[0]?.id ?? '', [assets]);
   const [assetId, setAssetId] = useState(defaultAssetId ?? firstAssetId);
-  const [issueType, setIssueType] = useState<IssueType>('visible_wear');
+  const [issueType, setIssueType] = useState<IssueType>('visible wear');
   const [severity, setSeverity] = useState<Severity>('medium');
   const [note, setNote] = useState('');
   const [photoName, setPhotoName] = useState('');
-  const [reportedBy, setReportedBy] = useState('A. Worker');
+  const [reportedBy, setReportedBy] = useState('Worker One');
+  const [assignedTo, setAssignedTo] = useState('Unassigned');
+  const [customAssignee, setCustomAssignee] = useState('');
+  const [isCustomAssignment, setIsCustomAssignment] = useState(false);
 
   if (!open) return null;
 
@@ -49,6 +52,7 @@ export function AddIssueModal({
       note,
       photoName: photoName || undefined,
       reportedBy,
+      assignedTo: isCustomAssignment ? customAssignee : assignedTo,
     });
 
     setNote('');
@@ -152,6 +156,44 @@ export function AddIssueModal({
                 required
               />
             </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">Assign To</label>
+              <select
+                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                value={isCustomAssignment ? 'custom' : assignedTo}
+                onChange={(e) => {
+                  if (e.target.value === 'custom') {
+                    setIsCustomAssignment(true);
+                  } else {
+                    setIsCustomAssignment(false);
+                    setAssignedTo(e.target.value);
+                  }
+                }}
+              >
+                <option value="Unassigned">Unassigned</option>
+                <option value="Maintenance Team One">Maintenance Team One</option>
+                <option value="Supervisor One">Supervisor One</option>
+                <option value="Supervisor Two">Supervisor Two</option>
+                <option value="Maintenance Team Two">Maintenance Team Two</option>
+                <option value="custom">Custom...</option>
+              </select>
+            </div>
+
+            {isCustomAssignment && (
+              <div>
+                <label className="mb-1 block text-sm font-medium text-slate-700">Custom Assignee</label>
+                <input
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                  placeholder="Enter name"
+                  value={customAssignee}
+                  onChange={(e) => setCustomAssignee(e.target.value)}
+                  required
+                />
+              </div>
+            )}
           </div>
 
           <div className="flex justify-end gap-3 pt-2">

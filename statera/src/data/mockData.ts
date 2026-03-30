@@ -7,8 +7,8 @@ export const initialAssets: Asset[] = [
         inspectionStatus: 'overdue',
         openIssueCount: 1,
         location: 'North Drift',
-        lastInspectionDate: '2026-02-20',
-        nextInspectionDue: '2026-03-10',
+        lastInspectionDate: '2026-02-29',
+        nextInspectionDue: '2026-03-29',
         openIssues: 1,
     },
     {
@@ -31,6 +31,16 @@ export const initialAssets: Asset[] = [
         nextInspectionDue: '2026-03-29',
         openIssues: 0,
     },
+    {
+        id: 'LB-30',
+        name: 'Lifting Beam LB-30',
+        inspectionStatus: 'due',
+        openIssueCount: 0,
+        location: 'Ore Pass 4',
+        lastInspectionDate: '2026-03-02',
+        nextInspectionDue: '2026-03-29',
+        openIssues: 0,
+    },
 ];
 
 export const initialIssues: Issue[] = [
@@ -38,7 +48,7 @@ export const initialIssues: Issue[] = [
         id: 'ISS-1001',
         assetId: 'LB-12',
         assetName: 'Lifting Beam LB-12',
-        issueType: 'visible_wear',
+        issueType: 'visible wear',
         severity: 'medium',
         note: 'Wear visible near left lifting point.',
         createdAt: '2026-03-14T09:30:00Z',

@@ -3,7 +3,7 @@ export type User = {
   email: string;
   password: string;
   name: string;
-  role: 'admin' | 'worker';
+  role: 'admin' | 'worker' | 'miner' | 'supervisor';
 };
 
 export const users: User[] = [
@@ -16,10 +16,10 @@ export const users: User[] = [
   },
   {
     id: 2,
-    email: 'worker1@statera.com',
+    email: 'workerOne@statera.com',
     password: 'demo1234',
-    name: 'Worker Two',
-    role: 'worker',
+    name: 'Worker One',
+    role: 'miner',
   },
   {
     id: 3,

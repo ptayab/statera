@@ -9,33 +9,33 @@ export default function Login(): JSX.Element {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-    const handleSignIn = (): void => {
+  const handleSignIn = (): void => {
     const matchedUser = users.find(
-        (user) => user.email === email && user.password === password
+      (user) => user.email === email && user.password === password
     );
 
     if (!matchedUser) {
-        setError('Invalid email or password');
-        return;
+      setError('Invalid email or password');
+      return;
     }
 
     localStorage.setItem('statera-user', JSON.stringify(matchedUser));
     setError('');
 
     navigate('/dashboard');
-    };
+  };
 
   return (
     <div className="min-h-screen bg-[#f5f6f8] flex flex-col px-6">
       <div className="pt-8">
-        <div className="text-2xl font-black tracking-tight text-slate-900">
+        <div className="text-2xl font-black tracking-tight text-slate-900 text-center">
           STATERA
         </div>
       </div>
 
       <div className="flex flex-1 items-center justify-center">
         <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white px-8 py-10 shadow-sm">
-          
+
           <div className="space-y-8">
             <div className="space-y-2">
               <p className="text-sm font-medium text-slate-400">

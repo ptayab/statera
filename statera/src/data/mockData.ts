@@ -17,8 +17,8 @@ export const initialAssets: Asset[] = [
         inspectionStatus: 'overdue',
         openIssueCount: 1,
         location: 'North Drift',
-        lastInspectionDate: '2026-02-29',
-        nextInspectionDue: '2026-03-29',
+        lastInspectionDate: '2026-02-20',
+        nextInspectionDue: '2026-03-10',
         openIssues: 1,
     },
     {
@@ -41,6 +41,17 @@ export const initialAssets: Asset[] = [
         nextInspectionDue: '2026-03-29',
         openIssues: 0,
     },
+    {
+        id: 'LB-30',
+        name: 'Lifting Beam LB-30',
+        inspectionStatus: 'due',
+        openIssueCount: 1,
+        location: 'Shaft 7',
+        lastInspectionDate: '2026-03-01',
+        nextInspectionDue: '2026-03-29',
+        openIssues: 1,
+    },
+
 
 ];
 

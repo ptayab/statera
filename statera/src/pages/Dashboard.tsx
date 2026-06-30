@@ -54,31 +54,31 @@ const menuItems: MenuItem[] = [
 
 const priorityItems: PriorityItem[] = [
   {
-    id: "3",
-    assetId: "LB-30",
-    category: "Reported Issue",
-    title: "crack",
-    detail: "Two separate incidents reported - corrosion and cracking. Escalating risk.",
+    id: "2",
+    assetId: "LB-12",
+    category: "Inspection",
+    title: "Inspection overdue",
+    detail: "Inspection overdue by 4 days.",
     severity: "high",
     status: "Open",
-    assignedTo: "Maintenance Team One",
-    reportedBy: "Worker Two",
-    reportedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-    dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toLocaleDateString(),
-  },
-  {
-    id: "4",
-    assetId: "LB-18",
-    category: "Inspection",
-    title: "Inspection due 5 days ago",
-    detail: "Scheduled monthly lifting beam inspection.",
-    severity: "high",
-    status: "In Progress",
-    assignedTo: "Maintenance Team Two",
+    assignedTo: "Inspector One",
     reportedBy: "System",
-    reportedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-    dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+    reportedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+    dueDate: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toLocaleDateString(),
   },
+  // {
+  //   id: "3",
+  //   assetId: "LB-30",
+  //   category: "Reported Issue",
+  //   title: "crack",
+  //   detail: "Two separate incidents reported - corrosion and cracking. Escalating risk.",
+  //   severity: "high",
+  //   status: "Open",
+  //   assignedTo: "Maintenance Team One",
+  //   reportedBy: "Worker Two",
+  //   reportedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+  //   dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+  // },
   {
     id: "3",
     assetId: "LB-21",
@@ -92,6 +92,20 @@ const priorityItems: PriorityItem[] = [
     reportedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
     dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toLocaleDateString(),
   },
+  {
+    id: "4",
+    assetId: "LB-18",
+    category: "Inspection",
+    title: "Inspection due tomorrow",
+    detail: "Scheduled monthly lifting beam inspection.",
+    severity: "low",
+    status: "In Progress",
+    assignedTo: "Maintenance Team Two",
+    reportedBy: "System",
+    reportedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+    dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+  },
+
   // {
   //   id: "3",
   //   assetId: "LB-30",
@@ -105,19 +119,19 @@ const priorityItems: PriorityItem[] = [
   //   reportedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
   //   dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toLocaleDateString(),
   // },
-  {
-    id: "2",
-    assetId: "LB-12",
-    category: "Inspection",
-    title: "Inspection completed",
-    detail: "Maintenance Team One completed the inspection 10 days ago.",
-    severity: "none",
-    status: "Resolved",
-    assignedTo: "Inspector One",
-    reportedBy: "System",
-    reportedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-    dueDate: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toLocaleDateString(),
-  },
+  // {
+  //   id: "2",
+  //   assetId: "LB-12",
+  //   category: "Inspection",
+  //   title: "Inspection completed",
+  //   detail: "Maintenance Team One completed the inspection 10 days ago.",
+  //   severity: "none",
+  //   status: "Resolved",
+  //   assignedTo: "Inspector One",
+  //   reportedBy: "System",
+  //   reportedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+  //   dueDate: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+  // },
 
 ];
 
@@ -239,15 +253,14 @@ export default function Dashboard(): JSX.Element {
                 <div
                   key={item.id}
                   onClick={() => setSelectedItem(item)}
-                  className={`cursor-pointer transition-all hover:shadow-md hover:-translate-y-0.5 rounded-xl p-5 shadow-sm ring-1 ${
-                    isOutOfService
-                      ? "bg-slate-800 ring-slate-700"
-                      : item.severity === "high"
-                        ? "bg-red-100 ring-red-500"
-                        : item.severity === "medium"
-                          ? "bg-amber-100 ring-amber-400"
-                          : "bg-white ring-slate-200"
-                  }`}
+                  className={`cursor-pointer transition-all hover:shadow-md hover:-translate-y-0.5 rounded-xl p-5 shadow-sm ring-1 ${isOutOfService
+                    ? "bg-slate-800 ring-slate-700"
+                    : item.severity === "high"
+                      ? "bg-red-100 ring-red-500"
+                      : item.severity === "medium"
+                        ? "bg-amber-100 ring-amber-400"
+                        : "bg-white ring-slate-200"
+                    }`}
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div>
@@ -255,11 +268,10 @@ export default function Dashboard(): JSX.Element {
                         <h3 className={`text-lg font-bold ${isOutOfService ? "text-white" : "text-slate-900"}`}>
                           {item.assetId}
                         </h3>
-                        <span className={`rounded-full px-2 py-1 text-xs font-semibold ring-1 ${
-                          isOutOfService
-                            ? "bg-slate-700 text-slate-200 ring-slate-600"
-                            : "bg-white text-slate-700 ring-slate-200"
-                        }`}>
+                        <span className={`rounded-full px-2 py-1 text-xs font-semibold ring-1 ${isOutOfService
+                          ? "bg-slate-700 text-slate-200 ring-slate-600"
+                          : "bg-white text-slate-700 ring-slate-200"
+                          }`}>
                           {item.category}
                         </span>
                         {isOutOfService && (
@@ -277,12 +289,11 @@ export default function Dashboard(): JSX.Element {
                     </div>
                     {item.status && (
                       <div className="flex-shrink-0">
-                        <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${
-                          item.status === 'Open' ? 'bg-blue-50 text-blue-800 ring-blue-700/20' :
+                        <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${item.status === 'Open' ? 'bg-blue-50 text-blue-800 ring-blue-700/20' :
                           item.status === 'In Progress' ? 'bg-yellow-50 text-yellow-800 ring-yellow-600/20' :
-                          item.status === 'Resolved' ? 'bg-green-50 text-green-800 ring-green-600/20' :
-                          'bg-gray-50 text-gray-800 ring-gray-600/20'
-                        }`}>
+                            item.status === 'Resolved' ? 'bg-green-50 text-green-800 ring-green-600/20' :
+                              'bg-gray-50 text-gray-800 ring-gray-600/20'
+                          }`}>
                           {item.status}
                         </span>
                       </div>

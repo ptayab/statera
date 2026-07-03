@@ -144,7 +144,20 @@ export type Database = {
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      supervisor_change_ticket_status: {
+        Args: { p_ticket_id: string; p_new_status: TicketStatus };
+        Returns: undefined;
+      };
+      supervisor_assign_ticket: {
+        Args: { p_ticket_id: string };
+        Returns: undefined;
+      };
+      supervisor_add_ticket_note: {
+        Args: { p_ticket_id: string; p_note: string };
+        Returns: undefined;
+      };
+    };
     Enums: {
       ticket_status: TicketStatus;
       user_role: UserRole;
@@ -153,3 +166,5 @@ export type Database = {
     CompositeTypes: Record<string, never>;
   };
 };
+
+export type TicketEvent = Database["public"]["Tables"]["ticket_events"]["Row"];

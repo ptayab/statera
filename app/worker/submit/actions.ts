@@ -126,7 +126,9 @@ export async function submitTicket(
     };
   }
 
-  revalidatePath("/submit");
+  revalidatePath("/worker");
+  revalidatePath("/worker/submit");
+  revalidatePath("/worker/tickets");
 
   return {
     ok: true,

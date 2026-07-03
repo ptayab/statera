@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { LogoutButton } from "@/components/auth/LogoutButton";
 import { TicketActions } from "@/components/dashboard/TicketActions";
 import { TicketHistory } from "@/components/dashboard/TicketHistory";
 import { getUserProfile } from "@/lib/auth/session";
@@ -34,17 +33,14 @@ export default async function TicketDetailPage({ params }: TicketDetailPageProps
 
   return (
     <main className="flex flex-1 flex-col px-4 py-6 sm:px-6 sm:py-8">
-      <header className="mb-6 flex items-start justify-between gap-4">
-        <div>
-          <Link
-            href="/dashboard"
-            className="text-sm text-zinc-600 hover:underline dark:text-zinc-400"
-          >
-            ← Back to dashboard
-          </Link>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight">Ticket detail</h1>
-        </div>
-        <LogoutButton />
+      <header className="mb-6">
+        <Link
+          href="/supervisor/all"
+          className="text-sm text-zinc-600 hover:underline dark:text-zinc-400"
+        >
+          ← Back to all issues
+        </Link>
+        <h1 className="mt-2 text-2xl font-semibold tracking-tight">Ticket detail</h1>
       </header>
 
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">

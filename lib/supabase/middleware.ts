@@ -38,8 +38,9 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const pathname = request.nextUrl.pathname;
-  const isProtected =
-    pathname.startsWith("/submit") || pathname.startsWith("/dashboard");
+  const isWorkerRoute = pathname.startsWith("/worker");
+  const isSupervisorRoute = pathname.startsWith("/supervisor");
+  const isProtected = isWorkerRoute || isSupervisorRoute;
 
   if (isProtected && !user) {
     const loginUrl = request.nextUrl.clone();
@@ -67,15 +68,15 @@ export async function updateSession(request: NextRequest) {
     }
 
     if (profile) {
-      if (pathname.startsWith("/dashboard") && profile.role !== "supervisor") {
+      if (isSupervisorRoute && profile.role !== "supervisor") {
         const redirectUrl = request.nextUrl.clone();
-        redirectUrl.pathname = "/submit";
+        redirectUrl.pathname = "/worker";
         return NextResponse.redirect(redirectUrl);
       }
 
-      if (pathname.startsWith("/submit") && profile.role !== "worker") {
+      if (isWorkerRoute && profile.role !== "worker") {
         const redirectUrl = request.nextUrl.clone();
-        redirectUrl.pathname = "/dashboard";
+        redirectUrl.pathname = "/supervisor";
         return NextResponse.redirect(redirectUrl);
       }
     }
@@ -84,8 +85,8 @@ export async function updateSession(request: NextRequest) {
       const homeUrl = request.nextUrl.clone();
       homeUrl.pathname = profile
         ? profile.role === "supervisor"
-          ? "/dashboard"
-          : "/submit"
+          ? "/supervisor"
+          : "/worker"
         : "/";
       return NextResponse.redirect(homeUrl);
     }

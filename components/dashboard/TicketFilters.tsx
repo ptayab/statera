@@ -4,7 +4,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { PILOT_TICKET_CATEGORIES } from "@/lib/tickets/categories";
 import { TICKET_STATUSES } from "@/lib/tickets/status";
 
-export function TicketFilters() {
+type TicketFiltersProps = {
+  basePath?: string;
+};
+
+export function TicketFilters({ basePath = "/supervisor/all" }: TicketFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -21,7 +25,7 @@ export function TicketFilters() {
     }
 
     const query = params.toString();
-    router.push(query ? `/dashboard?${query}` : "/dashboard");
+    router.push(query ? `${basePath}?${query}` : basePath);
   }
 
   return (

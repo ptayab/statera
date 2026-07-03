@@ -4,9 +4,12 @@ import { isPilotTicketCategory } from "@/lib/tickets/categories";
 import { formatTicketEvent, type TicketDetail, type TicketListItem } from "@/lib/tickets/display";
 import { isTicketStatus } from "@/lib/tickets/status";
 
+const OPEN_TICKET_STATUSES: TicketStatus[] = ["Submitted", "In Review", "In Progress"];
+
 export type TicketFilters = {
   status?: string;
   category?: string;
+  openOnly?: boolean;
 };
 
 export async function getSiteTickets(
@@ -21,7 +24,9 @@ export async function getSiteTickets(
     .eq("site_id", siteId)
     .order("created_at", { ascending: false });
 
-  if (filters.status && isTicketStatus(filters.status)) {
+  if (filters.openOnly) {
+    query = query.in("status", OPEN_TICKET_STATUSES);
+  } else if (filters.status && isTicketStatus(filters.status)) {
     query = query.eq("status", filters.status);
   }
 
@@ -55,6 +60,29 @@ export async function getSiteTickets(
     status: ticket.status as TicketStatus,
     created_at: ticket.created_at,
     reporter_name: reporterMap.get(ticket.created_by) ?? "Unknown",
+  }));
+}
+
+export async function getUserTickets(userId: string): Promise<TicketListItem[]> {
+  const supabase = await createServerClient();
+
+  const { data: tickets, error } = await supabase
+    .from("tickets")
+    .select("id, category, description, status, created_at, created_by")
+    .eq("created_by", userId)
+    .order("created_at", { ascending: false });
+
+  if (error || !tickets?.length) {
+    return [];
+  }
+
+  return tickets.map((ticket) => ({
+    id: ticket.id,
+    category: ticket.category,
+    description: ticket.description,
+    status: ticket.status as TicketStatus,
+    created_at: ticket.created_at,
+    reporter_name: "You",
   }));
 }
 

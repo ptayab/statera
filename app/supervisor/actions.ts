@@ -25,8 +25,10 @@ async function requireSupervisor(): Promise<
 }
 
 function revalidateTicket(ticketId: string) {
-  revalidatePath("/dashboard");
-  revalidatePath(`/dashboard/${ticketId}`);
+  revalidatePath("/supervisor");
+  revalidatePath("/supervisor/open");
+  revalidatePath("/supervisor/all");
+  revalidatePath(`/supervisor/${ticketId}`);
 }
 
 export async function changeTicketStatus(

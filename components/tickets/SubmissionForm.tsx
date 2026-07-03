@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { DangerousOccurrenceAlert } from "@/components/tickets/DangerousOccurrenceAlert";
-import { submitTicket } from "@/app/submit/actions";
+import { submitTicket } from "@/app/worker/submit/actions";
 import {
   DANGEROUS_OCCURRENCE_CATEGORY,
   PILOT_TICKET_CATEGORIES,

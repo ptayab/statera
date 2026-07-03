@@ -5,7 +5,7 @@ import {
   addTicketNote,
   assignTicketToSelf,
   changeTicketStatus,
-} from "@/app/dashboard/actions";
+} from "@/app/supervisor/actions";
 import type { TicketStatus } from "@/lib/supabase/types";
 import { TICKET_STATUSES } from "@/lib/tickets/status";
 

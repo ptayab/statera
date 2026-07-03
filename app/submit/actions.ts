@@ -1,0 +1,136 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { getUserProfile } from "@/lib/auth/session";
+import { createServerClient } from "@/lib/supabase/server";
+import {
+  DANGEROUS_OCCURRENCE_CATEGORY,
+  isPilotTicketCategory,
+} from "@/lib/tickets/categories";
+
+const MAX_PHOTO_BYTES = 5 * 1024 * 1024; // 5 MB
+const ALLOWED_PHOTO_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/heic",
+  "image/heif",
+]);
+
+export type SubmitTicketResult =
+  | { ok: true; ticketId: string; isDangerousOccurrence: boolean }
+  | { ok: false; error: string };
+
+export async function submitTicket(
+  formData: FormData,
+): Promise<SubmitTicketResult> {
+  const profile = await getUserProfile();
+
+  if (!profile) {
+    return { ok: false, error: "You must be signed in to submit a report." };
+  }
+
+  if (profile.role !== "worker") {
+    return { ok: false, error: "Only workers can submit reports." };
+  }
+
+  const category = String(formData.get("category") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+  const photo = formData.get("photo");
+
+  if (!isPilotTicketCategory(category)) {
+    return { ok: false, error: "Please choose a valid category." };
+  }
+
+  if (description.length < 3) {
+    return {
+      ok: false,
+      error: "Please add a short description (at least 3 characters).",
+    };
+  }
+
+  if (description.length > 5000) {
+    return { ok: false, error: "Description is too long (max 5000 characters)." };
+  }
+
+  let photoPath: string | null = null;
+  const supabase = await createServerClient();
+
+  if (photo instanceof File && photo.size > 0) {
+    if (photo.size > MAX_PHOTO_BYTES) {
+      return { ok: false, error: "Photo must be 5 MB or smaller." };
+    }
+
+    if (!ALLOWED_PHOTO_TYPES.has(photo.type)) {
+      return {
+        ok: false,
+        error: "Photo must be JPEG, PNG, or WebP.",
+      };
+    }
+
+    const extension = photo.name.split(".").pop()?.toLowerCase() ?? "jpg";
+    const objectPath = `${profile.site_id}/${profile.id}/${crypto.randomUUID()}.${extension}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("ticket-photos")
+      .upload(objectPath, photo, {
+        contentType: photo.type,
+        upsert: false,
+      });
+
+    if (uploadError) {
+      return {
+        ok: false,
+        error: `Photo upload failed: ${uploadError.message}`,
+      };
+    }
+
+    photoPath = objectPath;
+  }
+
+  const { data: ticket, error: ticketError } = await supabase
+    .from("tickets")
+    .insert({
+      created_by: profile.id,
+      site_id: profile.site_id,
+      category,
+      description,
+      photo_url: photoPath,
+      status: "Submitted",
+    })
+    .select("id")
+    .single();
+
+  if (ticketError || !ticket) {
+    return {
+      ok: false,
+      error: ticketError?.message ?? "Could not save your report. Try again.",
+    };
+  }
+
+  const { error: eventError } = await supabase.from("ticket_events").insert({
+    ticket_id: ticket.id,
+    event_type: "created",
+    actor: profile.id,
+    payload: {
+      category,
+      description,
+      has_photo: Boolean(photoPath),
+    },
+  });
+
+  if (eventError) {
+    return {
+      ok: false,
+      error: eventError.message,
+    };
+  }
+
+  revalidatePath("/submit");
+
+  return {
+    ok: true,
+    ticketId: ticket.id,
+    isDangerousOccurrence: category === DANGEROUS_OCCURRENCE_CATEGORY,
+  };
+}

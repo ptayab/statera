@@ -20,7 +20,7 @@ export async function getSiteTickets(
 
   let query = supabase
     .from("tickets")
-    .select("id, category, description, status, created_at, created_by")
+    .select("id, category, description, status, created_at, closed_at, created_by")
     .eq("site_id", siteId)
     .order("created_at", { ascending: false });
 
@@ -59,6 +59,7 @@ export async function getSiteTickets(
     description: ticket.description,
     status: ticket.status as TicketStatus,
     created_at: ticket.created_at,
+    closed_at: ticket.closed_at,
     reporter_name: reporterMap.get(ticket.created_by) ?? "Unknown",
   }));
 }
@@ -68,7 +69,7 @@ export async function getUserTickets(userId: string): Promise<TicketListItem[]> 
 
   const { data: tickets, error } = await supabase
     .from("tickets")
-    .select("id, category, description, status, created_at, created_by")
+    .select("id, category, description, status, created_at, closed_at, created_by")
     .eq("created_by", userId)
     .order("created_at", { ascending: false });
 
@@ -82,6 +83,7 @@ export async function getUserTickets(userId: string): Promise<TicketListItem[]> 
     description: ticket.description,
     status: ticket.status as TicketStatus,
     created_at: ticket.created_at,
+    closed_at: ticket.closed_at,
     reporter_name: "You",
   }));
 }

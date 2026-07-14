@@ -45,13 +45,13 @@ export type TicketListItem = {
   description: string;
   status: TicketStatus;
   created_at: string;
+  closed_at: string | null;
   reporter_name: string;
 };
 
 export type TicketDetail = TicketListItem & {
   photo_url: string | null;
   photo_signed_url: string | null;
-  closed_at: string | null;
   events: Array<
     TicketEvent & {
       actor_name: string | null;

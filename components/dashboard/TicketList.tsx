@@ -9,11 +9,41 @@ type TicketListProps = {
   detailHref?: (ticketId: string) => string;
 };
 
+const RELATIVE_DIVISIONS: { amount: number; unit: Intl.RelativeTimeFormatUnit }[] = [
+  { amount: 60, unit: "second" },
+  { amount: 60, unit: "minute" },
+  { amount: 24, unit: "hour" },
+  { amount: 7, unit: "day" },
+  { amount: 4.34524, unit: "week" },
+  { amount: 12, unit: "month" },
+  { amount: Number.POSITIVE_INFINITY, unit: "year" },
+];
+
 function formatWhen(iso: string) {
   return new Intl.DateTimeFormat(undefined, {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(iso));
+}
+
+function formatTimeAgo(iso: string) {
+  const created = new Date(iso).getTime();
+  let duration = (created - Date.now()) / 1000;
+
+  for (const division of RELATIVE_DIVISIONS) {
+    if (Math.abs(duration) < division.amount) {
+      return new Intl.RelativeTimeFormat(undefined, { numeric: "auto" }).format(
+        Math.round(duration),
+        division.unit,
+      );
+    }
+    duration /= division.amount;
+  }
+
+  return new Intl.RelativeTimeFormat(undefined, { numeric: "auto" }).format(
+    Math.round(duration),
+    "year",
+  );
 }
 
 export function TicketList({
@@ -34,9 +64,10 @@ export function TicketList({
     <ul className="divide-y divide-zinc-200 rounded-xl border border-zinc-200 dark:divide-zinc-800 dark:border-zinc-800">
       {tickets.map((ticket) => {
         const href = detailHref(ticket.id);
+        const when = `${formatTimeAgo(ticket.created_at)} · ${formatWhen(ticket.created_at)}`;
         const meta = showReporter
-          ? `${ticket.reporter_name} · ${formatWhen(ticket.created_at)}`
-          : formatWhen(ticket.created_at);
+          ? `${ticket.reporter_name} · ${when}`
+          : when;
 
         const content = (
           <>

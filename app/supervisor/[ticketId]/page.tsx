@@ -65,6 +65,12 @@ export default async function TicketDetailPage({ params }: TicketDetailPageProps
             </div>
             <div>
               <dt className="inline font-medium text-zinc-900 dark:text-zinc-100">
+                Assignee:{" "}
+              </dt>
+              <dd className="inline">{ticket.assignee_name ?? "Unassigned"}</dd>
+            </div>
+            <div>
+              <dt className="inline font-medium text-zinc-900 dark:text-zinc-100">
                 Submitted:{" "}
               </dt>
               <dd className="inline">{formatWhen(ticket.created_at)}</dd>
@@ -84,9 +90,11 @@ export default async function TicketDetailPage({ params }: TicketDetailPageProps
         </section>
 
         <TicketActions
-          key={ticket.status}
+          key={`${ticket.status}-${ticket.assigned_to ?? "none"}`}
           ticketId={ticket.id}
           currentStatus={ticket.status}
+          assignedTo={ticket.assigned_to}
+          currentUserId={profile.id}
         />
 
         <section className="space-y-4">

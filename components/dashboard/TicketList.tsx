@@ -65,9 +65,12 @@ export function TicketList({
       {tickets.map((ticket) => {
         const href = detailHref(ticket.id);
         const when = `${formatTimeAgo(ticket.created_at)} · ${formatWhen(ticket.created_at)}`;
-        const meta = showReporter
-          ? `${ticket.reporter_name} · ${when}`
-          : when;
+        const metaParts = [
+          showReporter ? ticket.reporter_name : null,
+          ticket.assignee_name ? `Assignee: ${ticket.assignee_name}` : null,
+          when,
+        ].filter(Boolean);
+        const meta = metaParts.join(" · ");
 
         const content = (
           <>

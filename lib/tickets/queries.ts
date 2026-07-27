@@ -12,6 +12,25 @@ export type TicketFilters = {
   openOnly?: boolean;
 };
 
+async function resolveUserNames(
+  supabase: Awaited<ReturnType<typeof createServerClient>>,
+  userIds: string[],
+): Promise<Map<string, string>> {
+  const uniqueIds = [...new Set(userIds.filter(Boolean))];
+  if (uniqueIds.length === 0) {
+    return new Map();
+  }
+
+  const { data: users } = await supabase
+    .from("users")
+    .select("id, name, email")
+    .in("id", uniqueIds);
+
+  return new Map(
+    (users ?? []).map((user) => [user.id, user.name ?? user.email]),
+  );
+}
+
 export async function getSiteTickets(
   siteId: string,
   filters: TicketFilters = {},
@@ -20,7 +39,9 @@ export async function getSiteTickets(
 
   let query = supabase
     .from("tickets")
-    .select("id, category, description, status, created_at, closed_at, created_by")
+    .select(
+      "id, category, description, status, created_at, closed_at, created_by, assigned_to",
+    )
     .eq("site_id", siteId)
     .order("created_at", { ascending: false });
 
@@ -40,17 +61,47 @@ export async function getSiteTickets(
     return [];
   }
 
-  const creatorIds = [...new Set(tickets.map((ticket) => ticket.created_by))];
-  const { data: reporters } = await supabase
-    .from("users")
-    .select("id, name, email")
-    .in("id", creatorIds);
+  const nameMap = await resolveUserNames(supabase, [
+    ...tickets.map((ticket) => ticket.created_by),
+    ...tickets.flatMap((ticket) =>
+      ticket.assigned_to ? [ticket.assigned_to] : [],
+    ),
+  ]);
 
-  const reporterMap = new Map(
-    (reporters ?? []).map((user) => [
-      user.id,
-      user.name ?? user.email,
-    ]),
+  return tickets.map((ticket) => ({
+    id: ticket.id,
+    category: ticket.category,
+    description: ticket.description,
+    status: ticket.status as TicketStatus,
+    created_at: ticket.created_at,
+    closed_at: ticket.closed_at,
+    reporter_name: nameMap.get(ticket.created_by) ?? "Unknown",
+    assignee_name: ticket.assigned_to
+      ? nameMap.get(ticket.assigned_to) ?? null
+      : null,
+  }));
+}
+
+export async function getUserTickets(userId: string): Promise<TicketListItem[]> {
+  const supabase = await createServerClient();
+
+  const { data: tickets, error } = await supabase
+    .from("tickets")
+    .select(
+      "id, category, description, status, created_at, closed_at, created_by, assigned_to",
+    )
+    .eq("created_by", userId)
+    .order("created_at", { ascending: false });
+
+  if (error || !tickets?.length) {
+    return [];
+  }
+
+  const nameMap = await resolveUserNames(
+    supabase,
+    tickets.flatMap((ticket) =>
+      ticket.assigned_to ? [ticket.assigned_to] : [],
+    ),
   );
 
   return tickets.map((ticket) => ({
@@ -60,31 +111,10 @@ export async function getSiteTickets(
     status: ticket.status as TicketStatus,
     created_at: ticket.created_at,
     closed_at: ticket.closed_at,
-    reporter_name: reporterMap.get(ticket.created_by) ?? "Unknown",
-  }));
-}
-
-export async function getUserTickets(userId: string): Promise<TicketListItem[]> {
-  const supabase = await createServerClient();
-
-  const { data: tickets, error } = await supabase
-    .from("tickets")
-    .select("id, category, description, status, created_at, closed_at, created_by")
-    .eq("created_by", userId)
-    .order("created_at", { ascending: false });
-
-  if (error || !tickets?.length) {
-    return [];
-  }
-
-  return tickets.map((ticket) => ({
-    id: ticket.id,
-    category: ticket.category,
-    description: ticket.description,
-    status: ticket.status as TicketStatus,
-    created_at: ticket.created_at,
-    closed_at: ticket.closed_at,
     reporter_name: "You",
+    assignee_name: ticket.assigned_to
+      ? nameMap.get(ticket.assigned_to) ?? null
+      : null,
   }));
 }
 
@@ -97,7 +127,7 @@ export async function getTicketDetail(
   const { data: ticket, error } = await supabase
     .from("tickets")
     .select(
-      "id, category, description, status, created_at, closed_at, photo_url, created_by, site_id",
+      "id, category, description, status, created_at, closed_at, photo_url, created_by, site_id, assigned_to",
     )
     .eq("id", ticketId)
     .eq("site_id", siteId)
@@ -106,12 +136,6 @@ export async function getTicketDetail(
   if (error || !ticket) {
     return null;
   }
-
-  const { data: reporter } = await supabase
-    .from("users")
-    .select("name, email")
-    .eq("id", ticket.created_by)
-    .maybeSingle();
 
   const { data: events } = await supabase
     .from("ticket_events")
@@ -123,13 +147,11 @@ export async function getTicketDetail(
     ...new Set((events ?? []).map((event) => event.actor).filter(Boolean)),
   ] as string[];
 
-  const { data: actors } = actorIds.length
-    ? await supabase.from("users").select("id, name, email").in("id", actorIds)
-    : { data: [] };
-
-  const actorMap = new Map(
-    (actors ?? []).map((user) => [user.id, user.name ?? user.email]),
-  );
+  const nameMap = await resolveUserNames(supabase, [
+    ticket.created_by,
+    ...(ticket.assigned_to ? [ticket.assigned_to] : []),
+    ...actorIds,
+  ]);
 
   let photoSignedUrl: string | null = null;
   if (ticket.photo_url) {
@@ -146,11 +168,15 @@ export async function getTicketDetail(
     status: ticket.status as TicketStatus,
     created_at: ticket.created_at,
     closed_at: ticket.closed_at,
+    assigned_to: ticket.assigned_to,
     photo_url: ticket.photo_url,
     photo_signed_url: photoSignedUrl,
-    reporter_name: reporter?.name ?? reporter?.email ?? "Unknown",
+    reporter_name: nameMap.get(ticket.created_by) ?? "Unknown",
+    assignee_name: ticket.assigned_to
+      ? nameMap.get(ticket.assigned_to) ?? null
+      : null,
     events: (events ?? []).map((event) => {
-      const actorName = event.actor ? actorMap.get(event.actor) ?? null : null;
+      const actorName = event.actor ? nameMap.get(event.actor) ?? null : null;
       const formatted = formatTicketEvent({ ...event, actor_name: actorName });
       return {
         ...event,

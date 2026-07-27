@@ -52,6 +52,7 @@ export type Database = {
           description: string;
           photo_url: string | null;
           status: TicketStatus;
+          assigned_to: string | null;
           ai_suggested_category: string | null;
           ai_suggested_priority: string | null;
           ai_explanation: string | null;
@@ -66,6 +67,7 @@ export type Database = {
           description: string;
           photo_url?: string | null;
           status?: TicketStatus;
+          assigned_to?: string | null;
           ai_suggested_category?: string | null;
           ai_suggested_priority?: string | null;
           ai_explanation?: string | null;
@@ -80,6 +82,7 @@ export type Database = {
           description?: string;
           photo_url?: string | null;
           status?: TicketStatus;
+          assigned_to?: string | null;
           ai_suggested_category?: string | null;
           ai_suggested_priority?: string | null;
           ai_explanation?: string | null;

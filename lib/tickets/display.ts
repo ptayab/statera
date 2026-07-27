@@ -47,9 +47,11 @@ export type TicketListItem = {
   created_at: string;
   closed_at: string | null;
   reporter_name: string;
+  assignee_name: string | null;
 };
 
 export type TicketDetail = TicketListItem & {
+  assigned_to: string | null;
   photo_url: string | null;
   photo_signed_url: string | null;
   events: Array<

@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { TicketActions } from "@/components/dashboard/TicketActions";
+import { addWorkerTicketMessage } from "@/app/worker/actions";
 import { TicketChat } from "@/components/dashboard/TicketChat";
-import { addTicketMessage } from "@/app/supervisor/actions";
+import { WorkerTicketActions } from "@/components/dashboard/WorkerTicketActions";
 import { getUserProfile } from "@/lib/auth/session";
-import { getTicketDetail } from "@/lib/tickets/queries";
+import { getWorkerTicketDetail } from "@/lib/tickets/queries";
 import { statusBadgeClass } from "@/lib/tickets/status";
 
-type TicketDetailPageProps = {
+type WorkerTicketDetailPageProps = {
   params: Promise<{ ticketId: string }>;
 };
 
@@ -18,41 +18,32 @@ function formatWhen(iso: string) {
   }).format(new Date(iso));
 }
 
-export default async function TicketDetailPage({ params }: TicketDetailPageProps) {
+export default async function WorkerTicketDetailPage({
+  params,
+}: WorkerTicketDetailPageProps) {
   const { ticketId } = await params;
   const profile = await getUserProfile();
 
-  if (!profile || profile.role !== "supervisor") {
+  if (!profile || profile.role !== "worker") {
     notFound();
   }
 
-  const ticket = await getTicketDetail(ticketId, profile.site_id);
+  const ticket = await getWorkerTicketDetail(ticketId, profile.id);
 
   if (!ticket) {
     notFound();
   }
 
-  const assignedToMe = ticket.assigned_to === profile.id;
-  const canSend = assignedToMe && ticket.status !== "Closed";
-  const disabledReason =
-    ticket.status === "Closed"
-      ? "This ticket is closed."
-      : ticket.assigned_to
-        ? assignedToMe
-          ? null
-          : "Only the assigned supervisor can reply in this conversation."
-        : "Assign this ticket to yourself to reply.";
-
   return (
     <main className="flex flex-1 flex-col px-4 py-6 sm:px-6 sm:py-8">
       <header className="mb-6">
         <Link
-          href="/supervisor/all"
+          href="/worker/tickets"
           className="text-sm text-zinc-600 hover:underline dark:text-zinc-400"
         >
-          ← Back to all issues
+          ← Back to my tickets
         </Link>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight">Ticket detail</h1>
+        <h1 className="mt-2 text-2xl font-semibold tracking-tight">Ticket</h1>
       </header>
 
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
@@ -66,15 +57,11 @@ export default async function TicketDetailPage({ params }: TicketDetailPageProps
             <span className="text-sm text-zinc-500">{ticket.category}</span>
           </div>
 
-          <p className="text-sm leading-relaxed whitespace-pre-wrap">{ticket.description}</p>
+          <p className="text-sm leading-relaxed whitespace-pre-wrap">
+            {ticket.description}
+          </p>
 
           <dl className="grid gap-2 text-sm text-zinc-600 dark:text-zinc-400">
-            <div>
-              <dt className="inline font-medium text-zinc-900 dark:text-zinc-100">
-                Reported by:{" "}
-              </dt>
-              <dd className="inline">{ticket.reporter_name}</dd>
-            </div>
             <div>
               <dt className="inline font-medium text-zinc-900 dark:text-zinc-100">
                 Assignee:{" "}
@@ -101,21 +88,19 @@ export default async function TicketDetailPage({ params }: TicketDetailPageProps
           ) : null}
         </section>
 
-        <TicketActions
-          key={`${ticket.status}-${ticket.assigned_to ?? "none"}`}
-          ticketId={ticket.id}
-          currentStatus={ticket.status}
-          assignedTo={ticket.assigned_to}
-          currentUserId={profile.id}
-        />
+        <WorkerTicketActions ticketId={ticket.id} status={ticket.status} />
 
         <TicketChat
           ticketId={ticket.id}
           events={ticket.events}
           currentUserId={profile.id}
-          canSend={canSend}
-          disabledReason={disabledReason}
-          sendMessage={addTicketMessage}
+          canSend={ticket.status !== "Closed"}
+          disabledReason={
+            ticket.status === "Closed"
+              ? "This ticket is closed."
+              : undefined
+          }
+          sendMessage={addWorkerTicketMessage}
         />
       </div>
     </main>

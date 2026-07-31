@@ -156,8 +156,20 @@ export type Database = {
         Args: { p_ticket_id: string };
         Returns: undefined;
       };
+      supervisor_unassign_ticket: {
+        Args: { p_ticket_id: string };
+        Returns: undefined;
+      };
       supervisor_add_ticket_note: {
         Args: { p_ticket_id: string; p_note: string };
+        Returns: undefined;
+      };
+      worker_add_ticket_message: {
+        Args: { p_ticket_id: string; p_message: string };
+        Returns: undefined;
+      };
+      worker_close_ticket: {
+        Args: { p_ticket_id: string };
         Returns: undefined;
       };
     };

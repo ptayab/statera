@@ -32,7 +32,7 @@ export default async function WorkerHomePage() {
         >
           <p className="text-sm font-medium">my tickets</p>
           <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-            See the status of reports you have filed.
+            Check status, chat with supervisors, and close resolved issues.
           </p>
         </Link>
       </div>

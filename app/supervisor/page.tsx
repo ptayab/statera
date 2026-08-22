@@ -1,6 +1,8 @@
+import { BroadcastComposer } from "@/components/dashboard/BroadcastComposer";
+import { BroadcastList } from "@/components/dashboard/BroadcastList";
 import Link from "next/link";
-import { TicketList } from "@/components/dashboard/TicketList";
 import { getUserProfile } from "@/lib/auth/session";
+import { getSiteBroadcasts } from "@/lib/broadcasts/queries";
 import { getSiteTickets } from "@/lib/tickets/queries";
 import { TICKET_STATUSES } from "@/lib/tickets/status";
 
@@ -11,9 +13,7 @@ export default async function SupervisorHomePage() {
     ? await getSiteTickets(profile.site_id, { openOnly: true })
     : [];
   const allTickets = profile ? await getSiteTickets(profile.site_id) : [];
-  const recentReports = allTickets
-    .filter((ticket) => ticket.status === "Submitted")
-    .slice(0, 5);
+  const broadcasts = profile ? await getSiteBroadcasts(profile.site_id) : [];
 
   const statusCounts = Object.fromEntries(
     TICKET_STATUSES.map((status) => [
@@ -111,14 +111,18 @@ export default async function SupervisorHomePage() {
       </section>
 
       <section className="mt-10">
-        <h2 className="text-lg font-semibold tracking-tight">Recent reports</h2>
+        <h2 className="text-lg font-semibold tracking-tight">Bulletin board</h2>
         <p className="mt-1 mb-4 text-sm text-zinc-600 dark:text-zinc-400">
-          The five latest submitted reports for your site.
+          Post broadcasts that workers can see on their bulletin board.
         </p>
-        <TicketList
-          tickets={recentReports}
-          emptyMessage="No submitted reports right now."
-        />
+        <div className="space-y-4">
+          <BroadcastComposer />
+          <BroadcastList
+            broadcasts={broadcasts}
+            canDelete
+            emptyMessage="No broadcasts posted yet."
+          />
+        </div>
       </section>
     </main>
   );

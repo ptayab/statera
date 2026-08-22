@@ -10,6 +10,7 @@ export type TicketFilters = {
   status?: string;
   category?: string;
   openOnly?: boolean;
+  closedOnly?: boolean;
 };
 
 async function resolveUserNames(
@@ -47,6 +48,8 @@ export async function getSiteTickets(
 
   if (filters.openOnly) {
     query = query.in("status", OPEN_TICKET_STATUSES);
+  } else if (filters.closedOnly) {
+    query = query.eq("status", "Closed");
   } else if (filters.status && isTicketStatus(filters.status)) {
     query = query.eq("status", filters.status);
   }
@@ -75,6 +78,7 @@ export async function getSiteTickets(
     status: ticket.status as TicketStatus,
     created_at: ticket.created_at,
     closed_at: ticket.closed_at,
+    assigned_to: ticket.assigned_to,
     reporter_name: nameMap.get(ticket.created_by) ?? "Unknown",
     assignee_name: ticket.assigned_to
       ? nameMap.get(ticket.assigned_to) ?? null
@@ -111,6 +115,7 @@ export async function getUserTickets(userId: string): Promise<TicketListItem[]> 
     status: ticket.status as TicketStatus,
     created_at: ticket.created_at,
     closed_at: ticket.closed_at,
+    assigned_to: ticket.assigned_to,
     reporter_name: "You",
     assignee_name: ticket.assigned_to
       ? nameMap.get(ticket.assigned_to) ?? null

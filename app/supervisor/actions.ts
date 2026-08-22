@@ -108,3 +108,75 @@ export async function addTicketNote(
   revalidateTicket(ticketId);
   return { ok: true };
 }
+
+function revalidateBroadcasts() {
+  revalidatePath("/supervisor");
+  revalidatePath("/worker");
+}
+
+export async function publishBroadcast(
+  title: string,
+  body: string,
+): Promise<ActionResult> {
+  const auth = await requireSupervisor();
+  if (!auth.ok) {
+    return auth;
+  }
+
+  const trimmedTitle = title.trim();
+  const trimmedBody = body.trim();
+
+  if (trimmedTitle.length < 1) {
+    return { ok: false, error: "Title cannot be empty." };
+  }
+
+  if (trimmedTitle.length > 120) {
+    return { ok: false, error: "Title is too long (max 120 characters)." };
+  }
+
+  if (trimmedBody.length < 1) {
+    return { ok: false, error: "Message cannot be empty." };
+  }
+
+  if (trimmedBody.length > 2000) {
+    return { ok: false, error: "Message is too long (max 2000 characters)." };
+  }
+
+  const supabase = await createServerClient();
+  const { error } = await supabase.rpc("supervisor_publish_broadcast", {
+    p_title: trimmedTitle,
+    p_body: trimmedBody,
+  });
+
+  if (error) {
+    return { ok: false, error: error.message };
+  }
+
+  revalidateBroadcasts();
+  return { ok: true };
+}
+
+export async function deleteBroadcast(
+  broadcastId: string,
+): Promise<ActionResult> {
+  const auth = await requireSupervisor();
+  if (!auth.ok) {
+    return auth;
+  }
+
+  if (!broadcastId) {
+    return { ok: false, error: "Broadcast not found." };
+  }
+
+  const supabase = await createServerClient();
+  const { error } = await supabase.rpc("supervisor_delete_broadcast", {
+    p_broadcast_id: broadcastId,
+  });
+
+  if (error) {
+    return { ok: false, error: error.message };
+  }
+
+  revalidateBroadcasts();
+  return { ok: true };
+}

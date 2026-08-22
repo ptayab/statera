@@ -145,6 +145,36 @@ export type Database = {
         };
         Relationships: [];
       };
+      site_broadcasts: {
+        Row: {
+          id: string;
+          site_id: string;
+          created_by: string;
+          author_name: string;
+          title: string;
+          body: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          site_id: string;
+          created_by: string;
+          author_name: string;
+          title: string;
+          body: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          site_id?: string;
+          created_by?: string;
+          author_name?: string;
+          title?: string;
+          body?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -158,6 +188,14 @@ export type Database = {
       };
       supervisor_add_ticket_note: {
         Args: { p_ticket_id: string; p_note: string };
+        Returns: undefined;
+      };
+      supervisor_publish_broadcast: {
+        Args: { p_title: string; p_body: string };
+        Returns: string;
+      };
+      supervisor_delete_broadcast: {
+        Args: { p_broadcast_id: string };
         Returns: undefined;
       };
     };

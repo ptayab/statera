@@ -31,14 +31,18 @@ export default async function TicketDetailPage({ params }: TicketDetailPageProps
     notFound();
   }
 
+  const isClosed = ticket.status === "Closed";
+  const backHref = isClosed ? "/supervisor/all" : "/supervisor/open";
+  const backLabel = isClosed ? "← Back to all issues" : "← Back to open issues";
+
   return (
     <main className="flex flex-1 flex-col px-4 py-6 sm:px-6 sm:py-8">
       <header className="mb-6">
         <Link
-          href="/supervisor/all"
+          href={backHref}
           className="text-sm text-zinc-600 hover:underline dark:text-zinc-400"
         >
-          ← Back to all issues
+          {backLabel}
         </Link>
         <h1 className="mt-2 text-2xl font-semibold tracking-tight">Ticket detail</h1>
       </header>

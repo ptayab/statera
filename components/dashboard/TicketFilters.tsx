@@ -6,9 +6,13 @@ import { TICKET_STATUSES } from "@/lib/tickets/status";
 
 type TicketFiltersProps = {
   basePath?: string;
+  showStatus?: boolean;
 };
 
-export function TicketFilters({ basePath = "/supervisor/all" }: TicketFiltersProps) {
+export function TicketFilters({
+  basePath = "/supervisor/all",
+  showStatus = true,
+}: TicketFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -30,21 +34,23 @@ export function TicketFilters({ basePath = "/supervisor/all" }: TicketFiltersPro
 
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-      <label className="flex flex-col gap-1 text-sm">
-        <span className="font-medium">Status</span>
-        <select
-          value={currentStatus}
-          onChange={(event) => updateFilter("status", event.target.value)}
-          className="rounded-lg border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-950"
-        >
-          <option value="">All statuses</option>
-          {TICKET_STATUSES.map((status) => (
-            <option key={status} value={status}>
-              {status}
-            </option>
-          ))}
-        </select>
-      </label>
+      {showStatus ? (
+        <label className="flex flex-col gap-1 text-sm">
+          <span className="font-medium">Status</span>
+          <select
+            value={currentStatus}
+            onChange={(event) => updateFilter("status", event.target.value)}
+            className="rounded-lg border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-950"
+          >
+            <option value="">All statuses</option>
+            {TICKET_STATUSES.map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
+            ))}
+          </select>
+        </label>
+      ) : null}
 
       <label className="flex flex-col gap-1 text-sm">
         <span className="font-medium">Category</span>

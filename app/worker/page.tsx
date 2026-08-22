@@ -1,8 +1,11 @@
 import Link from "next/link";
+import { BroadcastList } from "@/components/dashboard/BroadcastList";
 import { getUserProfile } from "@/lib/auth/session";
+import { getSiteBroadcasts } from "@/lib/broadcasts/queries";
 
 export default async function WorkerHomePage() {
   const profile = await getUserProfile();
+  const broadcasts = profile ? await getSiteBroadcasts(profile.site_id) : [];
 
   return (
     <main className="flex flex-1 flex-col px-4 py-6 sm:px-6 sm:py-8">
@@ -36,6 +39,17 @@ export default async function WorkerHomePage() {
           </p>
         </Link>
       </div>
+
+      <section className="mt-10">
+        <h2 className="text-lg font-semibold tracking-tight">Bulletin board</h2>
+        <p className="mt-1 mb-4 text-sm text-zinc-600 dark:text-zinc-400">
+          Site-wide updates from your supervisors.
+        </p>
+        <BroadcastList
+          broadcasts={broadcasts}
+          emptyMessage="No broadcasts yet."
+        />
+      </section>
     </main>
   );
 }

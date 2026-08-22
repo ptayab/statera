@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import { CategoryGuidance } from "@/components/tickets/CategoryGuidance";
-import { submitTicket } from "@/app/worker/submit/actions";
 import {
   PILOT_TICKET_CATEGORIES,
   getCategoryMeta,
@@ -11,7 +10,18 @@ import {
 import { TICKET_URGENCIES } from "@/lib/tickets/scoring";
 import type { TicketUrgency } from "@/lib/supabase/types";
 
-export function SubmissionForm() {
+type SubmitTicketFn = (
+  formData: FormData,
+) => Promise<
+  | { ok: true; ticketId: string; category: PilotTicketCategory }
+  | { ok: false; error: string }
+>;
+
+type SubmissionFormProps = {
+  submitTicket: SubmitTicketFn;
+};
+
+export function SubmissionForm({ submitTicket }: SubmissionFormProps) {
   const [category, setCategory] = useState<PilotTicketCategory | "">("");
   const [description, setDescription] = useState("");
   const [urgency, setUrgency] = useState<TicketUrgency>("Medium");
@@ -43,21 +53,29 @@ export function SubmissionForm() {
     }
 
     startTransition(async () => {
-      const result = await submitTicket(formData);
+      try {
+        const result = await submitTicket(formData);
 
-      if (!result.ok) {
-        setError(result.error);
-        return;
+        if (!result.ok) {
+          setError(result.error);
+          return;
+        }
+
+        setConfirmation({
+          ticketId: result.ticketId,
+          category: result.category,
+        });
+        setCategory("");
+        setDescription("");
+        setUrgency("Medium");
+        setPhoto(null);
+      } catch (error) {
+        setError(
+          error instanceof Error
+            ? error.message
+            : "Could not submit your report. Try again.",
+        );
       }
-
-      setConfirmation({
-        ticketId: result.ticketId,
-        category: result.category,
-      });
-      setCategory("");
-      setDescription("");
-      setUrgency("Medium");
-      setPhoto(null);
     });
   }
 

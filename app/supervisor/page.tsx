@@ -1,19 +1,34 @@
-import Link from "next/link";
 import { TicketList } from "@/components/dashboard/TicketList";
+import { Panel, PanelHeader, PageHeader, Section } from "@/components/ui/Panel";
+import { NavCard, StatTile } from "@/components/ui/StatTile";
 import { getUserProfile } from "@/lib/auth/session";
-import { getSiteTickets } from "@/lib/tickets/queries";
-import { TICKET_STATUSES } from "@/lib/tickets/status";
+import { formatDuration } from "@/lib/tickets/format";
+import { getSiteTicketsWithRanking } from "@/lib/tickets/queries";
+import { TICKET_STATUSES, isOpenTicketStatus } from "@/lib/tickets/status";
+import { idleLevel, statusVisual } from "@/lib/tickets/theme";
+
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
 export default async function SupervisorHomePage() {
   const profile = await getUserProfile();
 
-  const openTickets = profile
-    ? await getSiteTickets(profile.site_id, { openOnly: true })
+  // One fetch covers both panels; the open subset is just a filter on it.
+  const allTickets = profile
+    ? await getSiteTicketsWithRanking(profile.site_id)
     : [];
-  const allTickets = profile ? await getSiteTickets(profile.site_id) : [];
-  const recentReports = allTickets
-    .filter((ticket) => ticket.status === "Submitted")
-    .slice(0, 5);
+  const openTickets = allTickets.filter((ticket) =>
+    isOpenTicketStatus(ticket.status),
+  );
+
+  const needsTriage = openTickets.filter((ticket) =>
+    ["Critical", "High"].includes(ticket.ranking.label),
+  ).length;
+  const unassigned = openTickets.filter(
+    (ticket) => ticket.assignee_name === null,
+  ).length;
+  const goneQuiet = openTickets.filter((ticket) =>
+    ["dormant", "stalled"].includes(idleLevel(ticket.ranking.daysIdle)),
+  ).length;
 
   const statusCounts = Object.fromEntries(
     TICKET_STATUSES.map((status) => [
@@ -22,115 +37,157 @@ export default async function SupervisorHomePage() {
     ]),
   ) as Record<(typeof TICKET_STATUSES)[number], number>;
 
-  const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
   const submittedThisWeek = allTickets.filter(
-    (ticket) => new Date(ticket.created_at).getTime() >= weekAgo,
+    (ticket) => new Date(ticket.created_at).getTime() >= Date.now() - WEEK_MS,
   ).length;
 
   const closedDurations = allTickets
     .filter((ticket) => ticket.closed_at)
     .map(
       (ticket) =>
-        new Date(ticket.closed_at!).getTime() - new Date(ticket.created_at).getTime(),
+        new Date(ticket.closed_at!).getTime() -
+        new Date(ticket.created_at).getTime(),
     )
     .filter((ms) => ms >= 0);
   const averageClosingMs =
     closedDurations.length > 0
       ? closedDurations.reduce((sum, ms) => sum + ms, 0) / closedDurations.length
       : null;
-  const averageClosingLabel =
-    averageClosingMs == null
-      ? "—"
-      : averageClosingMs < 60 * 60 * 1000
-        ? `${Math.round(averageClosingMs / (60 * 1000))}m`
-        : averageClosingMs < 48 * 60 * 60 * 1000
-          ? `${(averageClosingMs / (60 * 60 * 1000)).toFixed(1)}h`
-          : `${(averageClosingMs / (24 * 60 * 60 * 1000)).toFixed(1)}d`;
+
+  const recentReports = openTickets
+    .filter((ticket) => ticket.status === "Submitted")
+    .sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+    )
+    .slice(0, 5);
 
   return (
-    <main className="flex flex-1 flex-col px-4 py-6 sm:px-6 sm:py-8">
-      <header className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Welcome{profile?.name ? `, ${profile.name}` : ""}
-        </h1>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          Review and act on safety reports for your site.
-        </p>
-      </header>
+    <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-6 sm:px-6 sm:py-8">
+      <PageHeader
+        eyebrow="Site overview"
+        title={`Welcome${profile?.name ? `, ${profile.name}` : ""}`}
+        description="Review and act on safety reports for your site."
+      />
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Link
+      <div className="grid gap-3 sm:grid-cols-3">
+        <NavCard
           href="/supervisor/priority"
-          className="rounded-xl border border-zinc-200 p-5 transition hover:border-statera-orange/40 hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900/50"
-        >
-          <p className="text-3xl font-semibold tabular-nums">{openTickets.length}</p>
-          <p className="mt-1 text-sm font-medium">Priority</p>
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-            AI-ranked triage — highest risk first.
-          </p>
-        </Link>
-
-        <Link
+          value={needsTriage}
+          title="Needs triage"
+          description="Critical and high AI ranking — work these first."
+          accent="bg-rose-600"
+          tone="text-rose-700 dark:text-rose-300"
+        />
+        <NavCard
           href="/supervisor/open"
-          className="rounded-xl border border-zinc-200 p-5 transition hover:border-statera-orange/40 hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900/50"
-        >
-          <p className="text-3xl font-semibold tabular-nums">{openTickets.length}</p>
-          <p className="mt-1 text-sm font-medium">Open issues</p>
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-            Tickets that still need attention.
-          </p>
-        </Link>
-
-        <Link
+          value={openTickets.length}
+          title="Open issues"
+          description="Everything still awaiting a resolution."
+          accent="bg-amber-400"
+        />
+        <NavCard
           href="/supervisor/all"
-          className="rounded-xl border border-zinc-200 p-5 transition hover:border-statera-orange/40 hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900/50"
-        >
-          <p className="text-3xl font-semibold tabular-nums">{allTickets.length}</p>
-          <p className="mt-1 text-sm font-medium">All issues</p>
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-            Full ticket history with filters.
-          </p>
-        </Link>
+          value={allTickets.length}
+          title="All issues"
+          description="Full report history with filters."
+          accent="bg-statera-orange"
+        />
       </div>
 
-      <section className="mt-10">
-        <h2 className="text-lg font-semibold tracking-tight">Statistics</h2>
-        <p className="mt-1 mb-4 text-sm text-zinc-600 dark:text-zinc-400">
-          A quick look at ticket volume for your site.
-        </p>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-          <div className="rounded-xl border border-zinc-200 px-4 py-3 dark:border-zinc-800">
-            <p className="text-2xl font-semibold tabular-nums">{submittedThisWeek}</p>
-            <p className="mt-1 text-xs text-zinc-500">This week</p>
-          </div>
-          <div className="rounded-xl border border-zinc-200 px-4 py-3 dark:border-zinc-800">
-            <p className="text-2xl font-semibold tabular-nums">{averageClosingLabel}</p>
-            <p className="mt-1 text-xs text-zinc-500">Avg. closing time</p>
-          </div>
-          {TICKET_STATUSES.map((status) => (
-            <div
-              key={status}
-              className="rounded-xl border border-zinc-200 px-4 py-3 dark:border-zinc-800"
-            >
-              <p className="text-2xl font-semibold tabular-nums">
-                {statusCounts[status]}
+      <div className="mt-4 grid gap-3 lg:grid-cols-3">
+        <Panel className="lg:col-span-2">
+          <PanelHeader
+            title="Pipeline"
+            description="Where every report at your site currently sits."
+          />
+          <div className="px-4 py-4">
+            {allTickets.length === 0 ? (
+              <p className="py-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
+                No reports yet.
               </p>
-              <p className="mt-1 text-xs text-zinc-500">{status}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+            ) : (
+              <>
+                <div className="flex h-3 overflow-hidden rounded-full bg-inset">
+                  {TICKET_STATUSES.map((status) =>
+                    statusCounts[status] > 0 ? (
+                      <div
+                        key={status}
+                        className={statusVisual(status).fill}
+                        style={{
+                          width: `${(statusCounts[status] / allTickets.length) * 100}%`,
+                        }}
+                        title={`${status}: ${statusCounts[status]}`}
+                      />
+                    ) : null,
+                  )}
+                </div>
 
-      <section className="mt-10">
-        <h2 className="text-lg font-semibold tracking-tight">Recent reports</h2>
-        <p className="mt-1 mb-4 text-sm text-zinc-600 dark:text-zinc-400">
-          The five latest submitted reports for your site.
-        </p>
+                <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2.5 sm:grid-cols-3">
+                  {TICKET_STATUSES.map((status) => (
+                    <div
+                      key={status}
+                      className="flex items-baseline justify-between gap-2 border-b border-hairline pb-2"
+                    >
+                      <dt className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-300">
+                        <span
+                          className={`h-2 w-2 shrink-0 rounded-full ${statusVisual(status).dot}`}
+                          aria-hidden
+                        />
+                        {status}
+                      </dt>
+                      <dd className="font-display text-base leading-none tabular-nums text-zinc-900 dark:text-zinc-100">
+                        {statusCounts[status]}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </>
+            )}
+          </div>
+        </Panel>
+
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-2">
+          <StatTile
+            label="New this week"
+            value={submittedThisWeek}
+            accent="bg-sky-500"
+          />
+          <StatTile
+            label="Avg. to close"
+            value={formatDuration(averageClosingMs)}
+            accent="bg-emerald-500"
+          />
+          <StatTile
+            label="Unassigned"
+            value={unassigned}
+            hint="No supervisor yet"
+            accent="bg-violet-500"
+          />
+          <StatTile
+            label="Gone quiet"
+            value={goneQuiet}
+            hint="Idle over 7 days"
+            accent="bg-orange-500"
+            tone={
+              goneQuiet > 0
+                ? "text-orange-700 dark:text-orange-300"
+                : undefined
+            }
+          />
+        </div>
+      </div>
+
+      <Section
+        title="Awaiting triage"
+        description="The newest reports nobody has picked up yet."
+        className="mt-8"
+      >
         <TicketList
           tickets={recentReports}
-          emptyMessage="No submitted reports right now."
+          emptyMessage="Every report has been picked up."
         />
-      </section>
+      </Section>
     </main>
   );
 }

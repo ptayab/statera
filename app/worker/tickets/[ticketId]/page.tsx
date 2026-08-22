@@ -3,20 +3,15 @@ import { notFound } from "next/navigation";
 import { addWorkerTicketMessage } from "@/app/worker/actions";
 import { TicketChat } from "@/components/dashboard/TicketChat";
 import { WorkerTicketActions } from "@/components/dashboard/WorkerTicketActions";
+import { StatusChip } from "@/components/ui/Chip";
+import { Eyebrow, Panel, PanelHeader } from "@/components/ui/Panel";
 import { getUserProfile } from "@/lib/auth/session";
+import { formatFullDateTime, shortId } from "@/lib/tickets/format";
 import { getWorkerTicketDetail } from "@/lib/tickets/queries";
-import { statusBadgeClass } from "@/lib/tickets/status";
 
 type WorkerTicketDetailPageProps = {
   params: Promise<{ ticketId: string }>;
 };
-
-function formatWhen(iso: string) {
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: "full",
-    timeStyle: "short",
-  }).format(new Date(iso));
-}
 
 export default async function WorkerTicketDetailPage({
   params,
@@ -35,58 +30,66 @@ export default async function WorkerTicketDetailPage({
   }
 
   return (
-    <main className="flex flex-1 flex-col px-4 py-6 sm:px-6 sm:py-8">
+    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 py-6 sm:px-6 sm:py-8">
       <header className="mb-6">
         <Link
           href="/worker/tickets"
-          className="text-sm text-zinc-600 hover:underline dark:text-zinc-400"
+          className="text-xs text-zinc-500 transition hover:text-statera-orange dark:text-zinc-400"
         >
           ← Back to my tickets
         </Link>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight">Ticket</h1>
+
+        <div className="mt-3">
+          <Eyebrow>Report {shortId(ticket.id)}</Eyebrow>
+          <h1 className="mt-2 text-[26px] font-semibold leading-tight tracking-tight text-zinc-900 dark:text-zinc-50">
+            {ticket.category}
+          </h1>
+        </div>
+
+        <div className="mt-3">
+          <StatusChip status={ticket.status} />
+        </div>
       </header>
 
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
-        <section className="space-y-4 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
-          <div className="flex flex-wrap items-center gap-2">
-            <span
-              className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusBadgeClass(ticket.status)}`}
-            >
-              {ticket.status}
-            </span>
-            <span className="text-sm text-zinc-500">{ticket.category}</span>
+      <div className="flex flex-col gap-4">
+        <Panel>
+          <PanelHeader title="What you reported" />
+          <div className="px-4 py-4">
+            <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-zinc-900 dark:text-zinc-100">
+              {ticket.description}
+            </p>
           </div>
 
-          <p className="text-sm leading-relaxed whitespace-pre-wrap">
-            {ticket.description}
-          </p>
-
-          <dl className="grid gap-2 text-sm text-zinc-600 dark:text-zinc-400">
-            <div>
-              <dt className="inline font-medium text-zinc-900 dark:text-zinc-100">
-                Assignee:{" "}
+          <dl className="space-y-2.5 border-t border-hairline px-4 py-4">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-3 border-b border-hairline pb-2.5">
+              <dt className="text-xs text-zinc-500 dark:text-zinc-400">
+                Assignee
               </dt>
-              <dd className="inline">{ticket.assignee_name ?? "Unassigned"}</dd>
+              <dd className="text-xs font-medium text-zinc-900 dark:text-zinc-100">
+                {ticket.assignee_name ?? "Unassigned"}
+              </dd>
             </div>
-            <div>
-              <dt className="inline font-medium text-zinc-900 dark:text-zinc-100">
-                Submitted:{" "}
+            <div className="flex flex-wrap items-baseline justify-between gap-x-3">
+              <dt className="text-xs text-zinc-500 dark:text-zinc-400">
+                Submitted
               </dt>
-              <dd className="inline">{formatWhen(ticket.created_at)}</dd>
+              <dd className="text-xs font-medium text-zinc-900 dark:text-zinc-100">
+                {formatFullDateTime(ticket.created_at)}
+              </dd>
             </div>
           </dl>
 
           {ticket.photo_signed_url ? (
-            <div className="overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-800">
+            <div className="border-t border-hairline bg-inset p-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={ticket.photo_signed_url}
-                alt="Ticket photo"
-                className="h-auto w-full object-contain"
+                alt="Photo attached to this report"
+                className="h-auto w-full rounded-lg object-contain"
               />
             </div>
           ) : null}
-        </section>
+        </Panel>
 
         <WorkerTicketActions ticketId={ticket.id} status={ticket.status} />
 
@@ -96,9 +99,7 @@ export default async function WorkerTicketDetailPage({
           currentUserId={profile.id}
           canSend={ticket.status !== "Closed"}
           disabledReason={
-            ticket.status === "Closed"
-              ? "This ticket is closed."
-              : undefined
+            ticket.status === "Closed" ? "This ticket is closed." : undefined
           }
           sendMessage={addWorkerTicketMessage}
         />

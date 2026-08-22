@@ -117,18 +117,15 @@ export function priorityLabelFromScore(score: number): PriorityLabel {
   return "Low";
 }
 
-export function priorityBadgeClass(label: PriorityLabel): string {
-  switch (label) {
-    case "Critical":
-      return "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200";
-    case "High":
-      return "bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-200";
-    case "Medium":
-      return "bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200";
-    case "Low":
-      return "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300";
-  }
-}
+/** Upper bound used to draw the score meter — scores above this simply peg. */
+export const SCORE_METER_MAX = 200;
+
+export const PRIORITY_THRESHOLDS: { label: PriorityLabel; min: number }[] = [
+  { label: "Critical", min: 150 },
+  { label: "High", min: 80 },
+  { label: "Medium", min: 40 },
+  { label: "Low", min: 0 },
+];
 
 export function scoreTicket(
   ticket: ScoreableTicket,

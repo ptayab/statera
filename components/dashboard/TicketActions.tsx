@@ -7,6 +7,13 @@ import {
   changeTicketStatus,
   unassignTicket,
 } from "@/app/supervisor/actions";
+import { Panel, PanelHeader } from "@/components/ui/Panel";
+import {
+  FIELD,
+  HELP_TEXT,
+  PRIMARY_BUTTON,
+  SECONDARY_BUTTON,
+} from "@/components/ui/controls";
 import type { TicketStatus } from "@/lib/supabase/types";
 import { TICKET_STATUSES } from "@/lib/tickets/status";
 
@@ -57,62 +64,56 @@ export function TicketActions({
 
   if (assignedToOther) {
     return (
-      <div className="space-y-2 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
-          Actions
-        </h2>
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+      <Panel>
+        <PanelHeader title="Actions" />
+        <p className={`px-4 py-4 ${HELP_TEXT}`}>
           This ticket is assigned to another supervisor. You can view it and the
           conversation, but only the assignee can update status or reply.
         </p>
-      </div>
+      </Panel>
     );
   }
 
   if (currentStatus === "Closed") {
     return (
-      <div className="space-y-2 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
-          Actions
-        </h2>
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+      <Panel>
+        <PanelHeader title="Actions" />
+        <p className={`px-4 py-4 ${HELP_TEXT}`}>
           This ticket was closed by the worker. Status can no longer be changed.
         </p>
-      </div>
+      </Panel>
     );
   }
 
   return (
-    <div className="space-y-6 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
-        Actions
-      </h2>
+    <Panel accent="bg-statera-orange">
+      <PanelHeader title="Actions" />
 
-      {isUnassigned ? (
-        <div className="space-y-2">
-          <button
-            type="button"
-            disabled={isPending}
-            onClick={() => runAction(() => assignTicketToSelf(ticketId))}
-            className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-700 dark:hover:bg-zinc-900"
-          >
-            Assign to me
-          </button>
-          <p className="text-xs text-zinc-500">
-            Claiming a ticket moves it from Submitted to In Review and lets you
-            update status and reply in the conversation.
-          </p>
-        </div>
-      ) : (
-        <>
-          <div className="space-y-2">
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              Assigned to you
+      <div className="space-y-4 px-4 py-4">
+        {isUnassigned ? (
+          <>
+            <button
+              type="button"
+              disabled={isPending}
+              onClick={() => runAction(() => assignTicketToSelf(ticketId))}
+              className={`w-full ${PRIMARY_BUTTON}`}
+            >
+              Assign to me
+            </button>
+            <p className={HELP_TEXT}>
+              Claiming a ticket moves it from Submitted to In Review and lets you
+              update status and reply in the conversation.
             </p>
-            <label htmlFor="status" className="text-sm font-medium">
-              Change status
-            </label>
-            <div className="flex flex-col gap-2 sm:flex-row">
+          </>
+        ) : (
+          <>
+            <div className="space-y-2">
+              <label
+                htmlFor="status"
+                className="text-xs font-semibold uppercase tracking-[0.08em] text-zinc-500 dark:text-zinc-400"
+              >
+                Change status
+              </label>
               <select
                 id="status"
                 value={status}
@@ -120,7 +121,7 @@ export function TicketActions({
                 onChange={(event) =>
                   setStatus(event.target.value as TicketStatus)
                 }
-                className="flex-1 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-950"
+                className={FIELD}
               >
                 {SUPERVISOR_STATUS_OPTIONS.map((option) => (
                   <option key={option} value={option}>
@@ -134,41 +135,44 @@ export function TicketActions({
                 onClick={() =>
                   runAction(() => changeTicketStatus(ticketId, status))
                 }
-                className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
+                className={`w-full ${PRIMARY_BUTTON}`}
               >
                 Update status
               </button>
+              <p className={HELP_TEXT}>
+                Mark Resolved when the fix is done — the worker closes the
+                ticket. Status changes appear in the conversation.
+              </p>
             </div>
-            <p className="text-xs text-zinc-500">
-              Mark Resolved when the fix is done — the worker closes the ticket.
-              Status changes appear in the conversation. To return a ticket to
-              Submitted, unassign it below.
-            </p>
-          </div>
 
-          <div className="space-y-2 border-t border-zinc-200 pt-4 dark:border-zinc-800">
-            <button
-              type="button"
-              disabled={isPending}
-              onClick={() => runAction(() => unassignTicket(ticketId))}
-              className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-700 dark:hover:bg-zinc-900"
-            >
-              Unassign
-            </button>
-            <p className="text-xs text-zinc-500">
-              Releases the ticket back to Submitted so another supervisor can
-              claim it.
-            </p>
-          </div>
-        </>
-      )}
+            <div className="space-y-2 border-t border-hairline pt-4">
+              <button
+                type="button"
+                disabled={isPending}
+                onClick={() => runAction(() => unassignTicket(ticketId))}
+                className={`w-full ${SECONDARY_BUTTON}`}
+              >
+                Unassign
+              </button>
+              <p className={HELP_TEXT}>
+                Releases the ticket back to Submitted so another supervisor can
+                claim it.
+              </p>
+            </div>
+          </>
+        )}
 
-      {error ? (
-        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-      ) : null}
-      {message ? (
-        <p className="text-sm text-emerald-600 dark:text-emerald-400">{message}</p>
-      ) : null}
-    </div>
+        {error ? (
+          <p className="text-xs font-medium text-rose-600 dark:text-rose-400">
+            {error}
+          </p>
+        ) : null}
+        {message ? (
+          <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
+            {message}
+          </p>
+        ) : null}
+      </div>
+    </Panel>
   );
 }

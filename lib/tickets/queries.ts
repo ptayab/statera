@@ -11,13 +11,24 @@ import {
   type TicketListItem,
 } from "@/lib/tickets/display";
 import { scoreTicket, type TicketScore } from "@/lib/tickets/scoring";
-import { isTicketStatus } from "@/lib/tickets/status";
+import { OPEN_TICKET_STATUSES, isTicketStatus } from "@/lib/tickets/status";
 
-const OPEN_TICKET_STATUSES: TicketStatus[] = [
-  "Submitted",
-  "In Review",
-  "In Progress",
-];
+type SupabaseServerClient = Awaited<ReturnType<typeof createServerClient>>;
+
+const TICKET_LIST_COLUMNS =
+  "id, category, description, status, urgency, created_at, closed_at, created_by, assigned_to";
+
+type TicketRow = {
+  id: string;
+  category: string;
+  description: string;
+  status: string;
+  urgency: string | null;
+  created_at: string;
+  closed_at: string | null;
+  created_by: string;
+  assigned_to: string | null;
+};
 
 type UserLookup = {
   name: string;
@@ -25,7 +36,7 @@ type UserLookup = {
 };
 
 async function resolveUsers(
-  supabase: Awaited<ReturnType<typeof createServerClient>>,
+  supabase: SupabaseServerClient,
   userIds: string[],
 ): Promise<Map<string, UserLookup>> {
   const uniqueIds = [...new Set(userIds.filter(Boolean))];
@@ -56,6 +67,34 @@ function toUrgency(value: string | null | undefined): TicketUrgency {
   return "Medium";
 }
 
+function participantIds(rows: TicketRow[]): string[] {
+  return [
+    ...rows.map((row) => row.created_by),
+    ...rows.flatMap((row) => (row.assigned_to ? [row.assigned_to] : [])),
+  ];
+}
+
+function toListItem(
+  row: TicketRow,
+  users: Map<string, UserLookup>,
+  reporterName?: string,
+): TicketListItem {
+  return {
+    id: row.id,
+    category: row.category,
+    description: row.description,
+    status: row.status as TicketStatus,
+    urgency: toUrgency(row.urgency),
+    created_at: row.created_at,
+    closed_at: row.closed_at,
+    reporter_name:
+      reporterName ?? users.get(row.created_by)?.name ?? "Unknown",
+    assignee_name: row.assigned_to
+      ? users.get(row.assigned_to)?.name ?? null
+      : null,
+  };
+}
+
 export type TicketFilters = {
   status?: string;
   category?: string;
@@ -68,17 +107,14 @@ export type RankedTicketListItem = TicketListItem & {
   ranking: TicketScore;
 };
 
-export async function getSiteTickets(
+function siteTicketQuery(
+  supabase: SupabaseServerClient,
   siteId: string,
-  filters: TicketFilters = {},
-): Promise<TicketListItem[]> {
-  const supabase = await createServerClient();
-
+  filters: TicketFilters,
+) {
   let query = supabase
     .from("tickets")
-    .select(
-      "id, category, description, status, urgency, created_at, closed_at, created_by, assigned_to",
-    )
+    .select(TICKET_LIST_COLUMNS)
     .eq("site_id", siteId)
     .order("created_at", { ascending: false });
 
@@ -92,53 +128,35 @@ export async function getSiteTickets(
     query = query.eq("category", filters.category);
   }
 
-  const { data: tickets, error } = await query;
-
-  if (error || !tickets?.length) {
-    return [];
-  }
-
-  const users = await resolveUsers(supabase, [
-    ...tickets.map((ticket) => ticket.created_by),
-    ...tickets.flatMap((ticket) =>
-      ticket.assigned_to ? [ticket.assigned_to] : [],
-    ),
-  ]);
-
-  return tickets.map((ticket) => ({
-    id: ticket.id,
-    category: ticket.category,
-    description: ticket.description,
-    status: ticket.status as TicketStatus,
-    urgency: toUrgency(ticket.urgency),
-    created_at: ticket.created_at,
-    closed_at: ticket.closed_at,
-    reporter_name: users.get(ticket.created_by)?.name ?? "Unknown",
-    assignee_name: ticket.assigned_to
-      ? users.get(ticket.assigned_to)?.name ?? null
-      : null,
-  }));
+  return query;
 }
 
-/** Open tickets ranked by AI score (highest first), with duplicate grouping metadata. */
-export async function getSiteTicketsRanked(
+/**
+ * Open reports per category across the whole site. Counting site-wide rather
+ * than per-page keeps the duplicate signal identical on every screen.
+ */
+async function getOpenCategoryCounts(
+  supabase: SupabaseServerClient,
   siteId: string,
-): Promise<RankedTicketListItem[]> {
-  const supabase = await createServerClient();
-
-  const { data: tickets, error } = await supabase
+): Promise<Map<string, number>> {
+  const { data } = await supabase
     .from("tickets")
-    .select(
-      "id, category, description, status, urgency, created_at, closed_at, created_by, assigned_to",
-    )
+    .select("category")
     .eq("site_id", siteId)
     .in("status", OPEN_TICKET_STATUSES);
 
-  if (error || !tickets?.length) {
-    return [];
+  const counts = new Map<string, number>();
+  for (const row of data ?? []) {
+    counts.set(row.category, (counts.get(row.category) ?? 0) + 1);
   }
+  return counts;
+}
 
-  const ticketIds = tickets.map((ticket) => ticket.id);
+async function getLastEventTimestamps(
+  supabase: SupabaseServerClient,
+  ticketIds: string[],
+): Promise<Map<string, string>> {
+  if (ticketIds.length === 0) return new Map();
 
   const { data: events } = await supabase
     .from("ticket_events")
@@ -152,94 +170,83 @@ export async function getSiteTicketsRanked(
       lastEventByTicket.set(event.ticket_id, event.created_at);
     }
   }
+  return lastEventByTicket;
+}
 
-  const categoryCounts = new Map<string, number>();
-  for (const ticket of tickets) {
-    categoryCounts.set(
-      ticket.category,
-      (categoryCounts.get(ticket.category) ?? 0) + 1,
-    );
+/**
+ * Site tickets in reverse-chronological order, each carrying its AI ranking.
+ *
+ * Round trips are grouped into two waves: the ticket rows and the site-wide
+ * category counts are independent, and the user lookup and last-activity
+ * lookup both depend only on the rows. Chaining all four would cost roughly
+ * twice the latency.
+ */
+export async function getSiteTicketsWithRanking(
+  siteId: string,
+  filters: TicketFilters = {},
+): Promise<RankedTicketListItem[]> {
+  const supabase = await createServerClient();
+
+  const [ticketResult, categoryCounts] = await Promise.all([
+    siteTicketQuery(supabase, siteId, filters),
+    getOpenCategoryCounts(supabase, siteId),
+  ]);
+
+  const rows = ticketResult.data as TicketRow[] | null;
+  if (ticketResult.error || !rows?.length) {
+    return [];
   }
 
-  const users = await resolveUsers(supabase, [
-    ...tickets.map((ticket) => ticket.created_by),
-    ...tickets.flatMap((ticket) =>
-      ticket.assigned_to ? [ticket.assigned_to] : [],
+  const [users, lastEvents] = await Promise.all([
+    resolveUsers(supabase, participantIds(rows)),
+    getLastEventTimestamps(
+      supabase,
+      rows.map((row) => row.id),
     ),
   ]);
 
-  const ranked: RankedTicketListItem[] = tickets.map((ticket) => {
-    const urgency = toUrgency(ticket.urgency);
-    const lastEventAt = lastEventByTicket.get(ticket.id) ?? null;
-    const duplicateCount = categoryCounts.get(ticket.category) ?? 1;
-    const ranking = scoreTicket(
-      {
-        category: ticket.category,
-        description: ticket.description,
-        urgency,
-        created_at: ticket.created_at,
-      },
-      lastEventAt,
-      duplicateCount,
-    );
+  return rows.map((row) => {
+    const item = toListItem(row, users);
+    const lastEventAt = lastEvents.get(row.id) ?? null;
+    const duplicateCount = Math.max(1, categoryCounts.get(row.category) ?? 1);
 
     return {
-      id: ticket.id,
-      category: ticket.category,
-      description: ticket.description,
-      status: ticket.status as TicketStatus,
-      urgency,
-      created_at: ticket.created_at,
-      closed_at: ticket.closed_at,
-      reporter_name: users.get(ticket.created_by)?.name ?? "Unknown",
-      assignee_name: ticket.assigned_to
-        ? users.get(ticket.assigned_to)?.name ?? null
-        : null,
+      ...item,
       last_event_at: lastEventAt,
       duplicate_count: duplicateCount,
-      ranking,
+      ranking: scoreTicket(item, lastEventAt, duplicateCount),
     };
   });
+}
 
-  ranked.sort((a, b) => b.ranking.score - a.ranking.score);
-  return ranked;
+/** Open tickets ordered by AI score, highest risk first. */
+export async function getSiteTicketsRanked(
+  siteId: string,
+): Promise<RankedTicketListItem[]> {
+  const ranked = await getSiteTicketsWithRanking(siteId, { openOnly: true });
+  return [...ranked].sort((a, b) => b.ranking.score - a.ranking.score);
 }
 
 export async function getUserTickets(userId: string): Promise<TicketListItem[]> {
   const supabase = await createServerClient();
 
-  const { data: tickets, error } = await supabase
+  const { data, error } = await supabase
     .from("tickets")
-    .select(
-      "id, category, description, status, urgency, created_at, closed_at, created_by, assigned_to",
-    )
+    .select(TICKET_LIST_COLUMNS)
     .eq("created_by", userId)
     .order("created_at", { ascending: false });
 
-  if (error || !tickets?.length) {
+  const rows = data as TicketRow[] | null;
+  if (error || !rows?.length) {
     return [];
   }
 
   const users = await resolveUsers(
     supabase,
-    tickets.flatMap((ticket) =>
-      ticket.assigned_to ? [ticket.assigned_to] : [],
-    ),
+    rows.flatMap((row) => (row.assigned_to ? [row.assigned_to] : [])),
   );
 
-  return tickets.map((ticket) => ({
-    id: ticket.id,
-    category: ticket.category,
-    description: ticket.description,
-    status: ticket.status as TicketStatus,
-    urgency: toUrgency(ticket.urgency),
-    created_at: ticket.created_at,
-    closed_at: ticket.closed_at,
-    reporter_name: "You",
-    assignee_name: ticket.assigned_to
-      ? users.get(ticket.assigned_to)?.name ?? null
-      : null,
-  }));
+  return rows.map((row) => toListItem(row, users, "You"));
 }
 
 async function loadTicketDetail(
@@ -269,14 +276,26 @@ async function loadTicketDetail(
     return null;
   }
 
-  const { data: events } = await supabase
-    .from("ticket_events")
-    .select("id, ticket_id, event_type, actor, payload, created_at")
-    .eq("ticket_id", ticketId)
-    .order("created_at", { ascending: true });
+  // Events, duplicate counts, and the photo URL are all independent of one
+  // another once the ticket row is known.
+  const [eventResult, categoryCounts, photoSignedUrl] = await Promise.all([
+    supabase
+      .from("ticket_events")
+      .select("id, ticket_id, event_type, actor, payload, created_at")
+      .eq("ticket_id", ticketId)
+      .order("created_at", { ascending: true }),
+    getOpenCategoryCounts(supabase, ticket.site_id),
+    ticket.photo_url
+      ? supabase.storage
+          .from("ticket-photos")
+          .createSignedUrl(ticket.photo_url, 3600)
+          .then(({ data }) => data?.signedUrl ?? null)
+      : Promise.resolve(null),
+  ]);
 
+  const events = eventResult.data ?? [];
   const actorIds = [
-    ...new Set((events ?? []).map((event) => event.actor).filter(Boolean)),
+    ...new Set(events.map((event) => event.actor).filter(Boolean)),
   ] as string[];
 
   const users = await resolveUsers(supabase, [
@@ -285,20 +304,21 @@ async function loadTicketDetail(
     ...actorIds,
   ]);
 
-  let photoSignedUrl: string | null = null;
-  if (ticket.photo_url) {
-    const { data: signed } = await supabase.storage
-      .from("ticket-photos")
-      .createSignedUrl(ticket.photo_url, 3600);
-    photoSignedUrl = signed?.signedUrl ?? null;
-  }
+  const urgency = toUrgency(ticket.urgency);
+  const lastEventAt = events.length
+    ? events[events.length - 1].created_at
+    : null;
+  const duplicateCount = Math.max(
+    1,
+    categoryCounts.get(ticket.category) ?? 1,
+  );
 
   return {
     id: ticket.id,
     category: ticket.category,
     description: ticket.description,
     status: ticket.status as TicketStatus,
-    urgency: toUrgency(ticket.urgency),
+    urgency,
     created_at: ticket.created_at,
     closed_at: ticket.closed_at,
     created_by: ticket.created_by,
@@ -309,7 +329,19 @@ async function loadTicketDetail(
     assignee_name: ticket.assigned_to
       ? users.get(ticket.assigned_to)?.name ?? null
       : null,
-    events: (events ?? []).map((event) => {
+    last_event_at: lastEventAt,
+    duplicate_count: duplicateCount,
+    ranking: scoreTicket(
+      {
+        category: ticket.category,
+        description: ticket.description,
+        urgency,
+        created_at: ticket.created_at,
+      },
+      lastEventAt,
+      duplicateCount,
+    ),
+    events: events.map((event) => {
       const actor = event.actor ? users.get(event.actor) : null;
       const actorName = actor?.name ?? null;
       const formatted = formatTicketEvent({ ...event, actor_name: actorName });

@@ -1,21 +1,30 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { addTicketMessage } from "@/app/supervisor/actions";
+import { AiRankingPanel } from "@/components/dashboard/AiRankingPanel";
 import { TicketActions } from "@/components/dashboard/TicketActions";
 import { TicketChat } from "@/components/dashboard/TicketChat";
-import { addTicketMessage } from "@/app/supervisor/actions";
+import { DangerousOccurrenceAlert } from "@/components/tickets/DangerousOccurrenceAlert";
+import { IdleChip, PriorityChip, StatusChip, UserRankingChip } from "@/components/ui/Chip";
+import { Eyebrow, Panel, PanelHeader } from "@/components/ui/Panel";
 import { getUserProfile } from "@/lib/auth/session";
+import { DANGEROUS_OCCURRENCE_CATEGORY } from "@/lib/tickets/categories";
+import { formatFullDateTime, shortId } from "@/lib/tickets/format";
 import { getTicketDetail } from "@/lib/tickets/queries";
-import { statusBadgeClass } from "@/lib/tickets/status";
 
 type TicketDetailPageProps = {
   params: Promise<{ ticketId: string }>;
 };
 
-function formatWhen(iso: string) {
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: "full",
-    timeStyle: "short",
-  }).format(new Date(iso));
+function DetailRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 border-b border-hairline pb-2.5 last:border-0 last:pb-0">
+      <dt className="text-xs text-zinc-500 dark:text-zinc-400">{label}</dt>
+      <dd className="text-xs font-medium text-zinc-900 dark:text-zinc-100">
+        {value}
+      </dd>
+    </div>
+  );
 }
 
 export default async function TicketDetailPage({ params }: TicketDetailPageProps) {
@@ -44,85 +53,107 @@ export default async function TicketDetailPage({ params }: TicketDetailPageProps
         : "Assign this ticket to yourself to reply.";
 
   return (
-    <main className="flex flex-1 flex-col px-4 py-6 sm:px-6 sm:py-8">
+    <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-6 sm:px-6 sm:py-8">
       <header className="mb-6">
         <Link
-          href="/supervisor/all"
-          className="text-sm text-zinc-600 hover:underline dark:text-zinc-400"
+          href="/supervisor/priority"
+          className="text-xs text-zinc-500 transition hover:text-statera-orange dark:text-zinc-400"
         >
-          ← Back to all issues
+          ← Back to priority queue
         </Link>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight">Ticket detail</h1>
+
+        <div className="mt-3">
+          <Eyebrow>Issue {shortId(ticket.id)}</Eyebrow>
+          <h1 className="mt-2 text-[26px] font-semibold leading-tight tracking-tight text-zinc-900 dark:text-zinc-50">
+            {ticket.category}
+          </h1>
+        </div>
+
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <PriorityChip label={ticket.ranking.label} />
+          <UserRankingChip urgency={ticket.urgency} />
+          <StatusChip status={ticket.status} />
+          <IdleChip daysIdle={ticket.ranking.daysIdle} />
+        </div>
       </header>
 
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
-        <section className="space-y-4 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
-          <div className="flex flex-wrap items-center gap-2">
-            <span
-              className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusBadgeClass(ticket.status)}`}
-            >
-              {ticket.status}
-            </span>
-            <span className="text-sm text-zinc-500">{ticket.category}</span>
-          </div>
-
-          <p className="text-sm leading-relaxed whitespace-pre-wrap">{ticket.description}</p>
-
-          <dl className="grid gap-2 text-sm text-zinc-600 dark:text-zinc-400">
-            <div>
-              <dt className="inline font-medium text-zinc-900 dark:text-zinc-100">
-                Worker urgency:{" "}
-              </dt>
-              <dd className="inline">{ticket.urgency}</dd>
-            </div>
-            <div>
-              <dt className="inline font-medium text-zinc-900 dark:text-zinc-100">
-                Reported by:{" "}
-              </dt>
-              <dd className="inline">{ticket.reporter_name}</dd>
-            </div>
-            <div>
-              <dt className="inline font-medium text-zinc-900 dark:text-zinc-100">
-                Assignee:{" "}
-              </dt>
-              <dd className="inline">{ticket.assignee_name ?? "Unassigned"}</dd>
-            </div>
-            <div>
-              <dt className="inline font-medium text-zinc-900 dark:text-zinc-100">
-                Submitted:{" "}
-              </dt>
-              <dd className="inline">{formatWhen(ticket.created_at)}</dd>
-            </div>
-          </dl>
-
-          {ticket.photo_signed_url ? (
-            <div className="overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-800">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={ticket.photo_signed_url}
-                alt="Ticket photo"
-                className="h-auto w-full object-contain"
-              />
-            </div>
+      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_21rem]">
+        <div className="flex flex-col gap-4">
+          {ticket.category === DANGEROUS_OCCURRENCE_CATEGORY ? (
+            <DangerousOccurrenceAlert />
           ) : null}
-        </section>
 
-        <TicketActions
-          key={`${ticket.status}-${ticket.assigned_to ?? "none"}`}
-          ticketId={ticket.id}
-          currentStatus={ticket.status}
-          assignedTo={ticket.assigned_to}
-          currentUserId={profile.id}
-        />
+          <Panel>
+            <PanelHeader title="Report" />
+            <div className="px-4 py-4">
+              <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-zinc-900 dark:text-zinc-100">
+                {ticket.description}
+              </p>
+            </div>
 
-        <TicketChat
-          ticketId={ticket.id}
-          events={ticket.events}
-          currentUserId={profile.id}
-          canSend={canSend}
-          disabledReason={disabledReason}
-          sendMessage={addTicketMessage}
-        />
+            {ticket.photo_signed_url ? (
+              <div className="border-t border-hairline bg-inset p-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={ticket.photo_signed_url}
+                  alt="Photo attached to this report"
+                  className="h-auto w-full rounded-lg object-contain"
+                />
+              </div>
+            ) : null}
+          </Panel>
+
+          <TicketChat
+            ticketId={ticket.id}
+            events={ticket.events}
+            currentUserId={profile.id}
+            canSend={canSend}
+            disabledReason={disabledReason}
+            sendMessage={addTicketMessage}
+          />
+        </div>
+
+        <aside className="flex flex-col gap-4 lg:sticky lg:top-6">
+          <AiRankingPanel
+            ranking={ticket.ranking}
+            urgency={ticket.urgency}
+            category={ticket.category}
+            createdAt={ticket.created_at}
+            lastEventAt={ticket.last_event_at}
+            duplicateCount={ticket.duplicate_count}
+          />
+
+          <Panel>
+            <PanelHeader title="Details" />
+            <dl className="space-y-2.5 px-4 py-4">
+              <DetailRow label="Reported by" value={ticket.reporter_name} />
+              <DetailRow label="AI ranking" value={ticket.ranking.label} />
+              <DetailRow label="User ranking" value={ticket.urgency} />
+              <DetailRow
+                label="Assignee"
+                value={ticket.assignee_name ?? "Unassigned"}
+              />
+              <DetailRow
+                label="Submitted"
+                value={formatFullDateTime(ticket.created_at)}
+              />
+              {ticket.closed_at ? (
+                <DetailRow
+                  label="Closed"
+                  value={formatFullDateTime(ticket.closed_at)}
+                />
+              ) : null}
+            </dl>
+          </Panel>
+
+          <TicketActions
+            key={`${ticket.status}-${ticket.assigned_to ?? "none"}`}
+            ticketId={ticket.id}
+            currentStatus={ticket.status}
+            assignedTo={ticket.assigned_to}
+            currentUserId={profile.id}
+          />
+        </aside>
       </div>
     </main>
   );

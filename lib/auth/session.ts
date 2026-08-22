@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createServerClient } from "@/lib/supabase/server";
 import type { UserRole } from "@/lib/supabase/types";
 
@@ -9,7 +10,11 @@ export type UserProfile = {
   site_id: string;
 };
 
-export async function getSessionUser() {
+/**
+ * Memoised for the lifetime of one request. Layouts and pages both need the
+ * profile, and each uncached call costs an auth round trip plus a users lookup.
+ */
+export const getSessionUser = cache(async () => {
   const supabase = await createServerClient();
   const {
     data: { user },
@@ -21,9 +26,9 @@ export async function getSessionUser() {
   }
 
   return user;
-}
+});
 
-export async function getUserProfile(): Promise<UserProfile | null> {
+export const getUserProfile = cache(async (): Promise<UserProfile | null> => {
   const supabase = await createServerClient();
   const {
     data: { user },
@@ -40,4 +45,4 @@ export async function getUserProfile(): Promise<UserProfile | null> {
     .maybeSingle();
 
   return profile;
-}
+});

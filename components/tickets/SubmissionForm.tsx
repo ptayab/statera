@@ -153,7 +153,11 @@ export function SubmissionForm() {
       </div>
 
       <fieldset className="space-y-3">
-        <legend className="text-sm font-medium">How urgent is this?</legend>
+        <legend className="text-sm font-medium">Your ranking</legend>
+        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+          How serious this feels to you. Supervisors also see a separate AI
+          ranking computed from this and other signals.
+        </p>
         <div className="grid grid-cols-3 gap-2">
           {TICKET_URGENCIES.map((option) => {
             const selected = urgency === option;

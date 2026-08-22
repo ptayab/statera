@@ -41,6 +41,7 @@ export async function updateSession(request: NextRequest) {
   const isWorkerRoute = pathname.startsWith("/worker");
   const isSupervisorRoute = pathname.startsWith("/supervisor");
   const isProtected = isWorkerRoute || isSupervisorRoute;
+  const isLoginRoute = pathname === "/login";
 
   if (isProtected && !user) {
     const loginUrl = request.nextUrl.clone();
@@ -48,7 +49,9 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  if (user) {
+  // The role is only used to gate protected routes and to bounce a signed-in
+  // user off the login page. Fetching it anywhere else is a wasted round trip.
+  if (user && (isProtected || isLoginRoute)) {
     const { data: profile } = await supabase
       .from("users")
       .select("role")

@@ -4,6 +4,7 @@ import type {
   TicketUrgency,
   UserRole,
 } from "@/lib/supabase/types";
+import type { TicketScore } from "@/lib/tickets/scoring";
 
 type EventPayload = Record<string, unknown>;
 
@@ -101,4 +102,9 @@ export type TicketDetail = TicketListItem & {
   photo_url: string | null;
   photo_signed_url: string | null;
   events: TicketDetailEvent[];
+  /** Timestamp of the most recent event, used for the idle/dormancy signal. */
+  last_event_at: string | null;
+  /** Open reports in the same category at this site, including this one. */
+  duplicate_count: number;
+  ranking: TicketScore;
 };

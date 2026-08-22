@@ -1,30 +1,75 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f6f6f4;
+  --foreground: #17181c;
+
+  /* Surfaces: the canvas is a warm off-white, panels sit on top of it. */
+  --canvas: #f6f6f4;
+  --panel: #ffffff;
+  --panel-muted: #fbfbf9;
+  --inset: #f2f2ef;
+
+  --hairline: rgba(24, 24, 27, 0.09);
+  --hairline-strong: rgba(24, 24, 27, 0.16);
+
+  /* Blueprint grid drawn on the canvas behind every page. */
+  --grid-line: rgba(24, 24, 27, 0.038);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0b0c0f;
+    --foreground: #e9e9ec;
+
+    --canvas: #0b0c0f;
+    --panel: #14161b;
+    --panel-muted: #101216;
+    --inset: #0e1014;
+
+    --hairline: rgba(255, 255, 255, 0.09);
+    --hairline-strong: rgba(255, 255, 255, 0.18);
+
+    --grid-line: rgba(255, 255, 255, 0.032);
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-statera-orange: #D4840A;
-  --color-statera-dark: #1C1E24;
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-display: var(--font-statera-display), sans-serif;
-  --font-body: var(--font-statera-body), sans-serif;
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-canvas: var(--canvas);
+  --color-panel: var(--panel);
+  --color-panel-muted: var(--panel-muted);
+  --color-inset: var(--inset);
+  --color-hairline: var(--hairline);
+  --color-hairline-strong: var(--hairline-strong);
+
+  --color-statera-orange: #d4840a;
+  --color-statera-dark: #1c1e24;
+
+  --font-sans: var(--font-statera-body), var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-display: var(--font-statera-display), "Arial Narrow", sans-serif;
+  --font-body: var(--font-statera-body), system-ui, sans-serif;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--canvas);
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 56px 56px;
+  background-position: center top;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }

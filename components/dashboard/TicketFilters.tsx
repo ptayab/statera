@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import { FIELD } from "@/components/ui/controls";
 import { PILOT_TICKET_CATEGORIES } from "@/lib/tickets/categories";
 import { TICKET_STATUSES } from "@/lib/tickets/status";
 
@@ -14,6 +15,7 @@ export function TicketFilters({ basePath = "/supervisor/all" }: TicketFiltersPro
 
   const currentStatus = searchParams.get("status") ?? "";
   const currentCategory = searchParams.get("category") ?? "";
+  const hasFilters = Boolean(currentStatus || currentCategory);
 
   function updateFilter(key: "status" | "category", value: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -29,13 +31,15 @@ export function TicketFilters({ basePath = "/supervisor/all" }: TicketFiltersPro
   }
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-      <label className="flex flex-col gap-1 text-sm">
-        <span className="font-medium">Status</span>
+    <div className="flex flex-wrap items-end gap-3">
+      <label className="flex flex-col gap-1.5">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-zinc-500 dark:text-zinc-400">
+          Status
+        </span>
         <select
           value={currentStatus}
           onChange={(event) => updateFilter("status", event.target.value)}
-          className="rounded-lg border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-950"
+          className={`w-auto ${FIELD}`}
         >
           <option value="">All statuses</option>
           {TICKET_STATUSES.map((status) => (
@@ -46,12 +50,14 @@ export function TicketFilters({ basePath = "/supervisor/all" }: TicketFiltersPro
         </select>
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
-        <span className="font-medium">Category</span>
+      <label className="flex flex-col gap-1.5">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-zinc-500 dark:text-zinc-400">
+          Category
+        </span>
         <select
           value={currentCategory}
           onChange={(event) => updateFilter("category", event.target.value)}
-          className="rounded-lg border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-950"
+          className={`w-auto ${FIELD}`}
         >
           <option value="">All categories</option>
           {PILOT_TICKET_CATEGORIES.map((category) => (
@@ -61,6 +67,16 @@ export function TicketFilters({ basePath = "/supervisor/all" }: TicketFiltersPro
           ))}
         </select>
       </label>
+
+      {hasFilters ? (
+        <button
+          type="button"
+          onClick={() => router.push(basePath)}
+          className="pb-2.5 text-xs font-medium text-zinc-500 transition hover:text-statera-orange dark:text-zinc-400"
+        >
+          Clear filters
+        </button>
+      ) : null}
     </div>
   );
 }

@@ -12,7 +12,7 @@ export default async function MyTicketsPage() {
       <header className="mb-6">
         <h1 className="text-2xl font-semibold tracking-tight">My tickets</h1>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          Reports you have submitted and their current status.
+          Reports you have submitted — open one to chat and track status.
         </p>
       </header>
 
@@ -20,7 +20,7 @@ export default async function MyTicketsPage() {
         tickets={tickets}
         showReporter={false}
         emptyMessage="You have not submitted any tickets yet."
-        detailHref={() => ""}
+        detailHref={(ticketId) => `/worker/tickets/${ticketId}`}
       />
     </main>
   );

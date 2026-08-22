@@ -29,6 +29,8 @@ function revalidateTicket(ticketId: string) {
   revalidatePath("/supervisor/open");
   revalidatePath("/supervisor/all");
   revalidatePath(`/supervisor/${ticketId}`);
+  revalidatePath("/worker/tickets");
+  revalidatePath(`/worker/tickets/${ticketId}`);
 }
 
 export async function changeTicketStatus(
@@ -42,6 +44,20 @@ export async function changeTicketStatus(
 
   if (!isTicketStatus(newStatus)) {
     return { ok: false, error: "Invalid status." };
+  }
+
+  if (newStatus === "Submitted") {
+    return {
+      ok: false,
+      error: "Unassign the ticket to return it to Submitted.",
+    };
+  }
+
+  if (newStatus === "Closed") {
+    return {
+      ok: false,
+      error: "Only the worker who reported this ticket can close it.",
+    };
   }
 
   const supabase = await createServerClient();
@@ -77,22 +93,41 @@ export async function assignTicketToSelf(ticketId: string): Promise<ActionResult
   return { ok: true };
 }
 
-export async function addTicketNote(
+export async function unassignTicket(ticketId: string): Promise<ActionResult> {
+  const auth = await requireSupervisor();
+  if (!auth.ok) {
+    return auth;
+  }
+
+  const supabase = await createServerClient();
+  const { error } = await supabase.rpc("supervisor_unassign_ticket", {
+    p_ticket_id: ticketId,
+  });
+
+  if (error) {
+    return { ok: false, error: error.message };
+  }
+
+  revalidateTicket(ticketId);
+  return { ok: true };
+}
+
+export async function addTicketMessage(
   ticketId: string,
-  note: string,
+  message: string,
 ): Promise<ActionResult> {
   const auth = await requireSupervisor();
   if (!auth.ok) {
     return auth;
   }
 
-  const trimmed = note.trim();
+  const trimmed = message.trim();
   if (trimmed.length < 1) {
-    return { ok: false, error: "Note cannot be empty." };
+    return { ok: false, error: "Message cannot be empty." };
   }
 
   if (trimmed.length > 500) {
-    return { ok: false, error: "Note is too long (max 500 characters)." };
+    return { ok: false, error: "Message is too long (max 500 characters)." };
   }
 
   const supabase = await createServerClient();

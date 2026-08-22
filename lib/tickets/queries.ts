@@ -1,21 +1,28 @@
 import { createServerClient } from "@/lib/supabase/server";
-import type { TicketStatus } from "@/lib/supabase/types";
+import type { TicketStatus, UserRole } from "@/lib/supabase/types";
 import { isPilotTicketCategory } from "@/lib/tickets/categories";
-import { formatTicketEvent, type TicketDetail, type TicketListItem } from "@/lib/tickets/display";
+import {
+  formatTicketEvent,
+  type TicketDetail,
+  type TicketListItem,
+} from "@/lib/tickets/display";
 import { isTicketStatus } from "@/lib/tickets/status";
 
-const OPEN_TICKET_STATUSES: TicketStatus[] = ["Submitted", "In Review", "In Progress"];
+const OPEN_TICKET_STATUSES: TicketStatus[] = [
+  "Submitted",
+  "In Review",
+  "In Progress",
+];
 
-export type TicketFilters = {
-  status?: string;
-  category?: string;
-  openOnly?: boolean;
+type UserLookup = {
+  name: string;
+  role: UserRole;
 };
 
-async function resolveUserNames(
+async function resolveUsers(
   supabase: Awaited<ReturnType<typeof createServerClient>>,
   userIds: string[],
-): Promise<Map<string, string>> {
+): Promise<Map<string, UserLookup>> {
   const uniqueIds = [...new Set(userIds.filter(Boolean))];
   if (uniqueIds.length === 0) {
     return new Map();
@@ -23,13 +30,25 @@ async function resolveUserNames(
 
   const { data: users } = await supabase
     .from("users")
-    .select("id, name, email")
+    .select("id, name, email, role")
     .in("id", uniqueIds);
 
   return new Map(
-    (users ?? []).map((user) => [user.id, user.name ?? user.email]),
+    (users ?? []).map((user) => [
+      user.id,
+      {
+        name: user.name ?? user.email,
+        role: user.role as UserRole,
+      },
+    ]),
   );
 }
+
+export type TicketFilters = {
+  status?: string;
+  category?: string;
+  openOnly?: boolean;
+};
 
 export async function getSiteTickets(
   siteId: string,
@@ -61,7 +80,7 @@ export async function getSiteTickets(
     return [];
   }
 
-  const nameMap = await resolveUserNames(supabase, [
+  const users = await resolveUsers(supabase, [
     ...tickets.map((ticket) => ticket.created_by),
     ...tickets.flatMap((ticket) =>
       ticket.assigned_to ? [ticket.assigned_to] : [],
@@ -75,9 +94,9 @@ export async function getSiteTickets(
     status: ticket.status as TicketStatus,
     created_at: ticket.created_at,
     closed_at: ticket.closed_at,
-    reporter_name: nameMap.get(ticket.created_by) ?? "Unknown",
+    reporter_name: users.get(ticket.created_by)?.name ?? "Unknown",
     assignee_name: ticket.assigned_to
-      ? nameMap.get(ticket.assigned_to) ?? null
+      ? users.get(ticket.assigned_to)?.name ?? null
       : null,
   }));
 }
@@ -97,7 +116,7 @@ export async function getUserTickets(userId: string): Promise<TicketListItem[]> 
     return [];
   }
 
-  const nameMap = await resolveUserNames(
+  const users = await resolveUsers(
     supabase,
     tickets.flatMap((ticket) =>
       ticket.assigned_to ? [ticket.assigned_to] : [],
@@ -113,25 +132,33 @@ export async function getUserTickets(userId: string): Promise<TicketListItem[]> 
     closed_at: ticket.closed_at,
     reporter_name: "You",
     assignee_name: ticket.assigned_to
-      ? nameMap.get(ticket.assigned_to) ?? null
+      ? users.get(ticket.assigned_to)?.name ?? null
       : null,
   }));
 }
 
-export async function getTicketDetail(
+async function loadTicketDetail(
   ticketId: string,
-  siteId: string,
+  scope:
+    | { kind: "site"; siteId: string }
+    | { kind: "owner"; userId: string },
 ): Promise<TicketDetail | null> {
   const supabase = await createServerClient();
 
-  const { data: ticket, error } = await supabase
+  let query = supabase
     .from("tickets")
     .select(
       "id, category, description, status, created_at, closed_at, photo_url, created_by, site_id, assigned_to",
     )
-    .eq("id", ticketId)
-    .eq("site_id", siteId)
-    .maybeSingle();
+    .eq("id", ticketId);
+
+  if (scope.kind === "site") {
+    query = query.eq("site_id", scope.siteId);
+  } else {
+    query = query.eq("created_by", scope.userId);
+  }
+
+  const { data: ticket, error } = await query.maybeSingle();
 
   if (error || !ticket) {
     return null;
@@ -147,7 +174,7 @@ export async function getTicketDetail(
     ...new Set((events ?? []).map((event) => event.actor).filter(Boolean)),
   ] as string[];
 
-  const nameMap = await resolveUserNames(supabase, [
+  const users = await resolveUsers(supabase, [
     ticket.created_by,
     ...(ticket.assigned_to ? [ticket.assigned_to] : []),
     ...actorIds,
@@ -168,21 +195,38 @@ export async function getTicketDetail(
     status: ticket.status as TicketStatus,
     created_at: ticket.created_at,
     closed_at: ticket.closed_at,
+    created_by: ticket.created_by,
     assigned_to: ticket.assigned_to,
     photo_url: ticket.photo_url,
     photo_signed_url: photoSignedUrl,
-    reporter_name: nameMap.get(ticket.created_by) ?? "Unknown",
+    reporter_name: users.get(ticket.created_by)?.name ?? "Unknown",
     assignee_name: ticket.assigned_to
-      ? nameMap.get(ticket.assigned_to) ?? null
+      ? users.get(ticket.assigned_to)?.name ?? null
       : null,
     events: (events ?? []).map((event) => {
-      const actorName = event.actor ? nameMap.get(event.actor) ?? null : null;
+      const actor = event.actor ? users.get(event.actor) : null;
+      const actorName = actor?.name ?? null;
       const formatted = formatTicketEvent({ ...event, actor_name: actorName });
       return {
         ...event,
         actor_name: actorName,
+        actor_role: actor?.role ?? null,
         formatted,
       };
     }),
   };
+}
+
+export async function getTicketDetail(
+  ticketId: string,
+  siteId: string,
+): Promise<TicketDetail | null> {
+  return loadTicketDetail(ticketId, { kind: "site", siteId });
+}
+
+export async function getWorkerTicketDetail(
+  ticketId: string,
+  userId: string,
+): Promise<TicketDetail | null> {
+  return loadTicketDetail(ticketId, { kind: "owner", userId });
 }

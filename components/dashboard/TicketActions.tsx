@@ -3,12 +3,17 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import {
-  addTicketNote,
   assignTicketToSelf,
   changeTicketStatus,
+  unassignTicket,
 } from "@/app/supervisor/actions";
 import type { TicketStatus } from "@/lib/supabase/types";
 import { TICKET_STATUSES } from "@/lib/tickets/status";
+
+/** Supervisor-managed statuses — Closed is reserved for the worker. */
+const SUPERVISOR_STATUS_OPTIONS = TICKET_STATUSES.filter(
+  (status) => status !== "Submitted" && status !== "Closed",
+);
 
 type TicketActionsProps = {
   ticketId: string;
@@ -24,8 +29,9 @@ export function TicketActions({
   currentUserId,
 }: TicketActionsProps) {
   const router = useRouter();
-  const [status, setStatus] = useState<TicketStatus>(currentStatus);
-  const [note, setNote] = useState("");
+  const initialStatus =
+    currentStatus === "Submitted" ? "In Review" : currentStatus;
+  const [status, setStatus] = useState<TicketStatus>(initialStatus);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -45,7 +51,6 @@ export function TicketActions({
         return;
       }
       setMessage("Saved.");
-      setNote("");
       router.refresh();
     });
   }
@@ -57,8 +62,21 @@ export function TicketActions({
           Actions
         </h2>
         <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          This ticket is assigned to another supervisor. You can view it, but
-          only the assignee can update status or add notes.
+          This ticket is assigned to another supervisor. You can view it and the
+          conversation, but only the assignee can update status or reply.
+        </p>
+      </div>
+    );
+  }
+
+  if (currentStatus === "Closed") {
+    return (
+      <div className="space-y-2 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
+          Actions
+        </h2>
+        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+          This ticket was closed by the worker. Status can no longer be changed.
         </p>
       </div>
     );
@@ -82,7 +100,7 @@ export function TicketActions({
           </button>
           <p className="text-xs text-zinc-500">
             Claiming a ticket moves it from Submitted to In Review and lets you
-            update status and add notes.
+            update status and reply in the conversation.
           </p>
         </div>
       ) : (
@@ -104,7 +122,7 @@ export function TicketActions({
                 }
                 className="flex-1 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-950"
               >
-                {TICKET_STATUSES.map((option) => (
+                {SUPERVISOR_STATUS_OPTIONS.map((option) => (
                   <option key={option} value={option}>
                     {option}
                   </option>
@@ -121,28 +139,26 @@ export function TicketActions({
                 Update status
               </button>
             </div>
+            <p className="text-xs text-zinc-500">
+              Mark Resolved when the fix is done — the worker closes the ticket.
+              Status changes appear in the conversation. To return a ticket to
+              Submitted, unassign it below.
+            </p>
           </div>
 
-          <div className="space-y-2">
-            <label htmlFor="note" className="text-sm font-medium">
-              Add note
-            </label>
-            <textarea
-              id="note"
-              rows={3}
-              value={note}
-              onChange={(event) => setNote(event.target.value)}
-              placeholder="Short update for the audit trail…"
-              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
-            />
+          <div className="space-y-2 border-t border-zinc-200 pt-4 dark:border-zinc-800">
             <button
               type="button"
-              disabled={isPending || note.trim().length === 0}
-              onClick={() => runAction(() => addTicketNote(ticketId, note))}
-              className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
+              disabled={isPending}
+              onClick={() => runAction(() => unassignTicket(ticketId))}
+              className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-700 dark:hover:bg-zinc-900"
             >
-              Add note
+              Unassign
             </button>
+            <p className="text-xs text-zinc-500">
+              Releases the ticket back to Submitted so another supervisor can
+              claim it.
+            </p>
           </div>
         </>
       )}

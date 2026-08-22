@@ -1,6 +1,7 @@
 import { Chip, IdleChip } from "@/components/ui/Chip";
 import { Panel, PanelHeader } from "@/components/ui/Panel";
 import type { TicketUrgency } from "@/lib/supabase/types";
+import type { TicketAiAnalysis } from "@/lib/tickets/ai-analysis";
 import {
   formatDateTime,
   formatDayCount,
@@ -22,13 +23,6 @@ const SIGNAL_CAPS = {
   dormancy: 30,
   wording: 20,
 };
-
-function describeWording(points: number): string {
-  if (points >= 20) return "urgent language detected";
-  if (points >= 10) return "warning language detected";
-  if (points >= 5) return "mild concern language";
-  return "no risk terms found";
-}
 
 function daysSince(iso: string): number {
   return Math.max(0, (Date.now() - new Date(iso).getTime()) / MS_PER_DAY);
@@ -96,6 +90,7 @@ type AiRankingPanelProps = {
   createdAt: string;
   lastEventAt: string | null;
   duplicateCount: number;
+  analysis: TicketAiAnalysis | null;
 };
 
 /**
@@ -110,6 +105,7 @@ export function AiRankingPanel({
   createdAt,
   lastEventAt,
   duplicateCount,
+  analysis,
 }: AiRankingPanelProps) {
   const priority = priorityVisual(ranking.label);
   const idle = idleVisual(ranking.daysIdle);
@@ -139,7 +135,9 @@ export function AiRankingPanel({
               {ranking.label}
             </p>
             <p className="mt-1.5 text-[11px] text-zinc-500 dark:text-zinc-400">
-              Recomputed on every view
+              {analysis
+                ? "Wording scored by Claude · other signals live"
+                : "Recomputed on every view"}
             </p>
           </div>
           <div className="text-right">
@@ -209,11 +207,17 @@ export function AiRankingPanel({
         />
         <SignalRow
           label="Wording"
-          detail={describeWording(factors.descriptionPts)}
+          detail={analysis ? "Claude language analysis" : "keyword fallback"}
           points={factors.descriptionPts}
           cap={SIGNAL_CAPS.wording}
           fill="bg-violet-500"
         />
+
+        {analysis?.languageSummary ? (
+          <p className="rounded-lg bg-inset px-3 py-2.5 text-[11px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+            {analysis.languageSummary}
+          </p>
+        ) : null}
 
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-lg bg-inset px-3 py-2.5 text-[11px] text-zinc-500 dark:text-zinc-400">
           <span className="font-semibold tabular-nums text-zinc-900 dark:text-zinc-100">
@@ -285,14 +289,25 @@ export function AiRankingPanel({
         </dl>
 
         {duplicateCount > 1 ? (
-          <div className="mt-4 flex items-center justify-between gap-2 border-t border-hairline pt-3">
-            <span className="text-xs text-zinc-500 dark:text-zinc-400">
-              Similar open reports
-            </span>
-            <Chip title={`${duplicateCount} open reports in this category`}>
-              <span className="tabular-nums">×{duplicateCount}</span> in{" "}
-              {categoryVisual(category).short.toLowerCase()}
-            </Chip>
+          <div className="mt-4 border-t border-hairline pt-3">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                Similar open reports
+              </span>
+              <Chip
+                title={
+                  analysis?.duplicateReason ??
+                  `${duplicateCount} reports grouped as the same issue`
+                }
+              >
+                <span className="tabular-nums">×{duplicateCount}</span> similar
+              </Chip>
+            </div>
+            {analysis?.duplicateReason ? (
+              <p className="mt-2 text-[11px] leading-relaxed text-zinc-500 dark:text-zinc-400">
+                {analysis.duplicateReason}
+              </p>
+            ) : null}
           </div>
         ) : null}
       </div>

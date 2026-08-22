@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { getUserProfile } from "@/lib/auth/session";
+import { analyzeReportWithClaude } from "@/lib/ai/claude";
 import { createServerClient } from "@/lib/supabase/server";
 import {
   DANGEROUS_OCCURRENCE_CATEGORY,
@@ -94,6 +95,25 @@ export async function submitTicket(
     photoPath = objectPath;
   }
 
+  let analysis = null;
+  try {
+    const { data: openReports } = await supabase.rpc(
+      "list_open_reports_for_ai",
+    );
+    analysis = await analyzeReportWithClaude({
+      category,
+      urgency: urgencyRaw,
+      description,
+      candidates: (openReports ?? []).map((row) => ({
+        id: row.id,
+        category: row.category,
+        description: row.description,
+      })),
+    });
+  } catch (error) {
+    console.error("Claude analysis failed; submitting without it.", error);
+  }
+
   const { data: ticket, error: ticketError } = await supabase
     .from("tickets")
     .insert({
@@ -104,6 +124,9 @@ export async function submitTicket(
       urgency: urgencyRaw,
       photo_url: photoPath,
       status: "Submitted",
+      ai_suggested_priority: analysis?.suggestedPriority ?? null,
+      ai_explanation: analysis?.languageSummary ?? null,
+      ai_analysis: analysis,
     })
     .select("id")
     .single();
@@ -132,6 +155,14 @@ export async function submitTicket(
       ok: false,
       error: eventError.message,
     };
+  }
+
+  if (analysis) {
+    await supabase.from("ai_interactions").insert({
+      ticket_id: ticket.id,
+      prompt_type: "pattern_check",
+      output: analysis,
+    });
   }
 
   revalidatePath("/worker");

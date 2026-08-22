@@ -93,7 +93,7 @@ export function IdleChip({ daysIdle }: { daysIdle: number }) {
 
 export function DuplicateChip({ count }: { count: number }) {
   return (
-    <Chip title={`${count} open reports in this category`}>
+    <Chip title={`${count} reports of the same issue, even if the wording differs`}>
       <span className="tabular-nums">×{count}</span> similar
     </Chip>
   );

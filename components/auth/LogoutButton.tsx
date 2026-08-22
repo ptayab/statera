@@ -1,25 +1,19 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { createBrowserClient } from "@/lib/supabase/client";
+import { useState } from "react";
 
 export function LogoutButton() {
-  const router = useRouter();
-
-  async function handleLogout() {
-    const supabase = createBrowserClient();
-    await supabase.auth.signOut();
-    router.push("/login");
-    router.refresh();
-  }
+  const [pending, setPending] = useState(false);
 
   return (
-    <button
-      type="button"
-      onClick={handleLogout}
-      className="text-sm text-zinc-600 underline-offset-2 hover:underline dark:text-zinc-400"
-    >
-      Sign out
-    </button>
+    <form action="/auth/signout" method="post" onSubmit={() => setPending(true)}>
+      <button
+        type="submit"
+        disabled={pending}
+        className="text-sm text-zinc-600 underline-offset-2 hover:underline disabled:opacity-60 dark:text-zinc-400"
+      >
+        {pending ? "Signing out…" : "Sign out"}
+      </button>
+    </form>
   );
 }

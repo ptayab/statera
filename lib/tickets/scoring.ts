@@ -132,13 +132,17 @@ export function scoreTicket(
   lastEventAt: string | null,
   duplicateCount: number,
   now: Date = new Date(),
+  options?: { descriptionPts?: number | null },
 ): TicketScore {
   const categoryPts = categoryPoints(ticket.category);
   const daysOpen = daysBetween(ticket.created_at, now);
   const agePts = Math.min(daysOpen * 2, 40);
   const daysIdle = daysBetween(lastEventAt ?? ticket.created_at, now);
   const dormancyPts = dormancyPoints(daysIdle);
-  const descriptionPts = descriptionPoints(ticket.description);
+  const descriptionPts =
+    options?.descriptionPts != null
+      ? Math.max(0, Math.min(20, options.descriptionPts))
+      : descriptionPoints(ticket.description);
   const urgencyMultiplier = URGENCY_MULTIPLIER[ticket.urgency] ?? 2;
   const dupeMult = duplicateMultiplier(duplicateCount, categoryPts);
 

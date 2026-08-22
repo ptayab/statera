@@ -121,6 +121,7 @@ export default async function TicketDetailPage({ params }: TicketDetailPageProps
             createdAt={ticket.created_at}
             lastEventAt={ticket.last_event_at}
             duplicateCount={ticket.duplicate_count}
+            analysis={ticket.ai_analysis}
           />
 
           <Panel>

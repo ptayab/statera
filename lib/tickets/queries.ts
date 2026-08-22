@@ -11,12 +11,17 @@ import {
   type TicketListItem,
 } from "@/lib/tickets/display";
 import { scoreTicket, type TicketScore } from "@/lib/tickets/scoring";
+import {
+  clusterDuplicateCounts,
+  parseAiAnalysis,
+  type TicketAiAnalysis,
+} from "@/lib/tickets/ai-analysis";
 import { OPEN_TICKET_STATUSES, isTicketStatus } from "@/lib/tickets/status";
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createServerClient>>;
 
 const TICKET_LIST_COLUMNS =
-  "id, category, description, status, urgency, created_at, closed_at, created_by, assigned_to";
+  "id, category, description, status, urgency, created_at, closed_at, created_by, assigned_to, ai_analysis, ai_explanation";
 
 type TicketRow = {
   id: string;
@@ -28,6 +33,8 @@ type TicketRow = {
   closed_at: string | null;
   created_by: string;
   assigned_to: string | null;
+  ai_analysis?: Record<string, unknown> | null;
+  ai_explanation?: string | null;
 };
 
 type UserLookup = {
@@ -105,6 +112,7 @@ export type RankedTicketListItem = TicketListItem & {
   last_event_at: string | null;
   duplicate_count: number;
   ranking: TicketScore;
+  ai_analysis: TicketAiAnalysis | null;
 };
 
 function siteTicketQuery(
@@ -132,24 +140,51 @@ function siteTicketQuery(
 }
 
 /**
- * Open reports per category across the whole site. Counting site-wide rather
- * than per-page keeps the duplicate signal identical on every screen.
+ * Semantic duplicate cluster sizes from Claude links.
+ * Tickets Claude has not grouped stay at 1 — same category is not enough.
  */
-async function getOpenCategoryCounts(
+function duplicateCountsForRows(
+  rows: Pick<TicketRow, "id" | "ai_analysis">[],
+): Map<string, number> {
+  return clusterDuplicateCounts(
+    rows.map((row) => ({
+      id: row.id,
+      duplicateIds: parseAiAnalysis(row.ai_analysis)?.duplicateIds ?? [],
+    })),
+  );
+}
+
+function rankRow(
+  row: TicketRow,
+  item: TicketListItem,
+  lastEventAt: string | null,
+  duplicateCount: number,
+): RankedTicketListItem {
+  const analysis = parseAiAnalysis(row.ai_analysis);
+  return {
+    ...item,
+    last_event_at: lastEventAt,
+    duplicate_count: duplicateCount,
+    ai_analysis: analysis,
+    ranking: scoreTicket(item, lastEventAt, duplicateCount, new Date(), {
+      descriptionPts: analysis?.descriptionPts,
+    }),
+  };
+}
+
+async function getOpenDuplicateContext(
   supabase: SupabaseServerClient,
   siteId: string,
 ): Promise<Map<string, number>> {
   const { data } = await supabase
     .from("tickets")
-    .select("category")
+    .select("id, ai_analysis")
     .eq("site_id", siteId)
     .in("status", OPEN_TICKET_STATUSES);
 
-  const counts = new Map<string, number>();
-  for (const row of data ?? []) {
-    counts.set(row.category, (counts.get(row.category) ?? 0) + 1);
-  }
-  return counts;
+  return duplicateCountsForRows(
+    (data ?? []) as Pick<TicketRow, "id" | "ai_analysis">[],
+  );
 }
 
 async function getLastEventTimestamps(
@@ -187,9 +222,9 @@ export async function getSiteTicketsWithRanking(
 ): Promise<RankedTicketListItem[]> {
   const supabase = await createServerClient();
 
-  const [ticketResult, categoryCounts] = await Promise.all([
+  const [ticketResult, duplicateContext] = await Promise.all([
     siteTicketQuery(supabase, siteId, filters),
-    getOpenCategoryCounts(supabase, siteId),
+    getOpenDuplicateContext(supabase, siteId),
   ]);
 
   const rows = ticketResult.data as TicketRow[] | null;
@@ -205,18 +240,16 @@ export async function getSiteTicketsWithRanking(
     ),
   ]);
 
-  return rows.map((row) => {
-    const item = toListItem(row, users);
-    const lastEventAt = lastEvents.get(row.id) ?? null;
-    const duplicateCount = Math.max(1, categoryCounts.get(row.category) ?? 1);
+  const duplicateCounts = duplicateContext;
 
-    return {
-      ...item,
-      last_event_at: lastEventAt,
-      duplicate_count: duplicateCount,
-      ranking: scoreTicket(item, lastEventAt, duplicateCount),
-    };
-  });
+  return rows.map((row) =>
+    rankRow(
+      row,
+      toListItem(row, users),
+      lastEvents.get(row.id) ?? null,
+      duplicateCounts.get(row.id) ?? 1,
+    ),
+  );
 }
 
 /** Open tickets ordered by AI score, highest risk first. */
@@ -260,7 +293,7 @@ async function loadTicketDetail(
   let query = supabase
     .from("tickets")
     .select(
-      "id, category, description, status, urgency, created_at, closed_at, photo_url, created_by, site_id, assigned_to",
+      "id, category, description, status, urgency, created_at, closed_at, photo_url, created_by, site_id, assigned_to, ai_analysis, ai_explanation",
     )
     .eq("id", ticketId);
 
@@ -278,13 +311,13 @@ async function loadTicketDetail(
 
   // Events, duplicate counts, and the photo URL are all independent of one
   // another once the ticket row is known.
-  const [eventResult, categoryCounts, photoSignedUrl] = await Promise.all([
+  const [eventResult, duplicateContext, photoSignedUrl] = await Promise.all([
     supabase
       .from("ticket_events")
       .select("id, ticket_id, event_type, actor, payload, created_at")
       .eq("ticket_id", ticketId)
       .order("created_at", { ascending: true }),
-    getOpenCategoryCounts(supabase, ticket.site_id),
+    getOpenDuplicateContext(supabase, ticket.site_id),
     ticket.photo_url
       ? supabase.storage
           .from("ticket-photos")
@@ -308,10 +341,8 @@ async function loadTicketDetail(
   const lastEventAt = events.length
     ? events[events.length - 1].created_at
     : null;
-  const duplicateCount = Math.max(
-    1,
-    categoryCounts.get(ticket.category) ?? 1,
-  );
+  const analysis = parseAiAnalysis(ticket.ai_analysis);
+  const clusterSize = duplicateContext.get(ticket.id) ?? 1;
 
   return {
     id: ticket.id,
@@ -330,7 +361,8 @@ async function loadTicketDetail(
       ? users.get(ticket.assigned_to)?.name ?? null
       : null,
     last_event_at: lastEventAt,
-    duplicate_count: duplicateCount,
+    duplicate_count: clusterSize,
+    ai_analysis: analysis,
     ranking: scoreTicket(
       {
         category: ticket.category,
@@ -339,7 +371,9 @@ async function loadTicketDetail(
         created_at: ticket.created_at,
       },
       lastEventAt,
-      duplicateCount,
+      clusterSize,
+      new Date(),
+      { descriptionPts: analysis?.descriptionPts },
     ),
     events: events.map((event) => {
       const actor = event.actor ? users.get(event.actor) : null;

@@ -59,6 +59,7 @@ export type Database = {
           ai_suggested_category: string | null;
           ai_suggested_priority: string | null;
           ai_explanation: string | null;
+          ai_analysis: Record<string, unknown> | null;
           created_at: string;
           closed_at: string | null;
         };
@@ -75,6 +76,7 @@ export type Database = {
           ai_suggested_category?: string | null;
           ai_suggested_priority?: string | null;
           ai_explanation?: string | null;
+          ai_analysis?: Record<string, unknown> | null;
           created_at?: string;
           closed_at?: string | null;
         };
@@ -91,6 +93,7 @@ export type Database = {
           ai_suggested_category?: string | null;
           ai_suggested_priority?: string | null;
           ai_explanation?: string | null;
+          ai_analysis?: Record<string, unknown> | null;
           created_at?: string;
           closed_at?: string | null;
         };
@@ -176,6 +179,14 @@ export type Database = {
       worker_close_ticket: {
         Args: { p_ticket_id: string };
         Returns: undefined;
+      };
+      list_open_reports_for_ai: {
+        Args: Record<string, never>;
+        Returns: {
+          id: string;
+          category: string;
+          description: string;
+        }[];
       };
     };
     Enums: {

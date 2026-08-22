@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { DangerousOccurrenceAlert } from "@/components/tickets/DangerousOccurrenceAlert";
+import { CategoryGuidance } from "@/components/tickets/CategoryGuidance";
 import { submitTicket } from "@/app/worker/submit/actions";
 import {
-  DANGEROUS_OCCURRENCE_CATEGORY,
   PILOT_TICKET_CATEGORIES,
+  getCategoryMeta,
   type PilotTicketCategory,
 } from "@/lib/tickets/categories";
 import { TICKET_URGENCIES } from "@/lib/tickets/scoring";
@@ -19,13 +19,11 @@ export function SubmissionForm() {
   const [error, setError] = useState<string | null>(null);
   const [confirmation, setConfirmation] = useState<{
     ticketId: string;
-    isDangerousOccurrence: boolean;
+    category: PilotTicketCategory;
   } | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const showDangerousReminder =
-    category === DANGEROUS_OCCURRENCE_CATEGORY ||
-    confirmation?.isDangerousOccurrence;
+  const selectedMeta = category ? getCategoryMeta(category) : undefined;
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -54,7 +52,7 @@ export function SubmissionForm() {
 
       setConfirmation({
         ticketId: result.ticketId,
-        isDangerousOccurrence: result.isDangerousOccurrence,
+        category: result.category,
       });
       setCategory("");
       setDescription("");
@@ -83,9 +81,7 @@ export function SubmissionForm() {
           </p>
         </div>
 
-        {confirmation.isDangerousOccurrence ? (
-          <DangerousOccurrenceAlert submitted />
-        ) : null}
+        <CategoryGuidance category={confirmation.category} submitted />
 
         <button
           type="button"
@@ -103,38 +99,37 @@ export function SubmissionForm() {
       onSubmit={handleSubmit}
       className="mx-auto flex w-full max-w-lg flex-col gap-6"
     >
-      <fieldset className="space-y-3">
-        <legend className="text-sm font-medium">What happened?</legend>
-        <div className="grid gap-2">
-          {PILOT_TICKET_CATEGORIES.map((option) => {
-            const selected = category === option;
-            return (
-              <label
-                key={option}
-                className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-sm transition ${
-                  selected
-                    ? "border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900"
-                    : "border-zinc-300 bg-white hover:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-950 dark:hover:border-zinc-500"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="category"
-                  value={option}
-                  checked={selected}
-                  onChange={() => setCategory(option)}
-                  className="sr-only"
-                />
-                <span>{option}</span>
-              </label>
-            );
-          })}
-        </div>
-      </fieldset>
-
-      {showDangerousReminder && category === DANGEROUS_OCCURRENCE_CATEGORY ? (
-        <DangerousOccurrenceAlert />
-      ) : null}
+      <div className="flex flex-col gap-2">
+        <label htmlFor="category" className="text-sm font-medium">
+          What happened?
+        </label>
+        <select
+          id="category"
+          name="category"
+          required
+          value={category}
+          onChange={(event) =>
+            setCategory(event.target.value as PilotTicketCategory | "")
+          }
+          className="rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950"
+        >
+          <option value="" disabled>
+            Choose a category
+          </option>
+          {PILOT_TICKET_CATEGORIES.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+        {selectedMeta ? (
+          <CategoryGuidance category={selectedMeta.name} showDescription />
+        ) : (
+          <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
+            Pick the closest match. You can explain the details below.
+          </p>
+        )}
+      </div>
 
       <div className="flex flex-col gap-1.5">
         <label htmlFor="description" className="text-sm font-medium">

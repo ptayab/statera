@@ -5,8 +5,8 @@ import { getUserProfile } from "@/lib/auth/session";
 import { analyzeReportWithClaude } from "@/lib/ai/claude";
 import { createServerClient } from "@/lib/supabase/server";
 import {
-  DANGEROUS_OCCURRENCE_CATEGORY,
   isPilotTicketCategory,
+  type PilotTicketCategory,
 } from "@/lib/tickets/categories";
 import { isTicketUrgency } from "@/lib/tickets/scoring";
 
@@ -20,7 +20,7 @@ const ALLOWED_PHOTO_TYPES = new Set([
 ]);
 
 export type SubmitTicketResult =
-  | { ok: true; ticketId: string; isDangerousOccurrence: boolean }
+  | { ok: true; ticketId: string; category: PilotTicketCategory }
   | { ok: false; error: string };
 
 export async function submitTicket(
@@ -176,6 +176,6 @@ export async function submitTicket(
   return {
     ok: true,
     ticketId: ticket.id,
-    isDangerousOccurrence: category === DANGEROUS_OCCURRENCE_CATEGORY,
+    category,
   };
 }

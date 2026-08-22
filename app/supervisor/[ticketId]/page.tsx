@@ -4,11 +4,11 @@ import { addTicketMessage } from "@/app/supervisor/actions";
 import { AiRankingPanel } from "@/components/dashboard/AiRankingPanel";
 import { TicketActions } from "@/components/dashboard/TicketActions";
 import { TicketChat } from "@/components/dashboard/TicketChat";
-import { DangerousOccurrenceAlert } from "@/components/tickets/DangerousOccurrenceAlert";
+import { CategoryGuidance } from "@/components/tickets/CategoryGuidance";
 import { IdleChip, PriorityChip, StatusChip, UserRankingChip } from "@/components/ui/Chip";
 import { Eyebrow, Panel, PanelHeader } from "@/components/ui/Panel";
 import { getUserProfile } from "@/lib/auth/session";
-import { DANGEROUS_OCCURRENCE_CATEGORY } from "@/lib/tickets/categories";
+import { getCategoryMeta } from "@/lib/tickets/categories";
 import { formatFullDateTime, shortId } from "@/lib/tickets/format";
 import { getTicketDetail } from "@/lib/tickets/queries";
 
@@ -79,8 +79,8 @@ export default async function TicketDetailPage({ params }: TicketDetailPageProps
 
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_21rem]">
         <div className="flex flex-col gap-4">
-          {ticket.category === DANGEROUS_OCCURRENCE_CATEGORY ? (
-            <DangerousOccurrenceAlert />
+          {getCategoryMeta(ticket.category)?.warnSupervisor ? (
+            <CategoryGuidance category={ticket.category} />
           ) : null}
 
           <Panel>

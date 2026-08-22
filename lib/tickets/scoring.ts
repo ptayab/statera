@@ -1,5 +1,5 @@
 import type { TicketUrgency } from "@/lib/supabase/types";
-import type { PilotTicketCategory } from "@/lib/tickets/categories";
+import { categoryRankingPoints } from "@/lib/tickets/categories";
 
 export type PriorityLabel = "Critical" | "High" | "Medium" | "Low";
 
@@ -24,12 +24,6 @@ export type ScoreableTicket = {
   description: string;
   urgency: TicketUrgency;
   created_at: string;
-};
-
-const CATEGORY_POINTS: Record<PilotTicketCategory, number> = {
-  "Dangerous Occurrence": 50,
-  "Unsafe Condition / Near-Miss": 30,
-  "Equipment Issue": 15,
 };
 
 const URGENCY_MULTIPLIER: Record<TicketUrgency, number> = {
@@ -79,7 +73,7 @@ function daysBetween(fromIso: string, to: Date = new Date()): number {
 }
 
 function categoryPoints(category: string): number {
-  return CATEGORY_POINTS[category as PilotTicketCategory] ?? 15;
+  return categoryRankingPoints(category);
 }
 
 function descriptionPoints(description: string): number {

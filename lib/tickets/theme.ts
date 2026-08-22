@@ -109,17 +109,47 @@ const CATEGORY_VISUALS: Record<PilotTicketCategory, CategoryVisual> = {
     short: "Dangerous occurrence",
     text: "text-rose-600 dark:text-rose-400",
   },
-  "Unsafe Condition / Near-Miss": {
+  "Unsafe Condition": {
+    short: "Unsafe",
+    text: "text-rose-600 dark:text-rose-400",
+  },
+  "Near-Miss Report": {
     short: "Near-miss",
-    text: "text-zinc-500 dark:text-zinc-400",
+    text: "text-orange-700 dark:text-orange-400",
+  },
+  "Fatigue / Wellness Concern": {
+    short: "Fatigue",
+    text: "text-orange-700 dark:text-orange-400",
   },
   "Equipment Issue": {
     short: "Equipment",
     text: "text-zinc-500 dark:text-zinc-400",
   },
+  "PPE Request": {
+    short: "PPE",
+    text: "text-zinc-500 dark:text-zinc-400",
+  },
+  "HR / Supervisor Escalation": {
+    short: "HR",
+    text: "text-zinc-500 dark:text-zinc-400",
+  },
+  "Training Request": {
+    short: "Training",
+    text: "text-zinc-500 dark:text-zinc-400",
+  },
+  "Procedure Clarification": {
+    short: "Procedure",
+    text: "text-zinc-500 dark:text-zinc-400",
+  },
 };
 
 export function categoryVisual(category: string): CategoryVisual {
+  if (category === "Unsafe Condition / Near-Miss") {
+    return {
+      short: "Near-miss",
+      text: "text-orange-700 dark:text-orange-400",
+    };
+  }
   return (
     CATEGORY_VISUALS[category as PilotTicketCategory] ?? {
       short: category,

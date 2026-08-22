@@ -1,11 +1,16 @@
 import { createServerClient } from "@/lib/supabase/server";
-import type { TicketStatus, UserRole } from "@/lib/supabase/types";
+import type {
+  TicketStatus,
+  TicketUrgency,
+  UserRole,
+} from "@/lib/supabase/types";
 import { isPilotTicketCategory } from "@/lib/tickets/categories";
 import {
   formatTicketEvent,
   type TicketDetail,
   type TicketListItem,
 } from "@/lib/tickets/display";
+import { scoreTicket, type TicketScore } from "@/lib/tickets/scoring";
 import { isTicketStatus } from "@/lib/tickets/status";
 
 const OPEN_TICKET_STATUSES: TicketStatus[] = [
@@ -44,10 +49,23 @@ async function resolveUsers(
   );
 }
 
+function toUrgency(value: string | null | undefined): TicketUrgency {
+  if (value === "Low" || value === "Medium" || value === "High") {
+    return value;
+  }
+  return "Medium";
+}
+
 export type TicketFilters = {
   status?: string;
   category?: string;
   openOnly?: boolean;
+};
+
+export type RankedTicketListItem = TicketListItem & {
+  last_event_at: string | null;
+  duplicate_count: number;
+  ranking: TicketScore;
 };
 
 export async function getSiteTickets(
@@ -59,7 +77,7 @@ export async function getSiteTickets(
   let query = supabase
     .from("tickets")
     .select(
-      "id, category, description, status, created_at, closed_at, created_by, assigned_to",
+      "id, category, description, status, urgency, created_at, closed_at, created_by, assigned_to",
     )
     .eq("site_id", siteId)
     .order("created_at", { ascending: false });
@@ -92,6 +110,7 @@ export async function getSiteTickets(
     category: ticket.category,
     description: ticket.description,
     status: ticket.status as TicketStatus,
+    urgency: toUrgency(ticket.urgency),
     created_at: ticket.created_at,
     closed_at: ticket.closed_at,
     reporter_name: users.get(ticket.created_by)?.name ?? "Unknown",
@@ -101,13 +120,98 @@ export async function getSiteTickets(
   }));
 }
 
+/** Open tickets ranked by AI score (highest first), with duplicate grouping metadata. */
+export async function getSiteTicketsRanked(
+  siteId: string,
+): Promise<RankedTicketListItem[]> {
+  const supabase = await createServerClient();
+
+  const { data: tickets, error } = await supabase
+    .from("tickets")
+    .select(
+      "id, category, description, status, urgency, created_at, closed_at, created_by, assigned_to",
+    )
+    .eq("site_id", siteId)
+    .in("status", OPEN_TICKET_STATUSES);
+
+  if (error || !tickets?.length) {
+    return [];
+  }
+
+  const ticketIds = tickets.map((ticket) => ticket.id);
+
+  const { data: events } = await supabase
+    .from("ticket_events")
+    .select("ticket_id, created_at")
+    .in("ticket_id", ticketIds)
+    .order("created_at", { ascending: false });
+
+  const lastEventByTicket = new Map<string, string>();
+  for (const event of events ?? []) {
+    if (!lastEventByTicket.has(event.ticket_id)) {
+      lastEventByTicket.set(event.ticket_id, event.created_at);
+    }
+  }
+
+  const categoryCounts = new Map<string, number>();
+  for (const ticket of tickets) {
+    categoryCounts.set(
+      ticket.category,
+      (categoryCounts.get(ticket.category) ?? 0) + 1,
+    );
+  }
+
+  const users = await resolveUsers(supabase, [
+    ...tickets.map((ticket) => ticket.created_by),
+    ...tickets.flatMap((ticket) =>
+      ticket.assigned_to ? [ticket.assigned_to] : [],
+    ),
+  ]);
+
+  const ranked: RankedTicketListItem[] = tickets.map((ticket) => {
+    const urgency = toUrgency(ticket.urgency);
+    const lastEventAt = lastEventByTicket.get(ticket.id) ?? null;
+    const duplicateCount = categoryCounts.get(ticket.category) ?? 1;
+    const ranking = scoreTicket(
+      {
+        category: ticket.category,
+        description: ticket.description,
+        urgency,
+        created_at: ticket.created_at,
+      },
+      lastEventAt,
+      duplicateCount,
+    );
+
+    return {
+      id: ticket.id,
+      category: ticket.category,
+      description: ticket.description,
+      status: ticket.status as TicketStatus,
+      urgency,
+      created_at: ticket.created_at,
+      closed_at: ticket.closed_at,
+      reporter_name: users.get(ticket.created_by)?.name ?? "Unknown",
+      assignee_name: ticket.assigned_to
+        ? users.get(ticket.assigned_to)?.name ?? null
+        : null,
+      last_event_at: lastEventAt,
+      duplicate_count: duplicateCount,
+      ranking,
+    };
+  });
+
+  ranked.sort((a, b) => b.ranking.score - a.ranking.score);
+  return ranked;
+}
+
 export async function getUserTickets(userId: string): Promise<TicketListItem[]> {
   const supabase = await createServerClient();
 
   const { data: tickets, error } = await supabase
     .from("tickets")
     .select(
-      "id, category, description, status, created_at, closed_at, created_by, assigned_to",
+      "id, category, description, status, urgency, created_at, closed_at, created_by, assigned_to",
     )
     .eq("created_by", userId)
     .order("created_at", { ascending: false });
@@ -128,6 +232,7 @@ export async function getUserTickets(userId: string): Promise<TicketListItem[]> 
     category: ticket.category,
     description: ticket.description,
     status: ticket.status as TicketStatus,
+    urgency: toUrgency(ticket.urgency),
     created_at: ticket.created_at,
     closed_at: ticket.closed_at,
     reporter_name: "You",
@@ -148,7 +253,7 @@ async function loadTicketDetail(
   let query = supabase
     .from("tickets")
     .select(
-      "id, category, description, status, created_at, closed_at, photo_url, created_by, site_id, assigned_to",
+      "id, category, description, status, urgency, created_at, closed_at, photo_url, created_by, site_id, assigned_to",
     )
     .eq("id", ticketId);
 
@@ -193,6 +298,7 @@ async function loadTicketDetail(
     category: ticket.category,
     description: ticket.description,
     status: ticket.status as TicketStatus,
+    urgency: toUrgency(ticket.urgency),
     created_at: ticket.created_at,
     closed_at: ticket.closed_at,
     created_by: ticket.created_by,

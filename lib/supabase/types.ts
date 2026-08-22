@@ -11,6 +11,8 @@ export type TicketStatus =
   | "Resolved"
   | "Closed";
 
+export type TicketUrgency = "Low" | "Medium" | "High";
+
 export type AiPromptType = "worker_coach" | "pattern_check";
 
 export type Database = {
@@ -52,6 +54,7 @@ export type Database = {
           description: string;
           photo_url: string | null;
           status: TicketStatus;
+          urgency: TicketUrgency;
           assigned_to: string | null;
           ai_suggested_category: string | null;
           ai_suggested_priority: string | null;
@@ -67,6 +70,7 @@ export type Database = {
           description: string;
           photo_url?: string | null;
           status?: TicketStatus;
+          urgency?: TicketUrgency;
           assigned_to?: string | null;
           ai_suggested_category?: string | null;
           ai_suggested_priority?: string | null;
@@ -82,6 +86,7 @@ export type Database = {
           description?: string;
           photo_url?: string | null;
           status?: TicketStatus;
+          urgency?: TicketUrgency;
           assigned_to?: string | null;
           ai_suggested_category?: string | null;
           ai_suggested_priority?: string | null;

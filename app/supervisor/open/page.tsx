@@ -18,7 +18,7 @@ export default async function OpenIssuesPage() {
         </p>
       </header>
 
-      <TicketList tickets={tickets} emptyMessage="No open issues right now." />
+      <TicketList tickets={tickets} emptyMessage="No open issues right now." showRanking />
     </main>
   );
 }

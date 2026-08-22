@@ -7,6 +7,7 @@ import {
   DANGEROUS_OCCURRENCE_CATEGORY,
   isPilotTicketCategory,
 } from "@/lib/tickets/categories";
+import { isTicketUrgency } from "@/lib/tickets/scoring";
 
 const MAX_PHOTO_BYTES = 5 * 1024 * 1024; // 5 MB
 const ALLOWED_PHOTO_TYPES = new Set([
@@ -36,10 +37,15 @@ export async function submitTicket(
 
   const category = String(formData.get("category") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
+  const urgencyRaw = String(formData.get("urgency") ?? "Medium").trim();
   const photo = formData.get("photo");
 
   if (!isPilotTicketCategory(category)) {
     return { ok: false, error: "Please choose a valid category." };
+  }
+
+  if (!isTicketUrgency(urgencyRaw)) {
+    return { ok: false, error: "Please choose a valid urgency." };
   }
 
   if (description.length < 3) {
@@ -95,6 +101,7 @@ export async function submitTicket(
       site_id: profile.site_id,
       category,
       description,
+      urgency: urgencyRaw,
       photo_url: photoPath,
       status: "Submitted",
     })
@@ -115,6 +122,7 @@ export async function submitTicket(
     payload: {
       category,
       description,
+      urgency: urgencyRaw,
       has_photo: Boolean(photoPath),
     },
   });
@@ -129,6 +137,10 @@ export async function submitTicket(
   revalidatePath("/worker");
   revalidatePath("/worker/submit");
   revalidatePath("/worker/tickets");
+  revalidatePath("/supervisor");
+  revalidatePath("/supervisor/open");
+  revalidatePath("/supervisor/all");
+  revalidatePath("/supervisor/priority");
 
   return {
     ok: true,

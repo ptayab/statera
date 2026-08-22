@@ -1,10 +1,15 @@
 import Link from "next/link";
 import type { TicketListItem } from "@/lib/tickets/display";
+import {
+  priorityBadgeClass,
+  scoreTicket,
+} from "@/lib/tickets/scoring";
 import { statusBadgeClass } from "@/lib/tickets/status";
 
 type TicketListProps = {
   tickets: TicketListItem[];
   showReporter?: boolean;
+  showRanking?: boolean;
   emptyMessage?: string;
   detailHref?: (ticketId: string) => string;
 };
@@ -49,6 +54,7 @@ function formatTimeAgo(iso: string) {
 export function TicketList({
   tickets,
   showReporter = true,
+  showRanking = false,
   emptyMessage = "No tickets match these filters yet.",
   detailHref = (ticketId) => `/supervisor/${ticketId}`,
 }: TicketListProps) {
@@ -58,6 +64,16 @@ export function TicketList({
         {emptyMessage}
       </p>
     );
+  }
+
+  const categoryCounts = new Map<string, number>();
+  if (showRanking) {
+    for (const ticket of tickets) {
+      categoryCounts.set(
+        ticket.category,
+        (categoryCounts.get(ticket.category) ?? 0) + 1,
+      );
+    }
   }
 
   return (
@@ -72,9 +88,25 @@ export function TicketList({
         ].filter(Boolean);
         const meta = metaParts.join(" · ");
 
+        const ranking = showRanking
+          ? scoreTicket(
+              ticket,
+              ticket.created_at,
+              categoryCounts.get(ticket.category) ?? 1,
+            )
+          : null;
+
         const content = (
           <>
             <div className="flex flex-wrap items-center gap-2">
+              {ranking ? (
+                <span
+                  className={`rounded-full px-2.5 py-0.5 text-xs font-semibold tabular-nums ${priorityBadgeClass(ranking.label)}`}
+                  title={`AI score ${ranking.score}`}
+                >
+                  {ranking.label} · {ranking.score}
+                </span>
+              ) : null}
               <span
                 className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusBadgeClass(ticket.status)}`}
               >

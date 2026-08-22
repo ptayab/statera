@@ -34,7 +34,7 @@ export default async function AllIssuesPage({ searchParams }: AllIssuesPageProps
         </Suspense>
       </div>
 
-      <TicketList tickets={tickets} />
+      <TicketList tickets={tickets} showRanking />
     </main>
   );
 }

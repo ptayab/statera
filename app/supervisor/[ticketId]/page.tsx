@@ -71,6 +71,12 @@ export default async function TicketDetailPage({ params }: TicketDetailPageProps
           <dl className="grid gap-2 text-sm text-zinc-600 dark:text-zinc-400">
             <div>
               <dt className="inline font-medium text-zinc-900 dark:text-zinc-100">
+                Worker urgency:{" "}
+              </dt>
+              <dd className="inline">{ticket.urgency}</dd>
+            </div>
+            <div>
+              <dt className="inline font-medium text-zinc-900 dark:text-zinc-100">
                 Reported by:{" "}
               </dt>
               <dd className="inline">{ticket.reporter_name}</dd>

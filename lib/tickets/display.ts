@@ -1,4 +1,9 @@
-import type { TicketEvent, TicketStatus, UserRole } from "@/lib/supabase/types";
+import type {
+  TicketEvent,
+  TicketStatus,
+  TicketUrgency,
+  UserRole,
+} from "@/lib/supabase/types";
 
 type EventPayload = Record<string, unknown>;
 
@@ -77,6 +82,7 @@ export type TicketListItem = {
   category: string;
   description: string;
   status: TicketStatus;
+  urgency: TicketUrgency;
   created_at: string;
   closed_at: string | null;
   reporter_name: string;

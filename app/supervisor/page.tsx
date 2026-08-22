@@ -58,7 +58,18 @@ export default async function SupervisorHomePage() {
         </p>
       </header>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-3">
+        <Link
+          href="/supervisor/priority"
+          className="rounded-xl border border-zinc-200 p-5 transition hover:border-statera-orange/40 hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900/50"
+        >
+          <p className="text-3xl font-semibold tabular-nums">{openTickets.length}</p>
+          <p className="mt-1 text-sm font-medium">Priority</p>
+          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+            AI-ranked triage — highest risk first.
+          </p>
+        </Link>
+
         <Link
           href="/supervisor/open"
           className="rounded-xl border border-zinc-200 p-5 transition hover:border-statera-orange/40 hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900/50"

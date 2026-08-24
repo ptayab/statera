@@ -1,4 +1,4 @@
-import Anthropic from "@anthropic-ai/sdk";
+import "server-only";
 import type { TicketAiAnalysis } from "@/lib/tickets/ai-analysis";
 
 export const CLAUDE_MODEL = "claude-sonnet-4-5";
@@ -38,6 +38,8 @@ export async function analyzeReportWithClaude(
     return null;
   }
 
+  // Dynamic import keeps this Node SDK off the worker submit client bundle.
+  const { default: Anthropic } = await import("@anthropic-ai/sdk");
   const client = new Anthropic({ apiKey });
   const candidateIds = new Set(input.candidates.map((row) => row.id));
 

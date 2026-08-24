@@ -1,3 +1,4 @@
+import { submitTicket } from "@/app/worker/submit/actions";
 import { SubmissionForm } from "@/components/tickets/SubmissionForm";
 import { PageHeader } from "@/components/ui/Panel";
 
@@ -10,7 +11,7 @@ export default function SubmitPage() {
         description="Describe the safety concern and add a photo if you have one."
       />
 
-      <SubmissionForm />
+      <SubmissionForm submitTicket={submitTicket} />
     </main>
   );
 }

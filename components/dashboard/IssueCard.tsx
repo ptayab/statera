@@ -3,7 +3,7 @@ import { Avatar, DuplicateChip, IdleChip, PriorityTag, StatusChip } from "@/comp
 import { formatCompactAge, formatDateTime } from "@/lib/tickets/format";
 import type { TicketListItem } from "@/lib/tickets/display";
 import type { TicketScore } from "@/lib/tickets/scoring";
-import { categoryVisual, idleLevel, priorityVisual } from "@/lib/tickets/theme";
+import { categoryVisual, idleLevel, issueRail } from "@/lib/tickets/theme";
 
 export type IssueCardItem = TicketListItem & {
   ranking?: TicketScore | null;
@@ -32,13 +32,14 @@ export function IssueCard({
   showAssignee = true,
 }: IssueCardProps) {
   const ranking = item.ranking ?? null;
-  const rail = ranking
-    ? priorityVisual(ranking.label).rail
-    : "bg-zinc-200 dark:bg-zinc-700";
+  const rail = issueRail(item.status, ranking?.label);
   const category = categoryVisual(item.category);
   const duplicates = item.duplicate_count ?? 1;
+  const isClosed = item.status === "Closed";
   const isNeglected =
-    ranking != null && ["dormant", "stalled"].includes(idleLevel(ranking.daysIdle));
+    !isClosed &&
+    ranking != null &&
+    ["dormant", "stalled"].includes(idleLevel(ranking.daysIdle));
 
   const content = (
     <>
@@ -90,10 +91,14 @@ export function IssueCard({
       <div className="flex shrink-0 flex-col items-end justify-center gap-2 py-3.5 pr-4">
         <time
           dateTime={item.created_at}
-          title={formatDateTime(item.created_at)}
+          title={
+            item.closed_at
+              ? `Open ${formatDateTime(item.created_at)} – ${formatDateTime(item.closed_at)}`
+              : formatDateTime(item.created_at)
+          }
           className="text-xs tabular-nums text-zinc-400 dark:text-zinc-500"
         >
-          {formatCompactAge(item.created_at)}
+          {formatCompactAge(item.created_at, item.closed_at)}
         </time>
         {showAssignee ? <Avatar name={item.assignee_name} /> : null}
       </div>

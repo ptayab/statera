@@ -96,6 +96,7 @@ function toListItem(
     closed_at: row.closed_at,
     reporter_name:
       reporterName ?? users.get(row.created_by)?.name ?? "Unknown",
+    assigned_to: row.assigned_to,
     assignee_name: row.assigned_to
       ? users.get(row.assigned_to)?.name ?? null
       : null,
@@ -369,6 +370,8 @@ async function loadTicketDetail(
         description: ticket.description,
         urgency,
         created_at: ticket.created_at,
+        closed_at: ticket.closed_at,
+        status: ticket.status,
       },
       lastEventAt,
       clusterSize,

@@ -30,12 +30,14 @@ export default async function SupervisorHomePage() {
     ["dormant", "stalled"].includes(idleLevel(ticket.ranking.daysIdle)),
   ).length;
 
+  const pipelineStatuses = TICKET_STATUSES.filter((status) => status !== "Closed");
+  const pipelineTickets = allTickets.filter((ticket) => ticket.status !== "Closed");
   const statusCounts = Object.fromEntries(
-    TICKET_STATUSES.map((status) => [
+    pipelineStatuses.map((status) => [
       status,
-      allTickets.filter((ticket) => ticket.status === status).length,
+      pipelineTickets.filter((ticket) => ticket.status === status).length,
     ]),
-  ) as Record<(typeof TICKET_STATUSES)[number], number>;
+  ) as Record<(typeof pipelineStatuses)[number], number>;
 
   const submittedThisWeek = allTickets.filter(
     (ticket) => new Date(ticket.created_at).getTime() >= Date.now() - WEEK_MS,
@@ -72,7 +74,7 @@ export default async function SupervisorHomePage() {
 
       <div className="grid gap-3 sm:grid-cols-3">
         <NavCard
-          href="/supervisor/priority"
+          href="/supervisor/open?sort=priority"
           value={needsTriage}
           title="Needs triage"
           description="Critical and high AI ranking — work these first."
@@ -80,7 +82,7 @@ export default async function SupervisorHomePage() {
           tone="text-rose-700 dark:text-rose-300"
         />
         <NavCard
-          href="/supervisor/open"
+          href="/supervisor/open?sort=time"
           value={openTickets.length}
           title="Open issues"
           description="Everything still awaiting a resolution."
@@ -99,23 +101,23 @@ export default async function SupervisorHomePage() {
         <Panel className="lg:col-span-2">
           <PanelHeader
             title="Pipeline"
-            description="Where every report at your site currently sits."
+            description="Where reports currently sit."
           />
           <div className="px-4 py-4">
-            {allTickets.length === 0 ? (
+            {pipelineTickets.length === 0 ? (
               <p className="py-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
-                No reports yet.
+                No reports in the pipeline.
               </p>
             ) : (
               <>
                 <div className="flex h-3 overflow-hidden rounded-full bg-inset">
-                  {TICKET_STATUSES.map((status) =>
+                  {pipelineStatuses.map((status) =>
                     statusCounts[status] > 0 ? (
                       <div
                         key={status}
                         className={statusVisual(status).fill}
                         style={{
-                          width: `${(statusCounts[status] / allTickets.length) * 100}%`,
+                          width: `${(statusCounts[status] / pipelineTickets.length) * 100}%`,
                         }}
                         title={`${status}: ${statusCounts[status]}`}
                       />
@@ -123,8 +125,8 @@ export default async function SupervisorHomePage() {
                   )}
                 </div>
 
-                <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2.5 sm:grid-cols-3">
-                  {TICKET_STATUSES.map((status) => (
+                <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2.5 sm:grid-cols-4">
+                  {pipelineStatuses.map((status) => (
                     <div
                       key={status}
                       className="flex items-baseline justify-between gap-2 border-b border-hairline pb-2"

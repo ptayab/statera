@@ -171,7 +171,6 @@ export async function submitTicket(
   revalidatePath("/supervisor");
   revalidatePath("/supervisor/open");
   revalidatePath("/supervisor/all");
-  revalidatePath("/supervisor/priority");
 
   return {
     ok: true,

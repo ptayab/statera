@@ -17,6 +17,8 @@ export type TicketScore = {
   label: PriorityLabel;
   factors: ScoreFactors;
   daysIdle: number;
+  /** Age used for scoring — frozen at close so closed issues stop ageing. */
+  daysOpen: number;
 };
 
 export type ScoreableTicket = {
@@ -24,6 +26,8 @@ export type ScoreableTicket = {
   description: string;
   urgency: TicketUrgency;
   created_at: string;
+  closed_at?: string | null;
+  status?: string;
 };
 
 const URGENCY_MULTIPLIER: Record<TicketUrgency, number> = {
@@ -69,7 +73,17 @@ const MS_PER_DAY = 24 * 60 * 60 * 1000;
 function daysBetween(fromIso: string, to: Date = new Date()): number {
   const from = new Date(fromIso).getTime();
   if (Number.isNaN(from)) return 0;
-  return Math.max(0, (to.getTime() - from) / MS_PER_DAY);
+  const until = to.getTime();
+  if (Number.isNaN(until)) return 0;
+  return Math.max(0, (until - from) / MS_PER_DAY);
+}
+
+/** Closed issues never score past close; earlier timestamps still reconstruct history. */
+function scoringAsOf(ticket: ScoreableTicket, now: Date): Date {
+  if (!ticket.closed_at) return now;
+  const closed = new Date(ticket.closed_at);
+  if (Number.isNaN(closed.getTime())) return now;
+  return closed.getTime() < now.getTime() ? closed : now;
 }
 
 function categoryPoints(category: string): number {
@@ -128,10 +142,11 @@ export function scoreTicket(
   now: Date = new Date(),
   options?: { descriptionPts?: number | null },
 ): TicketScore {
+  const asOf = scoringAsOf(ticket, now);
   const categoryPts = categoryPoints(ticket.category);
-  const daysOpen = daysBetween(ticket.created_at, now);
+  const daysOpen = daysBetween(ticket.created_at, asOf);
   const agePts = Math.min(daysOpen * 2, 40);
-  const daysIdle = daysBetween(lastEventAt ?? ticket.created_at, now);
+  const daysIdle = daysBetween(lastEventAt ?? ticket.created_at, asOf);
   const dormancyPts = dormancyPoints(daysIdle);
   const descriptionPts =
     options?.descriptionPts != null
@@ -156,6 +171,7 @@ export function scoreTicket(
       duplicateMultiplier: dupeMult,
     },
     daysIdle: Math.round(daysIdle * 10) / 10,
+    daysOpen: Math.round(daysOpen * 10) / 10,
   };
 }
 

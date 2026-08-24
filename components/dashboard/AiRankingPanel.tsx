@@ -14,8 +14,6 @@ import {
 } from "@/lib/tickets/scoring";
 import { categoryVisual, idleVisual, priorityVisual } from "@/lib/tickets/theme";
 
-const MS_PER_DAY = 24 * 60 * 60 * 1000;
-
 /** Caps used to draw each signal bar as "how strongly this signal fired". */
 const SIGNAL_CAPS = {
   category: 50,
@@ -23,10 +21,6 @@ const SIGNAL_CAPS = {
   dormancy: 30,
   wording: 20,
 };
-
-function daysSince(iso: string): number {
-  return Math.max(0, (Date.now() - new Date(iso).getTime()) / MS_PER_DAY);
-}
 
 function SignalRow({
   label,
@@ -117,7 +111,7 @@ export function AiRankingPanel({
     factors.dormancyPts +
     factors.descriptionPts;
   const meterPct = Math.min(ranking.score / SCORE_METER_MAX, 1) * 100;
-  const daysOpen = daysSince(createdAt);
+  const daysOpen = ranking.daysOpen;
 
   return (
     <Panel accent={priority.fill}>

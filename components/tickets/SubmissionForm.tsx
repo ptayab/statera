@@ -7,7 +7,10 @@ import {
   getCategoryMeta,
   type PilotTicketCategory,
 } from "@/lib/tickets/categories";
-import { TICKET_URGENCIES } from "@/lib/tickets/scoring";
+import {
+  TICKET_URGENCIES,
+  URGENCY_RESPONSE_TIMES,
+} from "@/lib/tickets/scoring";
 import type { TicketUrgency } from "@/lib/supabase/types";
 
 type SubmitTicketFn = (
@@ -167,9 +170,9 @@ export function SubmissionForm({ submitTicket }: SubmissionFormProps) {
 
       <fieldset className="space-y-3">
         <legend className="text-sm font-medium">Your ranking</legend>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">
-          How serious this feels to you. Supervisors also see a separate AI
-          ranking computed from this and other signals.
+        <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
+          This is how fast you want the issue to be looked at. Supervisors also
+          see a separate AI ranking computed from this and other signals.
         </p>
         <div className="grid grid-cols-3 gap-2">
           {TICKET_URGENCIES.map((option) => {
@@ -196,6 +199,12 @@ export function SubmissionForm({ submitTicket }: SubmissionFormProps) {
             );
           })}
         </div>
+        <p
+          className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400"
+          aria-live="polite"
+        >
+          {`${urgency} means you want this looked at ${URGENCY_RESPONSE_TIMES[urgency]}.`}
+        </p>
       </fieldset>
 
       <div className="flex flex-col gap-1.5">

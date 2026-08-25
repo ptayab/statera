@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { addTicketMessage } from "@/app/supervisor/actions";
 import { AiRankingPanel } from "@/components/dashboard/AiRankingPanel";
 import { ClosedIssueSummary } from "@/components/dashboard/ClosedIssueSummary";
+import { SupervisorReminders } from "@/components/dashboard/SupervisorReminders";
 import { TicketActions } from "@/components/dashboard/TicketActions";
 import { TicketChat } from "@/components/dashboard/TicketChat";
 import { CategoryGuidance } from "@/components/tickets/CategoryGuidance";
@@ -124,6 +125,8 @@ export default async function TicketDetailPage({ params }: TicketDetailPageProps
             disabledReason={disabledReason}
             sendMessage={addTicketMessage}
           />
+
+          <SupervisorReminders />
         </div>
 
         <aside className="flex flex-col gap-4 lg:sticky lg:top-6">

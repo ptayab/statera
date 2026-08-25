@@ -177,6 +177,13 @@ export function scoreTicket(
 
 export const TICKET_URGENCIES: TicketUrgency[] = ["Low", "Medium", "High"];
 
+/** How soon the reporter wants a supervisor to look at the issue. */
+export const URGENCY_RESPONSE_TIMES: Record<TicketUrgency, string> = {
+  High: "within 24 hours",
+  Medium: "within 2–3 days",
+  Low: "sometime within a week",
+};
+
 export function isTicketUrgency(value: string): value is TicketUrgency {
   return TICKET_URGENCIES.includes(value as TicketUrgency);
 }

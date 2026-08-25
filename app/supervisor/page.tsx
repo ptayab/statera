@@ -4,7 +4,7 @@ import { NavCard, StatTile } from "@/components/ui/StatTile";
 import { getUserProfile } from "@/lib/auth/session";
 import { formatDuration } from "@/lib/tickets/format";
 import { getSiteTicketsWithRanking } from "@/lib/tickets/queries";
-import { TICKET_STATUSES, isOpenTicketStatus } from "@/lib/tickets/status";
+import { PIPELINE_STATUS_GUIDANCE, TICKET_STATUSES, isOpenTicketStatus } from "@/lib/tickets/status";
 import { idleLevel, statusVisual } from "@/lib/tickets/theme";
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
@@ -69,7 +69,7 @@ export default async function SupervisorHomePage() {
       <PageHeader
         eyebrow="Site overview"
         title={`Welcome${profile?.name ? `, ${profile.name}` : ""}`}
-        description="Review and act on safety reports for your site."
+        description="Review and act on safety reports for your site. Write back to workers, and keep a no-blame policy so people keep reporting."
       />
 
       <div className="grid gap-3 sm:grid-cols-3">
@@ -125,22 +125,29 @@ export default async function SupervisorHomePage() {
                   )}
                 </div>
 
-                <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2.5 sm:grid-cols-4">
+                <dl className="mt-4 grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
                   {pipelineStatuses.map((status) => (
                     <div
                       key={status}
-                      className="flex items-baseline justify-between gap-2 border-b border-hairline pb-2"
+                      className="border-b border-hairline pb-2.5"
                     >
-                      <dt className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-300">
-                        <span
-                          className={`h-2 w-2 shrink-0 rounded-full ${statusVisual(status).dot}`}
-                          aria-hidden
-                        />
-                        {status}
-                      </dt>
-                      <dd className="font-display text-base leading-none tabular-nums text-zinc-900 dark:text-zinc-100">
-                        {statusCounts[status]}
-                      </dd>
+                      <div className="flex items-baseline justify-between gap-2">
+                        <dt className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-300">
+                          <span
+                            className={`h-2 w-2 shrink-0 rounded-full ${statusVisual(status).dot}`}
+                            aria-hidden
+                          />
+                          {status}
+                        </dt>
+                        <dd className="font-display text-base leading-none tabular-nums text-zinc-900 dark:text-zinc-100">
+                          {statusCounts[status]}
+                        </dd>
+                      </div>
+                      {PIPELINE_STATUS_GUIDANCE[status] ? (
+                        <p className="mt-1 pl-4 text-[11px] leading-relaxed text-zinc-500 dark:text-zinc-400">
+                          {PIPELINE_STATUS_GUIDANCE[status]}
+                        </p>
+                      ) : null}
                     </div>
                   ))}
                 </dl>

@@ -79,6 +79,15 @@ export function formatTicketEvent(
   }
 }
 
+/** Unseen ticket activity shown in the nav bell. */
+export type TicketNotification = {
+  ticketId: string;
+  href: string;
+  title: string;
+  preview: string;
+  at: string;
+};
+
 export type TicketListItem = {
   id: string;
   category: string;
@@ -88,6 +97,7 @@ export type TicketListItem = {
   created_at: string;
   closed_at: string | null;
   reporter_name: string;
+  assigned_to: string | null;
   assignee_name: string | null;
 };
 

@@ -126,6 +126,24 @@ export type Database = {
         };
         Relationships: [];
       };
+      ticket_reads: {
+        Row: {
+          user_id: string;
+          ticket_id: string;
+          last_seen_at: string;
+        };
+        Insert: {
+          user_id: string;
+          ticket_id: string;
+          last_seen_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          ticket_id?: string;
+          last_seen_at?: string;
+        };
+        Relationships: [];
+      };
       ai_interactions: {
         Row: {
           id: string;

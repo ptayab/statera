@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LogoutButton } from "@/components/auth/LogoutButton";
+import { NotificationBell } from "@/components/nav/NotificationBell";
+import type { TicketNotification } from "@/lib/tickets/display";
 
 export type NavItem = {
   href: string;
@@ -13,6 +15,7 @@ export type NavItem = {
 type TopNavProps = {
   items: NavItem[];
   userLabel?: string | null;
+  notifications?: TicketNotification[];
 };
 
 function isActive(pathname: string, item: NavItem): boolean {
@@ -23,7 +26,7 @@ function isActive(pathname: string, item: NavItem): boolean {
   return pathname === item.href;
 }
 
-export function TopNav({ items, userLabel }: TopNavProps) {
+export function TopNav({ items, userLabel, notifications = [] }: TopNavProps) {
   const pathname = usePathname();
 
   return (
@@ -69,7 +72,8 @@ export function TopNav({ items, userLabel }: TopNavProps) {
           </nav>
         </div>
 
-        <div className="flex items-center gap-3 sm:justify-end">
+        <div className="flex items-center gap-2 sm:justify-end">
+          <NotificationBell items={notifications} />
           {userLabel ? (
             <span className="hidden text-xs text-zinc-500 sm:inline dark:text-zinc-400">
               {userLabel}

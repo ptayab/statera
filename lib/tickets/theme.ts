@@ -6,6 +6,7 @@ import type { PriorityLabel } from "@/lib/tickets/scoring";
  * Single source of truth for issue colour. Roles are kept separate so a row
  * never turns into a rainbow:
  *   - priority owns saturated colour (red → orange → amber → green)
+ *   - closed issues drop the priority rail to grey — the work is done
  *   - status is a neutral chip with a coloured dot
  *   - category is quiet text, except Dangerous Occurrence which is regulatory
  *   - idle/dormancy has its own warm escalation
@@ -61,6 +62,22 @@ const PRIORITY_VISUALS: Record<PriorityLabel, PriorityVisual> = {
 
 export function priorityVisual(label: PriorityLabel): PriorityVisual {
   return PRIORITY_VISUALS[label] ?? PRIORITY_VISUALS.Low;
+}
+
+/** Neutral leading-edge bar used when an issue is no longer live. */
+export const CLOSED_RAIL = "bg-zinc-400";
+
+const UNRANKED_RAIL = "bg-zinc-200 dark:bg-zinc-700";
+
+/** Leading-edge bar for a list row: priority colour, unless the issue is closed. */
+export function issueRail(
+  status: TicketStatus,
+  label: PriorityLabel | null | undefined,
+): string {
+  if (status === "Closed") {
+    return CLOSED_RAIL;
+  }
+  return label ? priorityVisual(label).rail : UNRANKED_RAIL;
 }
 
 export const PRIORITY_ORDER: PriorityLabel[] = [

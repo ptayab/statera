@@ -28,9 +28,10 @@ export function formatFullDateTime(iso: string): string {
   }).format(new Date(iso));
 }
 
-export function formatTimeAgo(iso: string): string {
+export function formatTimeAgo(iso: string, untilIso?: string | null): string {
   const formatter = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
-  let duration = (new Date(iso).getTime() - Date.now()) / MS_PER_SECOND;
+  const until = untilIso ? new Date(untilIso).getTime() : Date.now();
+  let duration = (new Date(iso).getTime() - until) / MS_PER_SECOND;
 
   for (const division of RELATIVE_DIVISIONS) {
     if (Math.abs(duration) < division.amount) {
@@ -42,9 +43,10 @@ export function formatTimeAgo(iso: string): string {
   return formatter.format(Math.round(duration), "year");
 }
 
-/** Terse age for dense rows: "now", "40m", "6h", "12d", "9w". */
-export function formatCompactAge(iso: string): string {
-  const elapsed = Date.now() - new Date(iso).getTime();
+/** Terse age for dense rows: "now", "40m", "6h", "12d", "9w". Pass `untilIso` to freeze at close. */
+export function formatCompactAge(iso: string, untilIso?: string | null): string {
+  const until = untilIso ? new Date(untilIso).getTime() : Date.now();
+  const elapsed = until - new Date(iso).getTime();
 
   if (!Number.isFinite(elapsed) || elapsed < MS_PER_MINUTE) return "now";
   if (elapsed < MS_PER_HOUR) return `${Math.floor(elapsed / MS_PER_MINUTE)}m`;

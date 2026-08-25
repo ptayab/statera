@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { addTicketMessage } from "@/app/supervisor/actions";
 import { AiRankingPanel } from "@/components/dashboard/AiRankingPanel";
+import { ClosedIssueSummary } from "@/components/dashboard/ClosedIssueSummary";
 import { TicketActions } from "@/components/dashboard/TicketActions";
 import { TicketChat } from "@/components/dashboard/TicketChat";
 import { CategoryGuidance } from "@/components/tickets/CategoryGuidance";
@@ -10,6 +11,8 @@ import { Eyebrow, Panel, PanelHeader } from "@/components/ui/Panel";
 import { getUserProfile } from "@/lib/auth/session";
 import { getCategoryMeta } from "@/lib/tickets/categories";
 import { formatFullDateTime, shortId } from "@/lib/tickets/format";
+import { buildClosedIssueHistory } from "@/lib/tickets/history";
+import { markTicketSeen } from "@/lib/tickets/notifications";
 import { getTicketDetail } from "@/lib/tickets/queries";
 
 type TicketDetailPageProps = {
@@ -41,25 +44,35 @@ export default async function TicketDetailPage({ params }: TicketDetailPageProps
     notFound();
   }
 
+  await markTicketSeen(ticket.id);
+
   const assignedToMe = ticket.assigned_to === profile.id;
-  const canSend = assignedToMe && ticket.status !== "Closed";
-  const disabledReason =
-    ticket.status === "Closed"
-      ? "This ticket is closed."
-      : ticket.assigned_to
-        ? assignedToMe
-          ? null
-          : "Only the assigned supervisor can reply in this conversation."
-        : "Assign this ticket to yourself to reply.";
+  const isClosed = ticket.status === "Closed";
+  const canSend = assignedToMe && !isClosed;
+  const disabledReason = isClosed
+    ? "This ticket is closed."
+    : ticket.assigned_to
+      ? assignedToMe
+        ? null
+        : "Only the assigned supervisor can reply in this conversation."
+      : "Assign this ticket to yourself to reply.";
+  const closedHistory = isClosed
+    ? buildClosedIssueHistory(
+        ticket,
+        ticket.events,
+        ticket.duplicate_count,
+        ticket.ai_analysis?.descriptionPts,
+      )
+    : null;
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-6 sm:px-6 sm:py-8">
       <header className="mb-6">
         <Link
-          href="/supervisor/priority"
+          href="/supervisor/open"
           className="text-xs text-zinc-500 transition hover:text-statera-orange dark:text-zinc-400"
         >
-          ← Back to priority queue
+          ← Back to open issues
         </Link>
 
         <div className="mt-3">
@@ -70,10 +83,10 @@ export default async function TicketDetailPage({ params }: TicketDetailPageProps
         </div>
 
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <PriorityChip label={ticket.ranking.label} />
+          {isClosed ? null : <PriorityChip label={ticket.ranking.label} />}
           <UserRankingChip urgency={ticket.urgency} />
           <StatusChip status={ticket.status} />
-          <IdleChip daysIdle={ticket.ranking.daysIdle} />
+          {isClosed ? null : <IdleChip daysIdle={ticket.ranking.daysIdle} />}
         </div>
       </header>
 
@@ -114,21 +127,43 @@ export default async function TicketDetailPage({ params }: TicketDetailPageProps
         </div>
 
         <aside className="flex flex-col gap-4 lg:sticky lg:top-6">
-          <AiRankingPanel
-            ranking={ticket.ranking}
-            urgency={ticket.urgency}
-            category={ticket.category}
-            createdAt={ticket.created_at}
-            lastEventAt={ticket.last_event_at}
-            duplicateCount={ticket.duplicate_count}
-            analysis={ticket.ai_analysis}
-          />
+          {isClosed ? (
+            <ClosedIssueSummary
+              history={
+                closedHistory ?? {
+                  openedAt: ticket.created_at,
+                  closedAt: ticket.closed_at ?? ticket.created_at,
+                  rankings: [
+                    {
+                      label: ticket.ranking.label,
+                      score: ticket.ranking.score,
+                      from: ticket.created_at,
+                      to: ticket.closed_at ?? ticket.created_at,
+                    },
+                  ],
+                  dormancy: [],
+                }
+              }
+            />
+          ) : (
+            <AiRankingPanel
+              ranking={ticket.ranking}
+              urgency={ticket.urgency}
+              category={ticket.category}
+              createdAt={ticket.created_at}
+              lastEventAt={ticket.last_event_at}
+              duplicateCount={ticket.duplicate_count}
+              analysis={ticket.ai_analysis}
+            />
+          )}
 
           <Panel>
             <PanelHeader title="Details" />
             <dl className="space-y-2.5 px-4 py-4">
               <DetailRow label="Reported by" value={ticket.reporter_name} />
-              <DetailRow label="AI ranking" value={ticket.ranking.label} />
+              {isClosed ? null : (
+                <DetailRow label="AI ranking" value={ticket.ranking.label} />
+              )}
               <DetailRow label="User ranking" value={ticket.urgency} />
               <DetailRow
                 label="Assignee"

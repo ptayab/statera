@@ -7,6 +7,7 @@ import { StatusChip } from "@/components/ui/Chip";
 import { Eyebrow, Panel, PanelHeader } from "@/components/ui/Panel";
 import { getUserProfile } from "@/lib/auth/session";
 import { formatFullDateTime, shortId } from "@/lib/tickets/format";
+import { markTicketSeen } from "@/lib/tickets/notifications";
 import { getWorkerTicketDetail } from "@/lib/tickets/queries";
 
 type WorkerTicketDetailPageProps = {
@@ -28,6 +29,8 @@ export default async function WorkerTicketDetailPage({
   if (!ticket) {
     notFound();
   }
+
+  await markTicketSeen(ticket.id);
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 py-6 sm:px-6 sm:py-8">

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LogoutButton } from "@/components/auth/LogoutButton";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import { NotificationBell } from "@/components/nav/NotificationBell";
 import type { TicketNotification } from "@/lib/tickets/display";
 
@@ -37,12 +38,7 @@ export function TopNav({ items, userLabel, notifications = [] }: TopNavProps) {
       />
       <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-7">
-          <Link
-            href={items[0]?.href ?? "/"}
-            className="font-display text-xl leading-none tracking-[0.12em] text-zinc-900 dark:text-zinc-50"
-          >
-            STATERA
-          </Link>
+          <BrandLogo href={items[0]?.href ?? "/"} size={32} priority />
 
           <nav className="flex flex-wrap items-center gap-0.5">
             {items.map((item) => {

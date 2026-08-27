@@ -1,4 +1,5 @@
 import { LoginForm } from "@/components/auth/LoginForm";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 
 const ERROR_MESSAGES: Record<string, string> = {
   no_profile:
@@ -19,7 +20,13 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   return (
     <div className="flex min-h-screen">
       <aside className="hidden w-[45%] flex-col bg-statera-dark px-12 py-10 lg:flex">
-        <div className="flex flex-1 flex-col justify-center space-y-5">
+        <div className="flex flex-1 flex-col justify-center space-y-6">
+          <BrandLogo
+            size={88}
+            showWordmark={false}
+            className="mb-2"
+            priority
+          />
           <h1 className="font-display text-8xl leading-none tracking-wide text-white xl:text-9xl">
             STATERA
           </h1>
@@ -40,6 +47,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <div className="flex flex-1 flex-col justify-center px-8 py-12 sm:px-16 lg:px-20">
           <div className="mx-auto w-full max-w-md">
             <div className="mb-8 space-y-3 border-b border-zinc-200 pb-8">
+              <div className="mb-6 lg:hidden">
+                <BrandLogo size={40} priority />
+              </div>
               <h2 className="font-display text-5xl leading-none tracking-wide text-zinc-900">
                 SIGN IN
               </h2>

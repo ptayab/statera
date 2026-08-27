@@ -15,12 +15,10 @@ import {
   SECONDARY_BUTTON,
 } from "@/components/ui/controls";
 import type { TicketStatus } from "@/lib/supabase/types";
-import { TICKET_STATUSES } from "@/lib/tickets/status";
-
-/** Supervisor-managed statuses — Closed is reserved for the worker. */
-const SUPERVISOR_STATUS_OPTIONS = TICKET_STATUSES.filter(
-  (status) => status !== "Submitted" && status !== "Closed",
-);
+import {
+  SUPERVISOR_STATUS_OPTIONS,
+  type SupervisorStatus,
+} from "@/lib/tickets/status";
 
 type TicketActionsProps = {
   ticketId: string;
@@ -119,7 +117,7 @@ export function TicketActions({
                 value={status}
                 disabled={isPending}
                 onChange={(event) =>
-                  setStatus(event.target.value as TicketStatus)
+                  setStatus(event.target.value as SupervisorStatus)
                 }
                 className={FIELD}
               >

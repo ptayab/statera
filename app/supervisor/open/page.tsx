@@ -60,7 +60,7 @@ export default async function OpenIssuesPage({ searchParams }: OpenIssuesPagePro
       <PageHeader
         eyebrow="Open"
         title="Open issues"
-        description="Everything that is not yet resolved or closed. Rank by AI priority or by how recently it was reported."
+        description="Everything that is not yet closed, including issues waiting on the worker. Rank by AI priority or by how recently it was reported."
         action={
           <span className="font-display text-3xl leading-none tabular-nums text-zinc-300 dark:text-zinc-600">
             {visible.length}

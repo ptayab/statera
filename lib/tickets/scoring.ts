@@ -135,6 +135,14 @@ export const PRIORITY_THRESHOLDS: { label: PriorityLabel; min: number }[] = [
   { label: "Low", min: 0 },
 ];
 
+/** Target response window for each AI ranking. */
+export const RANKING_RESPONSE_GUIDANCE: Record<PriorityLabel, string> = {
+  Critical: "ASAP",
+  High: "Within a day",
+  Medium: "Within 2–3 days",
+  Low: "Within a week",
+};
+
 export function scoreTicket(
   ticket: ScoreableTicket,
   lastEventAt: string | null,

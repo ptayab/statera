@@ -38,11 +38,12 @@ export const SUPERVISOR_HANDLING_REMINDERS = [
   "Keep a no-blame policy to encourage reporting — people speak up when they know they will not be punished.",
 ];
 
-/** Statuses that still need supervisor attention. */
+/** Statuses that are not yet closed — Resolved stays assigned until the worker closes. */
 export const OPEN_TICKET_STATUSES: TicketStatus[] = [
   "Submitted",
   "In Review",
   "In Progress",
+  "Resolved",
 ];
 
 export function isTicketStatus(value: string): value is TicketStatus {

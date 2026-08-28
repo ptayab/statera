@@ -147,6 +147,7 @@ export default async function TicketDetailPage({ params }: TicketDetailPageProps
                   dormancy: [],
                 }
               }
+              languageSummary={ticket.ai_analysis?.languageSummary}
             />
           ) : (
             <AiRankingPanel

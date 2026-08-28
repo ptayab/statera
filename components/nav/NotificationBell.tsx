@@ -124,7 +124,10 @@ export function NotificationBell({ items }: NotificationBellProps) {
                       <span className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-100">
                         {item.title}
                       </span>
-                      <span className="shrink-0 text-[11px] text-zinc-400 dark:text-zinc-500">
+                      <span
+                        className="shrink-0 text-[11px] text-zinc-400 dark:text-zinc-500"
+                        suppressHydrationWarning
+                      >
                         {formatTimeAgo(item.at)}
                       </span>
                     </span>

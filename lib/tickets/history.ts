@@ -55,6 +55,7 @@ export function buildClosedIssueHistory(
   events: { created_at: string }[],
   duplicateCount: number,
   descriptionPts?: number | null,
+  feedbackAdjustment?: number | null,
 ): ClosedIssueHistory | null {
   const openedAt = validTime(ticket.created_at);
   const closedAt =
@@ -104,7 +105,7 @@ export function buildClosedIssueHistory(
     created_at: ticket.created_at,
     closed_at: ticket.closed_at,
   };
-  const options = { descriptionPts };
+  const options = { descriptionPts, feedbackAdjustment };
 
   const rankings: RankingPeriod[] = [];
   for (const asOf of [...samples].sort((a, b) => a - b)) {

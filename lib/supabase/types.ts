@@ -60,6 +60,7 @@ export type Database = {
           ai_suggested_priority: string | null;
           ai_explanation: string | null;
           ai_analysis: Record<string, unknown> | null;
+          ai_ranking_feedback: Record<string, unknown> | null;
           created_at: string;
           closed_at: string | null;
         };
@@ -77,6 +78,7 @@ export type Database = {
           ai_suggested_priority?: string | null;
           ai_explanation?: string | null;
           ai_analysis?: Record<string, unknown> | null;
+          ai_ranking_feedback?: Record<string, unknown> | null;
           created_at?: string;
           closed_at?: string | null;
         };
@@ -94,6 +96,7 @@ export type Database = {
           ai_suggested_priority?: string | null;
           ai_explanation?: string | null;
           ai_analysis?: Record<string, unknown> | null;
+          ai_ranking_feedback?: Record<string, unknown> | null;
           created_at?: string;
           closed_at?: string | null;
         };
@@ -204,6 +207,17 @@ export type Database = {
           id: string;
           category: string;
           description: string;
+        }[];
+      };
+      list_ranking_feedback_for_ai: {
+        Args: Record<string, never>;
+        Returns: {
+          category: string;
+          description: string;
+          ranking_label: string;
+          ranking_score: number;
+          agreed: boolean;
+          reason: string;
         }[];
       };
     };

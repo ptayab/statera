@@ -4,6 +4,10 @@ import { revalidatePath } from "next/cache";
 import { getUserProfile } from "@/lib/auth/session";
 import { createServerClient } from "@/lib/supabase/server";
 import type { TicketStatus } from "@/lib/supabase/types";
+import {
+  isPriorityLabel,
+  type RankingFeedbackRecord,
+} from "@/lib/tickets/ranking-feedback";
 import { isTicketStatus } from "@/lib/tickets/status";
 
 type ActionResult = { ok: true } | { ok: false; error: string };
@@ -138,6 +142,90 @@ export async function addTicketMessage(
 
   if (error) {
     return { ok: false, error: error.message };
+  }
+
+  revalidateTicket(ticketId);
+  return { ok: true };
+}
+
+export async function submitRankingFeedback(
+  ticketId: string,
+  agreed: boolean,
+  reason: string,
+  ranking: { label: string; score: number },
+): Promise<ActionResult> {
+  const auth = await requireSupervisor();
+  if (!auth.ok) {
+    return auth;
+  }
+
+  if (typeof agreed !== "boolean") {
+    return { ok: false, error: "Choose whether the ranking looks right." };
+  }
+
+  if (!isPriorityLabel(ranking.label) || !Number.isFinite(ranking.score)) {
+    return { ok: false, error: "Invalid ranking snapshot." };
+  }
+
+  const trimmedReason = reason.trim();
+  if (!agreed && trimmedReason.length < 3) {
+    return {
+      ok: false,
+      error: "Add a short reason so the AI can learn what was wrong.",
+    };
+  }
+  if (trimmedReason.length > 500) {
+    return { ok: false, error: "Reason is too long (max 500 characters)." };
+  }
+
+  const supabase = await createServerClient();
+  const { data: ticket, error: ticketError } = await supabase
+    .from("tickets")
+    .select("id")
+    .eq("id", ticketId)
+    .eq("site_id", auth.siteId)
+    .maybeSingle();
+
+  if (ticketError) {
+    return { ok: false, error: ticketError.message };
+  }
+
+  if (!ticket) {
+    return { ok: false, error: "Ticket not found." };
+  }
+
+  const feedback: RankingFeedbackRecord = {
+    agreed,
+    label: ranking.label,
+    score: ranking.score,
+    reason: trimmedReason || null,
+    at: new Date().toISOString(),
+  };
+
+  const { error } = await supabase
+    .from("tickets")
+    .update({ ai_ranking_feedback: feedback })
+    .eq("id", ticketId)
+    .eq("site_id", auth.siteId);
+
+  if (error) {
+    return { ok: false, error: error.message };
+  }
+
+  const { data: interaction } = await supabase
+    .from("ai_interactions")
+    .select("id")
+    .eq("ticket_id", ticketId)
+    .eq("prompt_type", "pattern_check")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (interaction) {
+    await supabase
+      .from("ai_interactions")
+      .update({ human_agreed: agreed })
+      .eq("id", interaction.id);
   }
 
   revalidateTicket(ticketId);

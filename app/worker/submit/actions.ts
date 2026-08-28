@@ -97,9 +97,10 @@ export async function submitTicket(
 
   let analysis = null;
   try {
-    const { data: openReports } = await supabase.rpc(
-      "list_open_reports_for_ai",
-    );
+    const [{ data: openReports }, { data: priorFeedback }] = await Promise.all([
+      supabase.rpc("list_open_reports_for_ai"),
+      supabase.rpc("list_ranking_feedback_for_ai"),
+    ]);
     analysis = await analyzeReportWithClaude({
       category,
       urgency: urgencyRaw,
@@ -108,6 +109,14 @@ export async function submitTicket(
         id: row.id,
         category: row.category,
         description: row.description,
+      })),
+      feedback: (priorFeedback ?? []).map((row) => ({
+        category: row.category,
+        description: row.description,
+        rankingLabel: row.ranking_label,
+        rankingScore: row.ranking_score,
+        agreed: row.agreed,
+        reason: row.reason,
       })),
     });
   } catch (error) {

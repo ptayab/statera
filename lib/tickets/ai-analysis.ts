@@ -1,5 +1,7 @@
 export type TicketAiAnalysis = {
   descriptionPts: number;
+  feedbackAdjustment: number;
+  feedbackSummary: string | null;
   languageSummary: string;
   suggestedPriority: string;
   duplicateIds: string[];
@@ -25,6 +27,12 @@ export function parseAiAnalysis(value: unknown): TicketAiAnalysis | null {
 
   return {
     descriptionPts: Math.max(0, Math.min(20, Math.round(row.descriptionPts))),
+    feedbackAdjustment:
+      typeof row.feedbackAdjustment === "number"
+        ? Math.max(-20, Math.min(20, Math.round(row.feedbackAdjustment)))
+        : 0,
+    feedbackSummary:
+      typeof row.feedbackSummary === "string" ? row.feedbackSummary : null,
     languageSummary: row.languageSummary,
     suggestedPriority:
       typeof row.suggestedPriority === "string"

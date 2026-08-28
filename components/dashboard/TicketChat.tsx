@@ -86,6 +86,7 @@ export function TicketChat({
                     <time
                       className="mt-0.5 block text-[10px] text-zinc-400 dark:text-zinc-500"
                       dateTime={event.created_at}
+                      suppressHydrationWarning
                     >
                       {formatDateTime(event.created_at)}
                     </time>
@@ -131,6 +132,7 @@ export function TicketChat({
                         : "text-zinc-400 dark:text-zinc-500"
                     }`}
                     dateTime={event.created_at}
+                    suppressHydrationWarning
                   >
                     {formatDateTime(event.created_at)}
                   </time>

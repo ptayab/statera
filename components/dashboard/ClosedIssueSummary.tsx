@@ -1,8 +1,11 @@
 import type { ReactNode } from "react";
+import { RankingFeedback } from "@/components/dashboard/RankingFeedback";
 import { Panel, PanelHeader } from "@/components/ui/Panel";
 import { PriorityTag } from "@/components/ui/Chip";
 import { formatCompactAge, formatDateTime, formatDayCount } from "@/lib/tickets/format";
 import type { ClosedIssueHistory } from "@/lib/tickets/history";
+import type { RankingFeedbackRecord } from "@/lib/tickets/ranking-feedback";
+import type { TicketScore } from "@/lib/tickets/scoring";
 import { CLOSED_RAIL, idleVisual } from "@/lib/tickets/theme";
 
 function SummaryRow({ children }: { children: ReactNode }) {
@@ -13,7 +16,17 @@ function SummaryRow({ children }: { children: ReactNode }) {
   );
 }
 
-export function ClosedIssueSummary({ history }: { history: ClosedIssueHistory }) {
+export function ClosedIssueSummary({
+  ticketId,
+  ranking,
+  rankingFeedback,
+  history,
+}: {
+  ticketId: string;
+  ranking: TicketScore;
+  rankingFeedback: RankingFeedbackRecord | null;
+  history: ClosedIssueHistory;
+}) {
   const timeOpen = formatCompactAge(history.openedAt, history.closedAt);
 
   return (
@@ -21,6 +34,14 @@ export function ClosedIssueSummary({ history }: { history: ClosedIssueHistory })
       <PanelHeader
         title="Summary"
         description="What the AI ranking did while this issue was open."
+        action={
+          <RankingFeedback
+            ticketId={ticketId}
+            rankingLabel={ranking.label}
+            rankingScore={ranking.score}
+            initialFeedback={rankingFeedback}
+          />
+        }
       />
 
       <div className="px-4 py-4">

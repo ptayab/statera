@@ -1,3 +1,4 @@
+import type { TicketStatus } from "@/lib/supabase/types";
 import { duplicateClusters } from "@/lib/tickets/ai-analysis";
 import type { TicketScore } from "@/lib/tickets/scoring";
 
@@ -64,4 +65,30 @@ export function groupSimilarIssues<T extends SimilarGroupTicket>(
   }
 
   return groups;
+}
+
+function isLiveStatus(status: TicketStatus): boolean {
+  return status !== "Resolved" && status !== "Closed";
+}
+
+/**
+ * Keep mixed similar groups together on Open issues: a resolved sibling
+ * stays in the live list with its still-open match, instead of splitting
+ * across “Waiting to close”.
+ */
+export function splitLiveAndWaiting<
+  T extends SimilarGroupTicket & { status: TicketStatus },
+>(tickets: T[]): { live: T[]; waiting: T[] } {
+  const live: T[] = [];
+  const waiting: T[] = [];
+
+  for (const group of groupSimilarIssues(tickets)) {
+    const members = group.kind === "cluster" ? group.tickets : [group.ticket];
+    const bucket = members.some((ticket) => isLiveStatus(ticket.status))
+      ? live
+      : waiting;
+    bucket.push(...members);
+  }
+
+  return { live, waiting };
 }

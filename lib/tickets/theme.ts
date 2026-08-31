@@ -80,6 +80,21 @@ export function issueRail(
   return label ? priorityVisual(label).rail : UNRANKED_RAIL;
 }
 
+/**
+ * Colour of a similar-issue box. Inner cards still fade on their own;
+ * the shell only drops priority tint once nothing in the group is live.
+ */
+export type ClusterIssueTone = "open" | "resolved" | "closed";
+
+export function clusterIssueTone(statuses: TicketStatus[]): ClusterIssueTone {
+  if (statuses.length === 0) return "open";
+  if (statuses.every((status) => status === "Closed")) return "closed";
+  if (statuses.every((status) => status === "Closed" || status === "Resolved")) {
+    return "resolved";
+  }
+  return "open";
+}
+
 export const PRIORITY_ORDER: PriorityLabel[] = [
   "Critical",
   "High",

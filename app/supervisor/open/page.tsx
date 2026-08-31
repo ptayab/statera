@@ -4,6 +4,7 @@ import { TicketList } from "@/components/dashboard/TicketList";
 import { PageHeader, Section } from "@/components/ui/Panel";
 import { getUserProfile } from "@/lib/auth/session";
 import { getSiteTicketsWithRanking } from "@/lib/tickets/queries";
+import { splitLiveAndWaiting } from "@/lib/tickets/similar";
 import { parseIssueAssignment, parseIssueSort } from "@/lib/tickets/sort";
 import { PRIORITY_ORDER, priorityVisual } from "@/lib/tickets/theme";
 
@@ -38,7 +39,6 @@ export default async function OpenIssuesPage({ searchParams }: OpenIssuesPagePro
   });
 
   const active = visible.filter((ticket) => ticket.status !== "Resolved");
-  const resolved = visible.filter((ticket) => ticket.status === "Resolved");
 
   function orderOpen(tickets: typeof visible) {
     return sort === "priority"
@@ -46,8 +46,9 @@ export default async function OpenIssuesPage({ searchParams }: OpenIssuesPagePro
       : tickets;
   }
 
-  const orderedActive = orderOpen(active);
-  const orderedResolved = orderOpen(resolved);
+  const { live: orderedActive, waiting: orderedResolved } = splitLiveAndWaiting(
+    orderOpen(visible),
+  );
 
   const counts = PRIORITY_ORDER.map((label) => ({
     label,

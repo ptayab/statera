@@ -1,3 +1,4 @@
+import { RankingGuide } from "@/components/dashboard/RankingGuide";
 import { TicketList } from "@/components/dashboard/TicketList";
 import { Panel, PanelHeader, PageHeader, Section } from "@/components/ui/Panel";
 import { NavCard, StatTile } from "@/components/ui/StatTile";
@@ -20,8 +21,10 @@ export default async function SupervisorHomePage() {
     isOpenTicketStatus(ticket.status),
   );
 
-  const needsTriage = openTickets.filter((ticket) =>
-    ["Critical", "High"].includes(ticket.ranking.label),
+  const needsTriage = openTickets.filter(
+    (ticket) =>
+      ticket.status !== "Resolved" &&
+      ["Critical", "High"].includes(ticket.ranking.label),
   ).length;
   const unassigned = openTickets.filter(
     (ticket) => ticket.assignee_name === null,
@@ -85,7 +88,7 @@ export default async function SupervisorHomePage() {
           href="/supervisor/open?sort=time"
           value={openTickets.length}
           title="Open issues"
-          description="Everything still awaiting a resolution."
+          description="Everything that is not yet closed."
           accent="bg-amber-400"
         />
         <NavCard
@@ -185,6 +188,10 @@ export default async function SupervisorHomePage() {
             }
           />
         </div>
+      </div>
+
+      <div className="mt-4">
+        <RankingGuide />
       </div>
 
       <Section

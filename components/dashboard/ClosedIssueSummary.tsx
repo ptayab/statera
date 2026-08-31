@@ -21,13 +21,16 @@ export function ClosedIssueSummary({
   ranking,
   rankingFeedback,
   history,
+  languageSummary,
 }: {
   ticketId: string;
   ranking: TicketScore;
   rankingFeedback: RankingFeedbackRecord | null;
   history: ClosedIssueHistory;
+  languageSummary?: string | null;
 }) {
   const timeOpen = formatCompactAge(history.openedAt, history.closedAt);
+  const wording = languageSummary?.trim() ?? "";
 
   return (
     <Panel accent={CLOSED_RAIL}>
@@ -44,7 +47,18 @@ export function ClosedIssueSummary({
         }
       />
 
-      <div className="px-4 py-4">
+      {wording ? (
+        <div className="px-4 py-4">
+          <h3 className="font-display text-[10px] uppercase tracking-[0.16em] text-zinc-400 dark:text-zinc-500">
+            Wording
+          </h3>
+          <p className="mt-3 rounded-lg bg-inset px-3 py-2.5 text-[11px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+            {wording}
+          </p>
+        </div>
+      ) : null}
+
+      <div className={`${wording ? "border-t border-hairline " : ""}px-4 py-4`}>
         <h3 className="font-display text-[10px] uppercase tracking-[0.16em] text-zinc-400 dark:text-zinc-500">
           Time open
         </h3>

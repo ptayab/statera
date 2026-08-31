@@ -50,12 +50,13 @@ export function parseAiAnalysis(value: unknown): TicketAiAnalysis | null {
 }
 
 /**
- * Connected-component sizes from Claude duplicate links.
+ * Connected components from Claude duplicate links.
  * An edge A–B exists if A listed B or B listed A.
+ * Each id maps to every member of its cluster (including itself).
  */
-export function clusterDuplicateCounts(
+export function duplicateClusters(
   tickets: { id: string; duplicateIds: string[] }[],
-): Map<string, number> {
+): Map<string, string[]> {
   const ids = new Set(tickets.map((ticket) => ticket.id));
   const neighbors = new Map<string, Set<string>>();
 
@@ -74,7 +75,7 @@ export function clusterDuplicateCounts(
     }
   }
 
-  const counts = new Map<string, number>();
+  const membersById = new Map<string, string[]>();
   const seen = new Set<string>();
 
   for (const id of ids) {
@@ -95,9 +96,21 @@ export function clusterDuplicateCounts(
     }
 
     for (const member of component) {
-      counts.set(member, component.length);
+      membersById.set(member, component);
     }
   }
 
+  return membersById;
+}
+
+/** Cluster sizes from Claude duplicate links. Tickets Claude has not grouped stay at 1. */
+export function clusterDuplicateCounts(
+  tickets: { id: string; duplicateIds: string[] }[],
+): Map<string, number> {
+  const clusters = duplicateClusters(tickets);
+  const counts = new Map<string, number>();
+  for (const [id, members] of clusters) {
+    counts.set(id, members.length);
+  }
   return counts;
 }

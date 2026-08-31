@@ -8,6 +8,7 @@ import { categoryVisual, idleLevel, issueRail } from "@/lib/tickets/theme";
 export type IssueCardItem = TicketListItem & {
   ranking?: TicketScore | null;
   duplicate_count?: number;
+  duplicateIds?: string[];
   last_event_at?: string | null;
 };
 
@@ -17,6 +18,8 @@ type IssueCardProps = {
   /** Position in an explicitly ordered list; shown in the leading gutter. */
   rank?: number;
   showAssignee?: boolean;
+  /** Inside a similar-issue box — drop the ×N chip and use a tighter card. */
+  nested?: boolean;
 };
 
 /**
@@ -30,16 +33,45 @@ export function IssueCard({
   href,
   rank,
   showAssignee = true,
+  nested = false,
 }: IssueCardProps) {
   const ranking = item.ranking ?? null;
   const rail = issueRail(item.status, ranking?.label);
   const category = categoryVisual(item.category);
   const duplicates = item.duplicate_count ?? 1;
   const isClosed = item.status === "Closed";
+  const isResolved = item.status === "Resolved";
+  const isSettled = isClosed || isResolved;
   const isNeglected =
-    !isClosed &&
+    !isSettled &&
     ranking != null &&
     ["dormant", "stalled"].includes(idleLevel(ranking.daysIdle));
+  const tone = isClosed ? "closed" : isResolved ? "resolved" : "open";
+  const titleClass = {
+    open: "text-zinc-900 dark:text-zinc-100",
+    resolved: "text-zinc-800 dark:text-zinc-200",
+    closed: "text-zinc-500 dark:text-zinc-500",
+  }[tone];
+  const categoryClass = {
+    open: category.text,
+    resolved: category.text,
+    closed: "text-zinc-500 dark:text-zinc-500",
+  }[tone];
+  const priorityClass = {
+    open: "",
+    resolved: "opacity-80",
+    closed: "text-zinc-500 dark:text-zinc-500",
+  }[tone];
+  const cardClass = {
+    open: "bg-panel ring-hairline shadow-[0_1px_2px_rgba(24,24,27,0.04)] hover:shadow-[0_6px_20px_-6px_rgba(24,24,27,0.18)]",
+    resolved: "bg-panel ring-hairline dark:bg-white/[0.04]",
+    closed: "bg-zinc-100/80 ring-hairline dark:bg-black/30 dark:ring-white/5",
+  }[tone];
+  const fadeClass = {
+    open: "",
+    resolved: "opacity-80 hover:opacity-95",
+    closed: "opacity-50 hover:opacity-80",
+  }[tone];
 
   const content = (
     <>
@@ -61,17 +93,22 @@ export function IssueCard({
               <span className="font-display text-[9px] uppercase leading-none tracking-[0.16em] text-zinc-400 dark:text-zinc-500">
                 AI
               </span>
-              <PriorityTag label={ranking.label} />
+              <PriorityTag
+                label={ranking.label}
+                className={priorityClass}
+              />
             </span>
           ) : null}
-          <p className="min-w-0 flex-1 truncate text-[15px] font-medium text-zinc-900 dark:text-zinc-100">
+          <p
+            className={`min-w-0 flex-1 truncate text-[15px] font-medium ${titleClass}`}
+          >
             {item.description}
           </p>
         </div>
 
         <p className="mt-1 text-[11px] text-zinc-500 dark:text-zinc-400">
           <span
-            className={`font-semibold uppercase tracking-[0.08em] ${category.text}`}
+            className={`font-semibold uppercase tracking-[0.08em] ${categoryClass}`}
           >
             {category.short}
           </span>
@@ -84,7 +121,7 @@ export function IssueCard({
         <div className="mt-2 flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
           <StatusChip status={item.status} />
           {isNeglected && ranking ? <IdleChip daysIdle={ranking.daysIdle} /> : null}
-          {duplicates > 1 ? <DuplicateChip count={duplicates} /> : null}
+          {duplicates > 1 && !nested ? <DuplicateChip count={duplicates} /> : null}
         </div>
       </div>
 
@@ -106,16 +143,22 @@ export function IssueCard({
   );
 
   return (
-    <li className="overflow-hidden rounded-xl bg-panel ring-1 ring-hairline shadow-[0_1px_2px_rgba(24,24,27,0.04)] transition duration-150 hover:ring-hairline-strong hover:shadow-[0_6px_20px_-6px_rgba(24,24,27,0.18)]">
+    <li
+      className={`overflow-hidden ring-1 transition duration-150 hover:ring-hairline-strong ${
+        nested ? "rounded-lg" : "rounded-xl"
+      } ${cardClass}`}
+    >
       {href ? (
         <Link
           href={href}
-          className="flex items-stretch focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-statera-orange"
+          className={`flex items-stretch focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-statera-orange ${fadeClass}`}
         >
           {content}
         </Link>
       ) : (
-        <div className="flex items-stretch">{content}</div>
+        <div className={`flex items-stretch ${fadeClass}`}>
+          {content}
+        </div>
       )}
     </li>
   );

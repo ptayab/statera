@@ -35,8 +35,14 @@ export function Chip({ children, tone = NEUTRAL_CHIP_CLASS, dot, title }: ChipPr
 }
 
 export function StatusChip({ status }: { status: TicketStatus }) {
+  const resolvedChip =
+    "bg-emerald-50 text-emerald-700 ring-emerald-200 dark:bg-emerald-500/12 dark:text-emerald-300 dark:ring-emerald-400/25";
+
   return (
-    <Chip tone={STATUS_CHIP_CLASS} dot={statusVisual(status).dot}>
+    <Chip
+      tone={status === "Resolved" ? resolvedChip : STATUS_CHIP_CLASS}
+      dot={statusVisual(status).dot}
+    >
       {status}
     </Chip>
   );

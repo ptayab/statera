@@ -5,6 +5,7 @@ import type {
   UserRole,
 } from "@/lib/supabase/types";
 import type { TicketAiAnalysis } from "@/lib/tickets/ai-analysis";
+import type { RankingFeedbackRecord } from "@/lib/tickets/ranking-feedback";
 import type { TicketScore } from "@/lib/tickets/scoring";
 
 type EventPayload = Record<string, unknown>;
@@ -119,4 +120,5 @@ export type TicketDetail = TicketListItem & {
   duplicate_count: number;
   ai_analysis: TicketAiAnalysis | null;
   ranking: TicketScore;
+  ranking_feedback: RankingFeedbackRecord | null;
 };

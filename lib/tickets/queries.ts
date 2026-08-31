@@ -16,6 +16,7 @@ import {
   parseAiAnalysis,
   type TicketAiAnalysis,
 } from "@/lib/tickets/ai-analysis";
+import { parseRankingFeedback } from "@/lib/tickets/ranking-feedback";
 import { OPEN_TICKET_STATUSES, isTicketStatus } from "@/lib/tickets/status";
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createServerClient>>;
@@ -169,6 +170,7 @@ function rankRow(
     ai_analysis: analysis,
     ranking: scoreTicket(item, lastEventAt, duplicateCount, new Date(), {
       descriptionPts: analysis?.descriptionPts,
+      feedbackAdjustment: analysis?.feedbackAdjustment,
     }),
   };
 }
@@ -294,7 +296,7 @@ async function loadTicketDetail(
   let query = supabase
     .from("tickets")
     .select(
-      "id, category, description, status, urgency, created_at, closed_at, photo_url, created_by, site_id, assigned_to, ai_analysis, ai_explanation",
+      "id, category, description, status, urgency, created_at, closed_at, photo_url, created_by, site_id, assigned_to, ai_analysis, ai_explanation, ai_ranking_feedback",
     )
     .eq("id", ticketId);
 
@@ -364,6 +366,7 @@ async function loadTicketDetail(
     last_event_at: lastEventAt,
     duplicate_count: clusterSize,
     ai_analysis: analysis,
+    ranking_feedback: parseRankingFeedback(ticket.ai_ranking_feedback),
     ranking: scoreTicket(
       {
         category: ticket.category,
@@ -376,7 +379,10 @@ async function loadTicketDetail(
       lastEventAt,
       clusterSize,
       new Date(),
-      { descriptionPts: analysis?.descriptionPts },
+      {
+        descriptionPts: analysis?.descriptionPts,
+        feedbackAdjustment: analysis?.feedbackAdjustment,
+      },
     ),
     events: events.map((event) => {
       const actor = event.actor ? users.get(event.actor) : null;

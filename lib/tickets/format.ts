@@ -9,27 +9,33 @@ const RELATIVE_DIVISIONS: { amount: number; unit: Intl.RelativeTimeFormatUnit }[
     { amount: Number.POSITIVE_INFINITY, unit: "year" },
   ];
 
+/**
+ * Pinned so the server and the browser never disagree on wording such as
+ * "6:40 PM" vs "6:40 p.m.", which shows up as a hydration mismatch.
+ */
+const LOCALE = "en-US";
+
 const MS_PER_SECOND = 1000;
 const MS_PER_MINUTE = 60 * MS_PER_SECOND;
 const MS_PER_HOUR = 60 * MS_PER_MINUTE;
 const MS_PER_DAY = 24 * MS_PER_HOUR;
 
 export function formatDateTime(iso: string): string {
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat(LOCALE, {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(iso));
 }
 
 export function formatFullDateTime(iso: string): string {
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat(LOCALE, {
     dateStyle: "full",
     timeStyle: "short",
   }).format(new Date(iso));
 }
 
 export function formatTimeAgo(iso: string, untilIso?: string | null): string {
-  const formatter = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+  const formatter = new Intl.RelativeTimeFormat(LOCALE, { numeric: "auto" });
   const until = untilIso ? new Date(untilIso).getTime() : Date.now();
   let duration = (new Date(iso).getTime() - until) / MS_PER_SECOND;
 

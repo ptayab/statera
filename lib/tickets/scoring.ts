@@ -8,6 +8,7 @@ export type ScoreFactors = {
   agePts: number;
   dormancyPts: number;
   descriptionPts: number;
+  feedbackAdjustment: number;
   urgencyMultiplier: number;
   duplicateMultiplier: number;
 };
@@ -148,7 +149,10 @@ export function scoreTicket(
   lastEventAt: string | null,
   duplicateCount: number,
   now: Date = new Date(),
-  options?: { descriptionPts?: number | null },
+  options?: {
+    descriptionPts?: number | null;
+    feedbackAdjustment?: number | null;
+  },
 ): TicketScore {
   const asOf = scoringAsOf(ticket, now);
   const categoryPts = categoryPoints(ticket.category);
@@ -160,11 +164,21 @@ export function scoreTicket(
     options?.descriptionPts != null
       ? Math.max(0, Math.min(20, options.descriptionPts))
       : descriptionPoints(ticket.description);
+  const feedbackAdjustment =
+    options?.feedbackAdjustment != null
+      ? Math.max(-20, Math.min(20, options.feedbackAdjustment))
+      : 0;
   const urgencyMultiplier = URGENCY_MULTIPLIER[ticket.urgency] ?? 2;
   const dupeMult = duplicateMultiplier(duplicateCount, categoryPts);
 
-  const base =
-    categoryPts + agePts + dormancyPts + descriptionPts;
+  const base = Math.max(
+    0,
+    categoryPts +
+      agePts +
+      dormancyPts +
+      descriptionPts +
+      feedbackAdjustment,
+  );
   const score = Math.round(base * urgencyMultiplier * dupeMult);
 
   return {
@@ -175,6 +189,7 @@ export function scoreTicket(
       agePts: Math.round(agePts * 10) / 10,
       dormancyPts,
       descriptionPts,
+      feedbackAdjustment,
       urgencyMultiplier,
       duplicateMultiplier: dupeMult,
     },

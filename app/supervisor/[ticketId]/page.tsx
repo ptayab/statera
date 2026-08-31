@@ -63,6 +63,7 @@ export default async function TicketDetailPage({ params }: TicketDetailPageProps
         ticket.events,
         ticket.duplicate_count,
         ticket.ai_analysis?.descriptionPts,
+        ticket.ai_analysis?.feedbackAdjustment,
       )
     : null;
 
@@ -132,6 +133,9 @@ export default async function TicketDetailPage({ params }: TicketDetailPageProps
         <aside className="flex flex-col gap-4 lg:sticky lg:top-6">
           {isClosed ? (
             <ClosedIssueSummary
+              ticketId={ticket.id}
+              ranking={ticket.ranking}
+              rankingFeedback={ticket.ranking_feedback}
               history={
                 closedHistory ?? {
                   openedAt: ticket.created_at,
@@ -151,6 +155,7 @@ export default async function TicketDetailPage({ params }: TicketDetailPageProps
             />
           ) : (
             <AiRankingPanel
+              ticketId={ticket.id}
               ranking={ticket.ranking}
               urgency={ticket.urgency}
               category={ticket.category}
@@ -158,6 +163,7 @@ export default async function TicketDetailPage({ params }: TicketDetailPageProps
               lastEventAt={ticket.last_event_at}
               duplicateCount={ticket.duplicate_count}
               analysis={ticket.ai_analysis}
+              rankingFeedback={ticket.ranking_feedback}
             />
           )}
 

@@ -1,7 +1,9 @@
+import { RankingFeedback } from "@/components/dashboard/RankingFeedback";
 import { Chip, IdleChip } from "@/components/ui/Chip";
 import { Panel, PanelHeader } from "@/components/ui/Panel";
 import type { TicketUrgency } from "@/lib/supabase/types";
 import type { TicketAiAnalysis } from "@/lib/tickets/ai-analysis";
+import type { RankingFeedbackRecord } from "@/lib/tickets/ranking-feedback";
 import {
   formatDateTime,
   formatDayCount,
@@ -20,6 +22,7 @@ const SIGNAL_CAPS = {
   age: 40,
   dormancy: 30,
   wording: 20,
+  feedback: 20,
 };
 
 function SignalRow({
@@ -35,7 +38,7 @@ function SignalRow({
   cap: number;
   fill: string;
 }) {
-  const pct = cap > 0 ? Math.min(points / cap, 1) * 100 : 0;
+  const pct = cap > 0 ? Math.min(Math.abs(points) / cap, 1) * 100 : 0;
 
   return (
     <div>
@@ -48,12 +51,13 @@ function SignalRow({
         </p>
         <span
           className={`shrink-0 text-xs font-semibold tabular-nums ${
-            points > 0
+            points !== 0
               ? "text-zinc-700 dark:text-zinc-200"
               : "text-zinc-300 dark:text-zinc-600"
           }`}
         >
-          +{points}
+          {points > 0 ? "+" : ""}
+          {points}
         </span>
       </div>
       <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-zinc-100 dark:bg-white/10">
@@ -78,6 +82,7 @@ function MetaRow({ label, value }: { label: string; value: string }) {
 }
 
 type AiRankingPanelProps = {
+  ticketId: string;
   ranking: TicketScore;
   urgency: TicketUrgency;
   category: string;
@@ -85,6 +90,7 @@ type AiRankingPanelProps = {
   lastEventAt: string | null;
   duplicateCount: number;
   analysis: TicketAiAnalysis | null;
+  rankingFeedback: RankingFeedbackRecord | null;
 };
 
 /**
@@ -93,6 +99,7 @@ type AiRankingPanelProps = {
  * scores are deliberately confined to this panel and kept off the dashboard.
  */
 export function AiRankingPanel({
+  ticketId,
   ranking,
   urgency,
   category,
@@ -100,6 +107,7 @@ export function AiRankingPanel({
   lastEventAt,
   duplicateCount,
   analysis,
+  rankingFeedback,
 }: AiRankingPanelProps) {
   const priority = priorityVisual(ranking.label);
   const idle = idleVisual(ranking.daysIdle);
@@ -109,7 +117,8 @@ export function AiRankingPanel({
     factors.categoryPts +
     factors.agePts +
     factors.dormancyPts +
-    factors.descriptionPts;
+    factors.descriptionPts +
+    factors.feedbackAdjustment;
   const meterPct = Math.min(ranking.score / SCORE_METER_MAX, 1) * 100;
   const daysOpen = ranking.daysOpen;
 
@@ -134,13 +143,21 @@ export function AiRankingPanel({
                 : "Recomputed on every view"}
             </p>
           </div>
-          <div className="text-right">
-            <p className="font-display text-3xl leading-none tabular-nums text-zinc-900 dark:text-zinc-100">
-              {ranking.score}
-            </p>
-            <p className="mt-1 font-display text-[10px] uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400">
-              Score
-            </p>
+          <div className="flex flex-col items-end gap-2">
+            <RankingFeedback
+              ticketId={ticketId}
+              rankingLabel={ranking.label}
+              rankingScore={ranking.score}
+              initialFeedback={rankingFeedback}
+            />
+            <div className="text-right">
+              <p className="font-display text-3xl leading-none tabular-nums text-zinc-900 dark:text-zinc-100">
+                {ranking.score}
+              </p>
+              <p className="mt-1 font-display text-[10px] uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400">
+                Score
+              </p>
+            </div>
           </div>
         </div>
 
@@ -206,10 +223,28 @@ export function AiRankingPanel({
           cap={SIGNAL_CAPS.wording}
           fill="bg-violet-500"
         />
+        {factors.feedbackAdjustment !== 0 ? (
+          <SignalRow
+            label="Site feedback"
+            detail="supervisor guidance from similar reports"
+            points={factors.feedbackAdjustment}
+            cap={SIGNAL_CAPS.feedback}
+            fill={
+              factors.feedbackAdjustment > 0
+                ? "bg-emerald-500"
+                : "bg-sky-500"
+            }
+          />
+        ) : null}
 
         {analysis?.languageSummary ? (
           <p className="rounded-lg bg-inset px-3 py-2.5 text-[11px] leading-relaxed text-zinc-600 dark:text-zinc-400">
             {analysis.languageSummary}
+          </p>
+        ) : null}
+        {analysis?.feedbackSummary ? (
+          <p className="rounded-lg bg-sky-50 px-3 py-2.5 text-[11px] leading-relaxed text-sky-800 dark:bg-sky-500/10 dark:text-sky-300">
+            Feedback applied: {analysis.feedbackSummary}
           </p>
         ) : null}
 

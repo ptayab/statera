@@ -113,6 +113,7 @@ export type TicketFilters = {
 export type RankedTicketListItem = TicketListItem & {
   last_event_at: string | null;
   duplicate_count: number;
+  duplicateIds: string[];
   ranking: TicketScore;
   ai_analysis: TicketAiAnalysis | null;
 };
@@ -167,6 +168,7 @@ function rankRow(
     ...item,
     last_event_at: lastEventAt,
     duplicate_count: duplicateCount,
+    duplicateIds: analysis?.duplicateIds ?? [],
     ai_analysis: analysis,
     ranking: scoreTicket(item, lastEventAt, duplicateCount, new Date(), {
       descriptionPts: analysis?.descriptionPts,

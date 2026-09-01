@@ -4,6 +4,8 @@ import {
   IssueListEmpty,
   type IssueCardItem,
 } from "@/components/dashboard/IssueCard";
+import { SimilarIssueGroup } from "@/components/dashboard/SimilarIssueGroup";
+import { groupSimilarIssues } from "@/lib/tickets/similar";
 
 type TicketListProps = {
   tickets: IssueCardItem[];
@@ -25,17 +27,30 @@ export function TicketList({
     return <IssueListEmpty message={emptyMessage} />;
   }
 
+  const groups = groupSimilarIssues(tickets);
+
   return (
     <IssueList>
-      {tickets.map((ticket, index) => (
-        <IssueCard
-          key={ticket.id}
-          item={ticket}
-          href={detailHref(ticket.id)}
-          rank={ranked ? index + 1 : undefined}
-          showAssignee={showAssignee}
-        />
-      ))}
+      {groups.map((group, index) =>
+        group.kind === "cluster" ? (
+          <SimilarIssueGroup
+            key={group.tickets.map((ticket) => ticket.id).join("-")}
+            tickets={group.tickets}
+            ranking={group.ranking}
+            rank={ranked ? index + 1 : undefined}
+            showAssignee={showAssignee}
+            detailHref={detailHref}
+          />
+        ) : (
+          <IssueCard
+            key={group.ticket.id}
+            item={group.ticket}
+            href={detailHref(group.ticket.id)}
+            rank={ranked ? index + 1 : undefined}
+            showAssignee={showAssignee}
+          />
+        ),
+      )}
     </IssueList>
   );
 }

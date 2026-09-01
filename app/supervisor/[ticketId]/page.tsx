@@ -10,7 +10,9 @@ import { CategoryGuidance } from "@/components/tickets/CategoryGuidance";
 import { IdleChip, PriorityChip, StatusChip, UserRankingChip } from "@/components/ui/Chip";
 import { Eyebrow, Panel, PanelHeader } from "@/components/ui/Panel";
 import { getUserProfile } from "@/lib/auth/session";
+import { createServerClient } from "@/lib/supabase/server";
 import { getCategoryMeta } from "@/lib/tickets/categories";
+import { storeClaudeAnalysisForTicket } from "@/lib/tickets/ensure-ai-analysis";
 import { formatFullDateTime, shortId } from "@/lib/tickets/format";
 import { buildClosedIssueHistory } from "@/lib/tickets/history";
 import { markTicketSeen } from "@/lib/tickets/notifications";
@@ -39,10 +41,23 @@ export default async function TicketDetailPage({ params }: TicketDetailPageProps
     notFound();
   }
 
-  const ticket = await getTicketDetail(ticketId, profile.site_id);
+  let ticket = await getTicketDetail(ticketId, profile.site_id);
 
   if (!ticket) {
     notFound();
+  }
+
+  if (!ticket.ai_analysis) {
+    const supabase = await createServerClient();
+    const analysis = await storeClaudeAnalysisForTicket(supabase, {
+      id: ticket.id,
+      category: ticket.category,
+      description: ticket.description,
+      urgency: ticket.urgency,
+    });
+    if (analysis) {
+      ticket = (await getTicketDetail(ticketId, profile.site_id)) ?? ticket;
+    }
   }
 
   await markTicketSeen(ticket.id);

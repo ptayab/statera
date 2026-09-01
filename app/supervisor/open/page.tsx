@@ -1,9 +1,10 @@
 import { Suspense } from "react";
 import { OpenIssueControls } from "@/components/dashboard/IssueSort";
 import { TicketList } from "@/components/dashboard/TicketList";
-import { PageHeader } from "@/components/ui/Panel";
+import { PageHeader, Section } from "@/components/ui/Panel";
 import { getUserProfile } from "@/lib/auth/session";
 import { getSiteTicketsWithRanking } from "@/lib/tickets/queries";
+import { splitLiveAndWaiting } from "@/lib/tickets/similar";
 import { parseIssueAssignment, parseIssueSort } from "@/lib/tickets/sort";
 import { PRIORITY_ORDER, priorityVisual } from "@/lib/tickets/theme";
 
@@ -37,15 +38,22 @@ export default async function OpenIssuesPage({ searchParams }: OpenIssuesPagePro
     return true;
   });
 
-  const ordered =
-    sort === "priority"
-      ? [...visible].sort((a, b) => b.ranking.score - a.ranking.score)
-      : visible;
+  const active = visible.filter((ticket) => ticket.status !== "Resolved");
+
+  function orderOpen(tickets: typeof visible) {
+    return sort === "priority"
+      ? [...tickets].sort((a, b) => b.ranking.score - a.ranking.score)
+      : tickets;
+  }
+
+  const { live: orderedActive, waiting: orderedResolved } = splitLiveAndWaiting(
+    orderOpen(visible),
+  );
 
   const counts = PRIORITY_ORDER.map((label) => ({
     label,
     visual: priorityVisual(label),
-    count: visible.filter((ticket) => ticket.ranking.label === label).length,
+    count: active.filter((ticket) => ticket.ranking.label === label).length,
   }));
 
   const emptyMessage =
@@ -79,7 +87,7 @@ export default async function OpenIssuesPage({ searchParams }: OpenIssuesPagePro
           <OpenIssueControls assignmentCounts={assignmentCounts} />
         </Suspense>
 
-        {visible.length > 0 ? (
+        {active.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {counts.map(({ label, visual, count }) => (
               <div
@@ -98,11 +106,23 @@ export default async function OpenIssuesPage({ searchParams }: OpenIssuesPagePro
         ) : null}
       </div>
 
-      <TicketList
-        tickets={ordered}
-        ranked={sort === "priority"}
-        emptyMessage={emptyMessage}
-      />
+      {orderedActive.length > 0 || orderedResolved.length === 0 ? (
+        <TicketList
+          tickets={orderedActive}
+          ranked={sort === "priority"}
+          emptyMessage={emptyMessage}
+        />
+      ) : null}
+
+      {orderedResolved.length > 0 ? (
+        <Section
+          title="Waiting to close"
+          description="Resolved — the worker closes these to finish the loop."
+          className="mt-8"
+        >
+          <TicketList tickets={orderedResolved} />
+        </Section>
+      ) : null}
     </main>
   );
 }

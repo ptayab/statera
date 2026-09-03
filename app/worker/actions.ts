@@ -45,6 +45,7 @@ export async function addWorkerTicketMessage(
   revalidatePath("/supervisor");
   revalidatePath("/supervisor/open");
   revalidatePath("/supervisor/all");
+  revalidatePath("/supervisor/reports");
 
   return { ok: true };
 }
@@ -77,6 +78,7 @@ export async function closeWorkerTicket(
   revalidatePath("/supervisor");
   revalidatePath("/supervisor/open");
   revalidatePath("/supervisor/all");
+  revalidatePath("/supervisor/reports");
 
   return { ok: true };
 }

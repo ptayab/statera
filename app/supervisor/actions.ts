@@ -32,6 +32,7 @@ function revalidateTicket(ticketId: string) {
   revalidatePath("/supervisor");
   revalidatePath("/supervisor/open");
   revalidatePath("/supervisor/all");
+  revalidatePath("/supervisor/reports");
   revalidatePath(`/supervisor/${ticketId}`);
   revalidatePath("/worker/tickets");
   revalidatePath(`/worker/tickets/${ticketId}`);

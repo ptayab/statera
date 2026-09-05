@@ -180,6 +180,7 @@ export async function submitTicket(
   revalidatePath("/supervisor");
   revalidatePath("/supervisor/open");
   revalidatePath("/supervisor/all");
+  revalidatePath("/supervisor/reports");
 
   return {
     ok: true,

@@ -31,7 +31,7 @@ export function TopNav({ items, userLabel, notifications = [] }: TopNavProps) {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-20 border-b border-hairline bg-panel/85 backdrop-blur-md">
+    <header className="sticky top-0 z-20 border-b border-hairline bg-panel/85 backdrop-blur-md print:hidden">
       <span
         className="absolute inset-x-0 top-0 h-[2px] bg-statera-orange"
         aria-hidden

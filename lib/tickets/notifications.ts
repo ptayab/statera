@@ -1,18 +1,25 @@
 import "server-only";
 
 import { createServerClient } from "@/lib/supabase/server";
-import type { TicketEvent } from "@/lib/supabase/types";
+import type {
+  TicketEvent,
+  TicketStatus,
+  TicketUrgency,
+} from "@/lib/supabase/types";
 import type { UserProfile } from "@/lib/auth/session";
 import {
   formatTicketEvent,
   type TicketNotification,
 } from "@/lib/tickets/display";
+import { isTicketStatus } from "@/lib/tickets/status";
 
 const MAX_NOTIFICATIONS = 20;
 
 type FollowedTicket = {
   id: string;
   category: string;
+  status: TicketStatus;
+  urgency: TicketUrgency;
 };
 
 function truncate(text: string, max: number): string {
@@ -21,11 +28,27 @@ function truncate(text: string, max: number): string {
   return `${oneLine.slice(0, Math.max(0, max - 1))}…`;
 }
 
+function toUrgency(value: string | null | undefined): TicketUrgency {
+  if (value === "Low" || value === "Medium" || value === "High") {
+    return value;
+  }
+  return "Medium";
+}
+
+function toStatus(value: string | null | undefined): TicketStatus {
+  if (value && isTicketStatus(value)) return value;
+  return "Submitted";
+}
+
+function labelForEvent(event: TicketEvent): string {
+  return formatTicketEvent(event).title;
+}
+
 function previewForEvent(event: TicketEvent): string {
   const formatted = formatTicketEvent(event);
   if (formatted.kind === "message") {
     const body = formatted.body?.trim();
-    return body ? truncate(body, 80) : "New message";
+    return body ? truncate(body, 100) : "New message";
   }
   return formatted.detail ?? formatted.title;
 }
@@ -36,29 +59,46 @@ function hrefForTicket(role: UserProfile["role"], ticketId: string): string {
     : `/supervisor/${ticketId}`;
 }
 
+function mapFollowedRows(
+  rows: {
+    id: string;
+    category: string;
+    status: string;
+    urgency: string | null;
+  }[],
+): FollowedTicket[] {
+  return rows.map((row) => ({
+    id: row.id,
+    category: row.category,
+    status: toStatus(row.status),
+    urgency: toUrgency(row.urgency),
+  }));
+}
+
 async function followedTickets(
   profile: UserProfile,
 ): Promise<FollowedTicket[]> {
   const supabase = await createServerClient();
+  const select = "id, category, status, urgency";
 
   if (profile.role === "worker") {
     const { data, error } = await supabase
       .from("tickets")
-      .select("id, category")
+      .select(select)
       .eq("created_by", profile.id);
 
     if (error) return [];
-    return data ?? [];
+    return mapFollowedRows(data ?? []);
   }
 
   const { data, error } = await supabase
     .from("tickets")
-    .select("id, category")
+    .select(select)
     .eq("site_id", profile.site_id)
     .eq("assigned_to", profile.id);
 
   if (error) return [];
-  return data ?? [];
+  return mapFollowedRows(data ?? []);
 }
 
 function latestEventByTicket(
@@ -71,6 +111,23 @@ function latestEventByTicket(
     }
   }
   return latest;
+}
+
+async function resolveActorNames(
+  actorIds: string[],
+): Promise<Map<string, string>> {
+  const uniqueIds = [...new Set(actorIds.filter(Boolean))];
+  if (uniqueIds.length === 0) return new Map();
+
+  const supabase = await createServerClient();
+  const { data } = await supabase
+    .from("users")
+    .select("id, name, email")
+    .in("id", uniqueIds);
+
+  return new Map(
+    (data ?? []).map((user) => [user.id, user.name ?? user.email]),
+  );
 }
 
 /**
@@ -112,8 +169,7 @@ export async function getUnreadTicketNotifications(
     (eventsResult.data ?? []) as TicketEvent[],
   );
 
-  const unread: TicketNotification[] = [];
-
+  const candidateEvents: TicketEvent[] = [];
   for (const [ticketId, event] of latestEvents) {
     if (event.actor === profile.id) continue;
 
@@ -125,14 +181,29 @@ export async function getUnreadTicketNotifications(
       continue;
     }
 
-    const ticket = ticketById.get(ticketId);
+    if (!ticketById.has(ticketId)) continue;
+    candidateEvents.push(event);
+  }
+
+  const actorNames = await resolveActorNames(
+    candidateEvents.map((event) => event.actor).filter((id): id is string => Boolean(id)),
+  );
+
+  const unread: TicketNotification[] = [];
+
+  for (const event of candidateEvents) {
+    const ticket = ticketById.get(event.ticket_id);
     if (!ticket) continue;
 
     unread.push({
-      ticketId,
-      href: hrefForTicket(profile.role, ticketId),
+      ticketId: event.ticket_id,
+      href: hrefForTicket(profile.role, event.ticket_id),
       title: ticket.category,
+      eventLabel: labelForEvent(event),
       preview: previewForEvent(event),
+      status: ticket.status,
+      urgency: ticket.urgency,
+      actorName: event.actor ? actorNames.get(event.actor) ?? null : null,
       at: event.created_at,
     });
   }

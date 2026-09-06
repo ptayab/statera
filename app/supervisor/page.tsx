@@ -85,7 +85,7 @@ export default async function SupervisorHomePage() {
           tone="text-rose-700 dark:text-rose-300"
         />
         <NavCard
-          href="/supervisor/open?sort=time"
+          href="/supervisor/open?sort=priority"
           value={openTickets.length}
           title="Open issues"
           description="Everything that is not yet closed."

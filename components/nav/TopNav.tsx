@@ -19,12 +19,17 @@ type TopNavProps = {
   notifications?: TicketNotification[];
 };
 
+function itemPath(href: string): string {
+  return href.split("?")[0] ?? href;
+}
+
 function isActive(pathname: string, item: NavItem): boolean {
+  const path = itemPath(item.href);
   if (item.match === "prefix") {
-    return pathname === item.href || pathname.startsWith(`${item.href}/`);
+    return pathname === path || pathname.startsWith(`${path}/`);
   }
 
-  return pathname === item.href;
+  return pathname === path;
 }
 
 export function TopNav({ items, userLabel, notifications = [] }: TopNavProps) {

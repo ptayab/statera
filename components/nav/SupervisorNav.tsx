@@ -3,7 +3,7 @@ import type { TicketNotification } from "@/lib/tickets/display";
 
 const SUPERVISOR_NAV_ITEMS = [
   { href: "/supervisor", label: "Home", match: "exact" as const },
-  { href: "/supervisor/open", label: "Open Issues", match: "prefix" as const },
+  { href: "/supervisor/open?sort=priority", label: "Open Issues", match: "prefix" as const },
   { href: "/supervisor/all", label: "All Issues", match: "prefix" as const },
   { href: "/supervisor/reports", label: "Reports", match: "prefix" as const },
 ];

@@ -61,10 +61,7 @@ export default async function SupervisorHomePage() {
 
   const recentReports = openTickets
     .filter((ticket) => ticket.status === "Submitted")
-    .sort(
-      (a, b) =>
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-    )
+    .sort((a, b) => b.ranking.score - a.ranking.score)
     .slice(0, 5);
 
   return (
@@ -196,11 +193,12 @@ export default async function SupervisorHomePage() {
 
       <Section
         title="Awaiting triage"
-        description="The newest reports nobody has picked up yet."
+        description="Reports nobody has picked up yet, highest AI priority first."
         className="mt-8"
       >
         <TicketList
           tickets={recentReports}
+          ranked
           emptyMessage="Every report has been picked up."
         />
       </Section>

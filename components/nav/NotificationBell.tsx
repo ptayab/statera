@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
+import { StatusChip } from "@/components/ui/Chip";
 import type { TicketNotification } from "@/lib/tickets/display";
 import { formatTimeAgo } from "@/lib/tickets/format";
+import { categoryVisual } from "@/lib/tickets/theme";
 
 const TICKET_PATH =
   /\/(?:supervisor|worker\/tickets)\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i;
@@ -98,45 +100,81 @@ export function NotificationBell({ items }: NotificationBellProps) {
           id={panelId}
           role="menu"
           aria-label="Unread ticket updates"
-          className="absolute right-0 z-30 mt-2 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-xl bg-panel shadow-[0_8px_24px_rgba(24,24,27,0.12)] ring-1 ring-hairline-strong"
+          className="absolute right-0 z-30 mt-2 w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-xl bg-panel shadow-[0_8px_24px_rgba(24,24,27,0.12)] ring-1 ring-hairline-strong"
         >
-          <div className="border-b border-hairline px-3 py-2.5">
+          <div className="flex items-baseline justify-between gap-3 border-b border-hairline px-3 py-2.5">
             <p className="font-display text-[11px] uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400">
               Updates
+            </p>
+            <p className="text-[11px] tabular-nums text-zinc-400 dark:text-zinc-500">
+              {count === 0
+                ? "All caught up"
+                : `${count} unread`}
             </p>
           </div>
 
           {count === 0 ? (
             <p className="px-3 py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
-              You&apos;re up to date
+              No new activity on tickets you follow.
             </p>
           ) : (
-            <ul className="max-h-[min(24rem,70vh)] overflow-y-auto py-1">
-              {visible.map((item) => (
-                <li key={item.ticketId}>
-                  <Link
-                    href={item.href}
-                    role="menuitem"
-                    onClick={() => setOpen(false)}
-                    className="block px-3 py-2.5 transition hover:bg-inset"
-                  >
-                    <span className="flex items-baseline justify-between gap-3">
-                      <span className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-100">
-                        {item.title}
+            <ul className="max-h-[min(28rem,70vh)] overflow-y-auto py-1">
+              {visible.map((item) => {
+                const category = categoryVisual(item.title);
+
+                return (
+                  <li key={item.ticketId}>
+                    <Link
+                      href={item.href}
+                      role="menuitem"
+                      onClick={() => setOpen(false)}
+                      className="block px-3 py-3 transition hover:bg-inset"
+                    >
+                      <span className="flex items-baseline justify-between gap-3">
+                        <span className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                          {item.eventLabel}
+                        </span>
+                        <span
+                          className="shrink-0 text-[11px] text-zinc-400 dark:text-zinc-500"
+                          suppressHydrationWarning
+                        >
+                          {formatTimeAgo(item.at)}
+                        </span>
                       </span>
-                      <span
-                        className="shrink-0 text-[11px] text-zinc-400 dark:text-zinc-500"
-                        suppressHydrationWarning
-                      >
-                        {formatTimeAgo(item.at)}
+
+                      <span className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px] text-zinc-500 dark:text-zinc-400">
+                        <span
+                          className={`font-semibold uppercase tracking-[0.08em] ${category.text}`}
+                        >
+                          {category.short}
+                        </span>
+                        {item.actorName ? (
+                          <>
+                            <span
+                              className="text-zinc-300 dark:text-zinc-600"
+                              aria-hidden
+                            >
+                              ·
+                            </span>
+                            <span>from {item.actorName}</span>
+                          </>
+                        ) : null}
                       </span>
-                    </span>
-                    <span className="mt-0.5 line-clamp-2 text-xs text-zinc-500 dark:text-zinc-400">
-                      {item.preview}
-                    </span>
-                  </Link>
-                </li>
-              ))}
+
+                      <span className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-zinc-600 dark:text-zinc-300">
+                        {item.preview}
+                      </span>
+
+                      <span className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1.5">
+                        <StatusChip status={item.status} />
+                        <span className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                          User ranking {item.urgency}
+                        </span>
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>

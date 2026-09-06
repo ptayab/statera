@@ -84,8 +84,16 @@ export function formatTicketEvent(
 export type TicketNotification = {
   ticketId: string;
   href: string;
+  /** Ticket category (full label). */
   title: string;
+  /** What happened — e.g. "Status updated", "Message". */
+  eventLabel: string;
+  /** Detail or message body for the latest unseen event. */
   preview: string;
+  status: TicketStatus;
+  urgency: TicketUrgency;
+  /** Who triggered the latest event, when known. */
+  actorName: string | null;
   at: string;
 };
 

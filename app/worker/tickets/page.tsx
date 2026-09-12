@@ -24,7 +24,7 @@ export default async function MyTicketsPage({ searchParams }: MyTicketsPageProps
     <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col px-4 py-6 sm:px-6 sm:py-8">
       <PageHeader
         eyebrow="My reports"
-        title="My tickets"
+        title="My Tickets"
         description="Reports you have submitted — open one to chat and track status."
       />
 

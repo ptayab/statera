@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #1b2436;
+  --canvas: #ffffff;
+  --panel: #ffffff;
+  --hairline: rgba(27, 36, 54, 0.1);
+  --hairline-strong: rgba(27, 36, 54, 0.18);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-canvas: var(--canvas);
+  --color-panel: var(--panel);
+  --color-hairline: var(--hairline);
+  --color-hairline-strong: var(--hairline-strong);
+
+  --color-statera-orange: #d4840a;
+  --color-statera-ink: #1b2436;
+  --color-statera-slate: #5a6579;
+  --color-statera-mist: #eef1f8;
+
+  --font-sans: var(--font-statera-body), system-ui, sans-serif;
+  --font-display: var(--font-statera-display), var(--font-statera-body), system-ui, sans-serif;
+  --font-body: var(--font-statera-body), system-ui, sans-serif;
+}
+
+body {
+  background-color: var(--canvas);
+  color: var(--foreground);
+  font-family: var(--font-body);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Soft daylight wash behind the hero and closing panel. */
+.wash {
+  background:
+    radial-gradient(1100px 520px at 18% 4%, #f4f1ff 0%, transparent 58%),
+    radial-gradient(900px 500px at 88% 12%, #e6eeff 0%, transparent 60%),
+    linear-gradient(180deg, #f6f7fc 0%, #eef2fb 52%, #ffffff 100%);
+}
+
+::selection {
+  background: rgba(212, 132, 10, 0.24);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

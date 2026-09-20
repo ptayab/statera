@@ -40,7 +40,7 @@ export function LevelSection({
     >
       <div className={`pointer-events-none absolute inset-0 ${texture}`} aria-hidden />
 
-      <div className="relative mx-auto flex max-w-7xl px-6 py-20 lg:px-10 lg:py-24">
+      <div className="relative mx-auto flex max-w-7xl px-5 py-14 sm:px-6 sm:py-20 lg:px-10 lg:py-24">
         {/* Shaft rail: fixed width so the line stays plumb between levels. */}
         <div className="relative hidden w-28 shrink-0 lg:block" aria-hidden>
           <div className={`absolute inset-y-0 left-6 w-px ${line} bg-current`} />
@@ -49,7 +49,9 @@ export function LevelSection({
           <div className="sticky top-24">
             <div className="flex items-center gap-2">
               <span className={`h-px w-6 ${line} bg-current`} />
-              <span className={`text-[10px] font-semibold tracking-[0.16em] ${meta}`}>
+              <span
+                className={`whitespace-nowrap text-[10px] font-semibold tracking-[0.16em] ${meta}`}
+              >
                 {depth}
               </span>
             </div>
@@ -68,7 +70,7 @@ export function LevelSection({
 
         <div className="min-w-0 flex-1">
           {/* Compact level marker for narrow screens. */}
-          <div className="mb-8 flex items-center gap-3 lg:hidden">
+          <div className="mb-6 flex items-center gap-3 lg:hidden">
             <span className={`text-sm font-extrabold ${meta}`}>{level}</span>
             <span className={`h-px w-8 ${line} bg-current`} />
             <span className={`text-[10px] font-semibold uppercase tracking-[0.2em] ${meta}`}>

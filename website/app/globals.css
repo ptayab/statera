@@ -39,6 +39,8 @@ body {
   background-color: var(--canvas);
   color: var(--foreground);
   font-family: var(--font-body);
+  /* Decorative strata art is positioned off-axis; never let it scroll sideways. */
+  overflow-x: hidden;
 }
 
 html {

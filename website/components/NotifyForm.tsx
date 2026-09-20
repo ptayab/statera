@@ -67,7 +67,8 @@ export function NotifyForm() {
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             placeholder="Enter your email"
-            className="w-full rounded-xl border-0 bg-white px-4 py-3 text-sm text-statera-ink shadow-sm ring-1 ring-black/10 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-statera-orange"
+            /* 16px on mobile: anything smaller makes iOS Safari zoom on focus. */
+            className="w-full rounded-xl border-0 bg-white px-4 py-3 text-base text-statera-ink shadow-sm ring-1 ring-black/10 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-statera-orange sm:text-sm"
           />
         </label>
         <button

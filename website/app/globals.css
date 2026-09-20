@@ -2,11 +2,11 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #1b2436;
+  --foreground: #141414;
   --canvas: #ffffff;
   --panel: #ffffff;
-  --hairline: rgba(27, 36, 54, 0.1);
-  --hairline-strong: rgba(27, 36, 54, 0.18);
+  --hairline: rgba(0, 0, 0, 0.1);
+  --hairline-strong: rgba(0, 0, 0, 0.18);
 }
 
 @theme inline {
@@ -18,9 +18,17 @@
   --color-hairline-strong: var(--hairline-strong);
 
   --color-statera-orange: #d4840a;
-  --color-statera-ink: #1b2436;
-  --color-statera-slate: #5a6579;
-  --color-statera-mist: #eef1f8;
+  --color-statera-ink: #141414;
+  --color-statera-slate: #5f5f5f;
+  --color-statera-mist: #efefef;
+
+  /* Strata: daylight at the surface down to black rock at the bottom. */
+  --color-level-0: #fafafa;
+  --color-level-1: #c8c8c8;
+  --color-level-2: #5c5c5c;
+  --color-level-3: #363636;
+  --color-level-4: #1a1a1a;
+  --color-level-5: #050505;
 
   --font-sans: var(--font-statera-body), system-ui, sans-serif;
   --font-display: var(--font-statera-display), var(--font-statera-body), system-ui, sans-serif;
@@ -37,12 +45,40 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Soft daylight wash behind the hero and closing panel. */
+/* Daylight at the surface, above the first strata line. */
 .wash {
   background:
-    radial-gradient(1100px 520px at 18% 4%, #f4f1ff 0%, transparent 58%),
-    radial-gradient(900px 500px at 88% 12%, #e6eeff 0%, transparent 60%),
-    linear-gradient(180deg, #f6f7fc 0%, #eef2fb 52%, #ffffff 100%);
+    radial-gradient(1100px 520px at 18% 4%, #ffffff 0%, transparent 58%),
+    radial-gradient(900px 500px at 88% 12%, #f4f4f4 0%, transparent 60%),
+    linear-gradient(180deg, #fdfdfd 0%, #f1f1f1 58%, #fafafa 100%);
+}
+
+/* Ore fleck, scattered through the deeper ground. */
+.dust {
+  background-image:
+    radial-gradient(circle at 12% 28%, rgba(0, 0, 0, 0.12) 0 1px, transparent 1px),
+    radial-gradient(circle at 64% 12%, rgba(0, 0, 0, 0.1) 0 1px, transparent 1px),
+    radial-gradient(circle at 38% 72%, rgba(0, 0, 0, 0.09) 0 1px, transparent 1px),
+    radial-gradient(circle at 86% 58%, rgba(212, 132, 10, 0.16) 0 1px, transparent 1px),
+    radial-gradient(circle at 22% 90%, rgba(0, 0, 0, 0.08) 0 1px, transparent 1px);
+  background-size: 190px 190px, 240px 240px, 170px 170px, 300px 300px, 220px 220px;
+}
+
+.dust-deep {
+  background-image:
+    radial-gradient(circle at 18% 24%, rgba(255, 255, 255, 0.16) 0 1px, transparent 1px),
+    radial-gradient(circle at 72% 62%, rgba(212, 132, 10, 0.3) 0 1px, transparent 1px),
+    radial-gradient(circle at 44% 84%, rgba(255, 255, 255, 0.12) 0 1px, transparent 1px);
+  background-size: 210px 210px, 280px 280px, 180px 180px;
+}
+
+/* Depth ruler ticks along the shaft. */
+.shaft-ticks {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    currentColor 0 1px,
+    transparent 1px 16px
+  );
 }
 
 ::selection {

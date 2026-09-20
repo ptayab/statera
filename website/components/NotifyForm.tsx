@@ -58,7 +58,7 @@ export function NotifyForm() {
     <form onSubmit={onSubmit} className="w-full">
       <div className="flex flex-col gap-2.5 sm:flex-row">
         <label className="flex-1">
-          <span className="sr-only">Work email</span>
+          <span className="sr-only">Email</span>
           <input
             type="email"
             name="email"
@@ -66,7 +66,7 @@ export function NotifyForm() {
             autoComplete="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            placeholder="Enter your work email"
+            placeholder="Enter your email"
             className="w-full rounded-xl border-0 bg-white px-4 py-3 text-sm text-statera-ink shadow-sm ring-1 ring-black/10 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-statera-orange"
           />
         </label>

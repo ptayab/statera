@@ -1,6 +1,9 @@
 import { BrandLogo } from "@/components/BrandLogo";
+import { Headframe } from "@/components/Headframe";
+import { LevelSection } from "@/components/LevelSection";
 import { NotifyForm } from "@/components/NotifyForm";
 import { StatusTrailMock } from "@/components/StatusTrailMock";
+import { StrataDivider } from "@/components/StrataDivider";
 import { SupervisorQueueMock } from "@/components/SupervisorQueueMock";
 import { WindowChrome } from "@/components/WindowChrome";
 import { WorkerReportMock } from "@/components/WorkerReportMock";
@@ -31,7 +34,6 @@ const STEPS = [
 const QUICK_FACTS = [
   "Nothing to install: open a link",
   "Works underground, offline",
-  "Built for crews of 5 to 50",
   "Ranked queue for supervisors",
 ];
 
@@ -58,31 +60,21 @@ const PATTERN_REPORTS = [
 
 export default function HomePage() {
   return (
-    <div className="min-h-full bg-white text-statera-ink">
-      <div className="bg-statera-mist px-6 py-2.5 text-center text-[13px] text-statera-slate">
-        Safety reporting built for mine crews.{" "}
-        <a
-          className="font-semibold text-statera-ink underline-offset-4 hover:underline"
-          href="#how-it-works"
-        >
-          See how it works →
-        </a>
-      </div>
-
-      <header className="sticky top-0 z-40 border-b border-zinc-100 bg-white/90 backdrop-blur">
+    <div className="min-h-full bg-level-0 text-statera-ink">
+      <header className="sticky top-0 z-40 border-b border-statera-ink/10 bg-level-0/90 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3.5 lg:px-10">
           <a href="#top" aria-label="Statera home">
             <BrandLogo />
           </a>
 
           <nav className="hidden items-center gap-8 text-sm font-medium text-statera-slate md:flex">
-            <a className="transition hover:text-statera-ink" href="#how-it-works">
+            <a className="transition hover:text-statera-ink" href="#level-01">
               How it works
             </a>
-            <a className="transition hover:text-statera-ink" href="#features">
-              Features
+            <a className="transition hover:text-statera-ink" href="#level-02">
+              Roles
             </a>
-            <a className="transition hover:text-statera-ink" href="#patterns">
+            <a className="transition hover:text-statera-ink" href="#level-03">
               Patterns
             </a>
           </nav>
@@ -96,107 +88,120 @@ export default function HomePage() {
         </div>
       </header>
 
-      <section id="top" className="wash relative overflow-hidden">
-        <div className="mx-auto grid max-w-7xl gap-16 px-6 pb-24 pt-16 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:gap-10 lg:px-10 lg:pb-32 lg:pt-20">
-          <div>
-            <span className="inline-flex items-center gap-2.5 rounded-full bg-white/80 py-1.5 pl-1.5 pr-4 shadow-sm ring-1 ring-black/5">
-              <span className="rounded-full bg-statera-orange px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
-                New
-              </span>
-              <span className="text-[13px] font-medium text-statera-slate">
-                AI-assisted hazard ranking
-              </span>
-            </span>
-
-            <h1 className="mt-7 font-display text-[44px] font-extrabold leading-[1.04] tracking-[-0.03em] sm:text-6xl xl:text-[68px]">
-              Keeping mines safe
-              <br />
-              starts with a report
-            </h1>
-
-            <p className="mt-6 max-w-xl text-lg leading-8 text-statera-slate">
-              Workers flag a hazard in about a minute, even with no signal.
-              Supervisors see what’s urgent first, follow every report through
-              to done, and have their year-end report ready when they need it.
-            </p>
-
-            <div id="notify" className="mt-9 max-w-xl scroll-mt-28">
-              <NotifyForm />
-              <p className="mt-3 text-xs text-zinc-500">
-                Leave your work email and we’ll let you know when Statera opens
-                for your site.
+      {/* Surface */}
+      <div id="top" className="wash relative">
+        <LevelSection
+          level="00"
+          depth="Surface · 0 m"
+          label="Surface"
+          tone=""
+          texture=""
+        >
+          <div className="grid gap-16 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:gap-10">
+            <div>
+              <p className="font-display text-[13px] font-extrabold uppercase tracking-[0.32em] text-statera-orange">
+                Coming soon
               </p>
+
+              <h1 className="mt-7 font-display text-[44px] font-extrabold leading-[1.04] tracking-[-0.03em] sm:text-6xl xl:text-[68px]">
+                Keeping mines safe
+                <br />
+                starts with a report
+              </h1>
+
+              <p className="mt-6 max-w-xl text-lg leading-8 text-statera-slate">
+                Workers flag a hazard in about a minute, even with no signal.
+                Supervisors see what’s urgent first, follow every report through
+                to done, and have their year-end report ready when they need it.
+              </p>
+
+              <div id="notify" className="mt-9 max-w-xl scroll-mt-28">
+                <NotifyForm />
+                <p className="mt-3 text-xs text-zinc-500">
+                  Leave your email and we’ll let you know when Statera is ready.
+                </p>
+              </div>
+            </div>
+
+            <div className="relative min-h-[420px] sm:min-h-[500px] lg:min-h-[560px]">
+              <Headframe className="pointer-events-none absolute -left-10 bottom-0 hidden h-56 w-auto text-statera-ink/25 lg:block" />
+
+              <div className="absolute left-0 top-6 z-20 w-[46%] max-w-[230px] lg:left-16">
+                <WindowChrome title="statera · report">
+                  <WorkerReportMock />
+                </WindowChrome>
+              </div>
+
+              <div className="absolute right-0 top-0 z-10 w-[64%] max-w-[360px]">
+                <WindowChrome title="statera · supervisor">
+                  <SupervisorQueueMock />
+                </WindowChrome>
+              </div>
+
+              <div className="absolute bottom-0 right-6 z-30 w-[56%] max-w-[300px] lg:right-16">
+                <WindowChrome title="statera · report status">
+                  <StatusTrailMock />
+                </WindowChrome>
+              </div>
             </div>
           </div>
 
-          <div className="relative min-h-[420px] sm:min-h-[500px] lg:min-h-[560px]">
-            <div className="absolute left-0 top-6 z-20 w-[46%] max-w-[230px] lg:left-4">
-              <WindowChrome title="statera · report">
-                <WorkerReportMock />
-              </WindowChrome>
-            </div>
-
-            <div className="absolute right-0 top-0 z-10 w-[64%] max-w-[360px]">
-              <WindowChrome title="statera · supervisor">
-                <SupervisorQueueMock />
-              </WindowChrome>
-            </div>
-
-            <div className="absolute bottom-0 right-6 z-30 w-[56%] max-w-[300px] lg:right-16">
-              <WindowChrome title="statera · report status">
-                <StatusTrailMock />
-              </WindowChrome>
-            </div>
+          <div className="mt-16 grid gap-y-4 border-t border-statera-ink/10 pt-7 sm:grid-cols-2 lg:grid-cols-3">
+            {QUICK_FACTS.map((fact) => (
+              <p className="text-sm text-statera-slate" key={fact}>
+                {fact}
+              </p>
+            ))}
           </div>
-        </div>
-      </section>
-
-      <section className="border-y border-zinc-100 bg-white">
-        <div className="mx-auto grid max-w-7xl gap-y-4 px-6 py-7 sm:grid-cols-2 lg:grid-cols-4 lg:px-10">
-          {QUICK_FACTS.map((fact) => (
-            <div className="flex items-center gap-2.5" key={fact}>
-              <span
-                className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-statera-mist"
-                aria-hidden
-              >
-                <span className="h-1.5 w-1.5 rounded-full bg-statera-orange" />
-              </span>
-              <p className="text-sm text-statera-slate">{fact}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+        </LevelSection>
+      </div>
 
       <main>
-        <section id="how-it-works" className="scroll-mt-24 px-6 py-24 lg:px-10 lg:py-28">
-          <div className="mx-auto max-w-7xl">
-            <p className="text-sm font-semibold text-statera-orange">How it works</p>
-            <h2 className="mt-3 max-w-2xl font-display text-4xl font-extrabold leading-[1.1] tracking-[-0.025em] sm:text-5xl">
-              From “someone should report that” to done.
-            </h2>
+        <StrataDivider tone="text-level-1" />
+        <LevelSection
+          id="level-01"
+          level="01"
+          depth="−40 m"
+          label="Report"
+          tone="bg-level-1"
+        >
+          <p className="text-sm font-semibold text-statera-orange">How it works</p>
+          <h2 className="mt-3 max-w-2xl font-display text-4xl font-extrabold leading-[1.1] tracking-[-0.025em] sm:text-5xl">
+            From “someone should report that” to done.
+          </h2>
 
-            <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {STEPS.map((step) => (
-                <article
-                  key={step.number}
-                  className="rounded-2xl bg-[#f7f8fc] p-7 ring-1 ring-black/5 transition hover:bg-white hover:shadow-[0_18px_40px_-24px_rgba(27,36,54,0.4)]"
-                >
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-white text-sm font-bold text-statera-orange shadow-sm ring-1 ring-black/5">
-                    {step.number}
-                  </span>
-                  <h3 className="mt-6 font-display text-lg font-bold tracking-[-0.01em]">
-                    {step.title}
-                  </h3>
-                  <p className="mt-2.5 text-sm leading-6 text-statera-slate">{step.body}</p>
-                </article>
-              ))}
-            </div>
+          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {STEPS.map((step) => (
+              <article
+                key={step.number}
+                className="rounded-2xl bg-white p-7 ring-1 ring-black/10"
+              >
+                <span className="font-display text-2xl font-extrabold leading-none text-statera-orange">
+                  {step.number}
+                </span>
+                <h3 className="mt-6 font-display text-lg font-bold tracking-[-0.01em]">
+                  {step.title}
+                </h3>
+                <p className="mt-2.5 text-sm leading-6 text-statera-slate">
+                  {step.body}
+                </p>
+              </article>
+            ))}
           </div>
-        </section>
+        </LevelSection>
 
-        <section id="features" className="scroll-mt-24 px-6 pb-8 lg:px-10">
-          <div className="mx-auto grid max-w-7xl gap-5 lg:grid-cols-2">
-            <article className="rounded-3xl bg-[#f1f4fd] p-9 ring-1 ring-black/5 sm:p-12">
+        <StrataDivider tone="text-level-2" seam="stroke-white/20" />
+        <LevelSection
+          id="level-02"
+          level="02"
+          depth="−120 m"
+          label="Triage"
+          tone="bg-level-2"
+          texture="dust-deep"
+          dark
+        >
+          <div className="grid gap-5 lg:grid-cols-2">
+            <article className="rounded-3xl bg-white/85 p-9 text-statera-ink ring-1 ring-black/5 sm:p-12">
               <p className="text-sm font-semibold text-statera-orange">For workers</p>
               <h2 className="mt-4 font-display text-3xl font-extrabold leading-[1.12] tracking-[-0.02em] sm:text-4xl">
                 You’ll know what happened.
@@ -208,7 +213,9 @@ export default function HomePage() {
             </article>
 
             <article className="rounded-3xl bg-statera-ink p-9 text-white ring-1 ring-black/5 sm:p-12">
-              <p className="text-sm font-semibold text-statera-orange">For supervisors</p>
+              <p className="text-sm font-semibold text-statera-orange">
+                For supervisors
+              </p>
               <h2 className="mt-4 font-display text-3xl font-extrabold leading-[1.12] tracking-[-0.02em] sm:text-4xl">
                 The urgent stuff first. Nothing dropped.
               </h2>
@@ -219,28 +226,37 @@ export default function HomePage() {
               </p>
             </article>
           </div>
-        </section>
+        </LevelSection>
 
-        <section id="patterns" className="scroll-mt-24 px-6 py-24 lg:px-10 lg:py-28">
-          <div className="mx-auto grid max-w-7xl items-center gap-14 lg:grid-cols-[0.9fr_1.1fr]">
+        <StrataDivider tone="text-level-3" seam="stroke-white/20" />
+        <LevelSection
+          id="level-03"
+          level="03"
+          depth="−220 m"
+          label="Patterns"
+          tone="bg-level-3"
+          texture="dust-deep"
+          dark
+        >
+          <div className="grid items-center gap-14 lg:grid-cols-[0.9fr_1.1fr]">
             <div>
               <p className="text-sm font-semibold text-statera-orange">Pattern check</p>
               <h2 className="mt-3 font-display text-4xl font-extrabold leading-[1.1] tracking-[-0.025em] sm:text-5xl">
                 Three reports. Two workers. One hoist.
               </h2>
-              <p className="mt-6 text-base leading-7 text-statera-slate">
+              <p className="mt-6 text-base leading-7 text-white/80">
                 Nobody reading today’s reports can see that the same near-miss
                 came up twice last week. Statera can. It looks across 30 days of
                 reports and flags when the same problem keeps showing up in the
                 same place or on the same equipment.
               </p>
-              <p className="mt-6 rounded-xl bg-statera-mist px-5 py-4 text-sm font-medium leading-6">
+              <p className="mt-6 rounded-xl bg-white/10 px-5 py-4 text-sm font-medium leading-6 ring-1 ring-white/15">
                 Flags point to the location or machine, never to the people who
                 reported it.
               </p>
             </div>
 
-            <div className="rounded-2xl bg-white p-6 shadow-[0_28px_70px_-36px_rgba(27,36,54,0.5)] ring-1 ring-black/5 sm:p-8">
+            <div className="rounded-2xl bg-white p-6 text-statera-ink shadow-[0_28px_70px_-36px_rgba(0,0,0,0.5)] ring-1 ring-black/5 sm:p-8">
               <div className="flex items-center justify-between border-b border-zinc-100 pb-5">
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-400">
@@ -273,46 +289,86 @@ export default function HomePage() {
               ))}
             </div>
           </div>
-        </section>
+        </LevelSection>
 
-        <section className="px-6 pb-24 lg:px-10 lg:pb-28">
-          <div className="mx-auto grid max-w-7xl gap-5 md:grid-cols-3">
+        <StrataDivider tone="text-level-4" seam="stroke-white/20" />
+        <LevelSection
+          level="04"
+          depth="−310 m"
+          label="Built for site"
+          tone="bg-level-4"
+          texture="dust-deep"
+          dark
+        >
+          <div className="grid gap-5 md:grid-cols-3">
             {FEATURES.map((feature) => (
               <article
                 key={feature.title}
-                className="rounded-2xl bg-white p-8 shadow-[0_18px_44px_-30px_rgba(27,36,54,0.5)] ring-1 ring-black/5"
+                className="rounded-2xl bg-white p-8 shadow-[0_18px_44px_-30px_rgba(0,0,0,0.5)] ring-1 ring-black/5"
               >
-                <h2 className="font-display text-xl font-bold leading-[1.25] tracking-[-0.015em]">
+                <h2 className="font-display text-xl font-bold leading-[1.25] tracking-[-0.015em] text-statera-ink">
                   {feature.title}
                 </h2>
                 <p className="mt-4 text-sm leading-6 text-statera-slate">{feature.body}</p>
               </article>
             ))}
           </div>
-        </section>
+        </LevelSection>
 
-        <section className="px-6 pb-24 lg:px-10 lg:pb-28">
-          <div className="wash mx-auto max-w-7xl rounded-3xl px-8 py-16 text-center ring-1 ring-black/5 sm:px-12 lg:py-20">
-            <p className="text-sm font-semibold text-statera-orange">Accountability</p>
-            <h2 className="mx-auto mt-3 max-w-3xl font-display text-4xl font-extrabold leading-[1.08] tracking-[-0.025em] sm:text-5xl">
-              Statera flags. People decide.
-            </h2>
-            <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-statera-slate">
-              Statera never closes, dismisses, or changes a report on its own. A
-              named person takes every action, and every step is logged with who
-              did it and when.
-            </p>
-            <div className="mx-auto mt-9 max-w-xl">
-              <NotifyForm />
+        <StrataDivider tone="text-level-5" seam="stroke-white/20" />
+        <LevelSection
+          level="05"
+          depth="−420 m · bottom"
+          label="Bedrock"
+          tone="bg-level-5"
+          texture="dust-deep"
+          dark
+        >
+          <div className="grid gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+            <div>
+              <p className="text-sm font-semibold text-statera-orange">Accountability</p>
+              <h2 className="mt-3 font-display text-4xl font-extrabold leading-[1.06] tracking-[-0.025em] sm:text-5xl">
+                Statera flags.
+                <br />
+                People decide.
+              </h2>
+              <p className="mt-6 max-w-xl text-base leading-7 text-white/70">
+                Statera never closes, dismisses, or changes a report on its own.
+                A named person takes every action, and every step is logged with
+                who did it and when.
+              </p>
+            </div>
+
+            <div className="rounded-3xl bg-white/[0.07] p-8 ring-1 ring-white/15 sm:p-10">
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-statera-orange">
+                Coming soon
+              </p>
+              <p className="mt-3 font-display text-2xl font-bold tracking-[-0.015em]">
+                Be first up the shaft.
+              </p>
+              <p className="mt-3 text-sm leading-6 text-white/65">
+                We’ll email once, when Statera is ready.
+              </p>
+              <div className="mt-7">
+                <NotifyForm />
+              </div>
             </div>
           </div>
-        </section>
+        </LevelSection>
       </main>
 
-      <footer className="border-t border-zinc-100 bg-white px-6 py-8 lg:px-10">
-        <p className="mx-auto max-w-7xl text-xs text-zinc-500">
-          © 2026 Statera Mine Systems. All rights reserved.
-        </p>
+      <footer className="bg-statera-ink px-6 py-8 lg:px-10">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-y-3">
+          <p className="text-xs text-white/45">
+            © 2026 Statera Mine Systems. All rights reserved.
+          </p>
+          <a
+            href="#top"
+            className="text-xs font-semibold text-white/70 underline-offset-4 transition hover:text-white hover:underline"
+          >
+            Return to surface ↑
+          </a>
+        </div>
       </footer>
     </div>
   );

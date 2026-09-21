@@ -4,7 +4,9 @@ import type {
   TicketUrgency,
   UserRole,
 } from "@/lib/supabase/types";
+import type { TicketActionItem } from "@/lib/tickets/action-items";
 import type { TicketAiAnalysis } from "@/lib/tickets/ai-analysis";
+import { formatDate } from "@/lib/tickets/format";
 import type { RankingFeedbackRecord } from "@/lib/tickets/ranking-feedback";
 import type { TicketScore } from "@/lib/tickets/scoring";
 
@@ -23,6 +25,18 @@ const MESSAGE_EVENT_TYPES = new Set(["message", "note_added"]);
 
 export function isMessageEvent(eventType: string): boolean {
   return MESSAGE_EVENT_TYPES.has(eventType);
+}
+
+function actionItemTitle(payload: EventPayload): string | undefined {
+  return payload.title ? String(payload.title) : undefined;
+}
+
+function actionItemDetail(payload: EventPayload): string | undefined {
+  const title = actionItemTitle(payload);
+  if (!title) return undefined;
+  return payload.due_on
+    ? `${title} · due ${formatDate(String(payload.due_on))}`
+    : title;
 }
 
 export function formatTicketEvent(
@@ -70,6 +84,30 @@ export function formatTicketEvent(
         kind: "system",
         title: "Unassigned",
         detail: "Returned to Submitted for another supervisor to claim",
+      };
+    case "action_added":
+      return {
+        kind: "system",
+        title: "Action item added",
+        detail: actionItemDetail(payload),
+      };
+    case "action_completed":
+      return {
+        kind: "system",
+        title: "Action item done",
+        detail: actionItemTitle(payload),
+      };
+    case "action_reopened":
+      return {
+        kind: "system",
+        title: "Action item reopened",
+        detail: actionItemTitle(payload),
+      };
+    case "action_removed":
+      return {
+        kind: "system",
+        title: "Action item removed",
+        detail: actionItemTitle(payload),
       };
     default:
       return {
@@ -129,4 +167,5 @@ export type TicketDetail = TicketListItem & {
   ai_analysis: TicketAiAnalysis | null;
   ranking: TicketScore;
   ranking_feedback: RankingFeedbackRecord | null;
+  action_items: TicketActionItem[];
 };

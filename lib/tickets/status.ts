@@ -34,6 +34,7 @@ export const PIPELINE_STATUS_GUIDANCE: Partial<Record<TicketStatus, string>> = {
 
 export const SUPERVISOR_HANDLING_REMINDERS = [
   "Write back to the worker in the conversation so they know what is happening.",
+  "Add action items with due dates so the follow-up work is visible.",
   "Thank the worker for reporting the issue.",
   "Keep a no-blame policy to encourage reporting — people speak up when they know they will not be punished.",
 ];

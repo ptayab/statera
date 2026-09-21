@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { addWorkerTicketMessage } from "@/app/worker/actions";
+import { WorkerActionItems } from "@/components/dashboard/TicketActionItems";
 import { TicketChat } from "@/components/dashboard/TicketChat";
 import { WorkerTicketActions } from "@/components/dashboard/WorkerTicketActions";
 import { StatusChip } from "@/components/ui/Chip";
@@ -93,6 +94,8 @@ export default async function WorkerTicketDetailPage({
             </div>
           ) : null}
         </Panel>
+
+        <WorkerActionItems items={ticket.action_items} />
 
         <WorkerTicketActions ticketId={ticket.id} status={ticket.status} />
 

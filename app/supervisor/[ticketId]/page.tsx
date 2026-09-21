@@ -4,6 +4,7 @@ import { addTicketMessage } from "@/app/supervisor/actions";
 import { AiRankingPanel } from "@/components/dashboard/AiRankingPanel";
 import { ClosedIssueSummary } from "@/components/dashboard/ClosedIssueSummary";
 import { SupervisorReminders } from "@/components/dashboard/SupervisorReminders";
+import { TicketActionItems } from "@/components/dashboard/TicketActionItems";
 import { TicketActions } from "@/components/dashboard/TicketActions";
 import { TicketChat } from "@/components/dashboard/TicketChat";
 import { CategoryGuidance } from "@/components/tickets/CategoryGuidance";
@@ -132,6 +133,21 @@ export default async function TicketDetailPage({ params }: TicketDetailPageProps
               </div>
             ) : null}
           </Panel>
+
+          <TicketActionItems
+            ticketId={ticket.id}
+            items={ticket.action_items}
+            canEdit={assignedToMe && !isClosed}
+            disabledReason={
+              isClosed
+                ? "This ticket is closed."
+                : assignedToMe
+                  ? null
+                  : ticket.assigned_to
+                    ? "Only the assigned supervisor can add action items."
+                    : "Claim this ticket to add action items."
+            }
+          />
 
           <TicketChat
             ticketId={ticket.id}

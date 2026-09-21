@@ -1,10 +1,15 @@
+import { ActionItemInbox } from "@/components/dashboard/TicketActionItems";
 import { RankingGuide } from "@/components/dashboard/RankingGuide";
 import { TicketList } from "@/components/dashboard/TicketList";
 import { Panel, PanelHeader, PageHeader, Section } from "@/components/ui/Panel";
 import { NavCard, StatTile } from "@/components/ui/StatTile";
 import { getUserProfile } from "@/lib/auth/session";
+import { isActionItemOverdue } from "@/lib/tickets/action-items";
 import { formatDuration } from "@/lib/tickets/format";
-import { getSiteTicketsWithRanking } from "@/lib/tickets/queries";
+import {
+  getOpenActionItems,
+  getSiteTicketsWithRanking,
+} from "@/lib/tickets/queries";
 import { PIPELINE_STATUS_GUIDANCE, TICKET_STATUSES, isOpenTicketStatus } from "@/lib/tickets/status";
 import { idleLevel, statusVisual } from "@/lib/tickets/theme";
 
@@ -14,9 +19,12 @@ export default async function SupervisorHomePage() {
   const profile = await getUserProfile();
 
   // One fetch covers both panels; the open subset is just a filter on it.
-  const allTickets = profile
-    ? await getSiteTicketsWithRanking(profile.site_id)
-    : [];
+  const [allTickets, actionItems] = profile
+    ? await Promise.all([
+        getSiteTicketsWithRanking(profile.site_id),
+        getOpenActionItems(profile.site_id),
+      ])
+    : [[], []];
   const openTickets = allTickets.filter((ticket) =>
     isOpenTicketStatus(ticket.status),
   );
@@ -66,6 +74,9 @@ export default async function SupervisorHomePage() {
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
     )
     .slice(0, 5);
+  const overdueActionItems = actionItems.filter((item) =>
+    isActionItemOverdue(item),
+  ).length;
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-6 sm:px-6 sm:py-8">
@@ -193,6 +204,20 @@ export default async function SupervisorHomePage() {
       <div className="mt-4">
         <RankingGuide />
       </div>
+
+      <Section
+        title="Action items"
+        description={
+          actionItems.length === 0
+            ? "Open follow-up work across reports."
+            : overdueActionItems > 0
+              ? `${actionItems.length} open, ${overdueActionItems} overdue.`
+              : `${actionItems.length} open across reports.`
+        }
+        className="mt-8"
+      >
+        <ActionItemInbox items={actionItems} />
+      </Section>
 
       <Section
         title="Awaiting triage"

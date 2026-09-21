@@ -6,6 +6,12 @@ import type {
 } from "@/lib/supabase/types";
 import { isPilotTicketCategory } from "@/lib/tickets/categories";
 import {
+  ACTION_ITEM_EVENT_TYPES,
+  foldActionItems,
+  isActionItemOverdue,
+  type OpenActionItem,
+} from "@/lib/tickets/action-items";
+import {
   formatTicketEvent,
   type TicketDetail,
   type TicketListItem,
@@ -369,6 +375,7 @@ async function loadTicketDetail(
     duplicate_count: clusterSize,
     ai_analysis: analysis,
     ranking_feedback: parseRankingFeedback(ticket.ai_ranking_feedback),
+    action_items: foldActionItems(events),
     ranking: scoreTicket(
       {
         category: ticket.category,
@@ -412,4 +419,63 @@ export async function getWorkerTicketDetail(
   userId: string,
 ): Promise<TicketDetail | null> {
   return loadTicketDetail(ticketId, { kind: "owner", userId });
+}
+
+/** Incomplete action items on open site tickets, overdue first. */
+export async function getOpenActionItems(
+  siteId: string,
+): Promise<OpenActionItem[]> {
+  const supabase = await createServerClient();
+  const { data: tickets, error: ticketError } = await supabase
+    .from("tickets")
+    .select("id, category")
+    .eq("site_id", siteId)
+    .in("status", OPEN_TICKET_STATUSES);
+
+  if (ticketError || !tickets?.length) {
+    return [];
+  }
+
+  const ticketIds = tickets.map((ticket) => ticket.id);
+  const { data: events, error: eventError } = await supabase
+    .from("ticket_events")
+    .select("ticket_id, event_type, payload, created_at")
+    .in("ticket_id", ticketIds)
+    .in("event_type", [...ACTION_ITEM_EVENT_TYPES])
+    .order("created_at", { ascending: true });
+
+  if (eventError || !events?.length) {
+    return [];
+  }
+
+  const categoryByTicket = new Map(
+    tickets.map((ticket) => [ticket.id, ticket.category]),
+  );
+  const eventsByTicket = new Map<string, typeof events>();
+  for (const event of events) {
+    const list = eventsByTicket.get(event.ticket_id) ?? [];
+    list.push(event);
+    eventsByTicket.set(event.ticket_id, list);
+  }
+
+  return [...eventsByTicket.entries()]
+    .flatMap(([ticketId, ticketEvents]) =>
+      foldActionItems(ticketEvents)
+        .filter((item) => !item.completedAt)
+        .map((item) => ({
+          ...item,
+          ticketId,
+          ticketCategory: categoryByTicket.get(ticketId) ?? "Report",
+        })),
+    )
+    .sort((a, b) => {
+      const aOverdue = isActionItemOverdue(a);
+      const bOverdue = isActionItemOverdue(b);
+      if (aOverdue !== bOverdue) return aOverdue ? -1 : 1;
+      if (a.dueOn && b.dueOn && a.dueOn !== b.dueOn) {
+        return a.dueOn.localeCompare(b.dueOn);
+      }
+      if (a.dueOn !== b.dueOn) return a.dueOn ? -1 : 1;
+      return a.createdAt.localeCompare(b.createdAt);
+    });
 }

@@ -34,6 +34,16 @@ export function formatFullDateTime(iso: string): string {
   }).format(new Date(iso));
 }
 
+/** Calendar day only. Parses YYYY-MM-DD as a local date so due dates do not shift. */
+export function formatDate(value: string): string {
+  const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  const date = dateOnly
+    ? new Date(Number(dateOnly[1]), Number(dateOnly[2]) - 1, Number(dateOnly[3]))
+    : new Date(value);
+
+  return new Intl.DateTimeFormat(LOCALE, { dateStyle: "medium" }).format(date);
+}
+
 export function formatTimeAgo(iso: string, untilIso?: string | null): string {
   const formatter = new Intl.RelativeTimeFormat(LOCALE, { numeric: "auto" });
   const until = untilIso ? new Date(untilIso).getTime() : Date.now();

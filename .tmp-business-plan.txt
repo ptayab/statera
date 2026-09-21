@@ -1,0 +1,398 @@
+BUSINESS PLAN
+Statera
+“Safety reporting and communication for modern mining operations.”
+Prepared for:  ISSA MINING SAFETY CONFERENCE 2026
+Prepared by:  Team Statera
+Contact:  nitishjoson83@gmail.com  · 306-229-0735; tim.li@usask.ca · 6394807619
+Date:  September 19, 2026, Version:  1.0
+CONFIDENTIAL — This document contains proprietary and confidential information of Statera. It is shared for evaluation purposes only and may not be reproduced or distributed without written permission.
+Table of Contents
+1. Executive Summary1
+What we do1
+The problem1
+Our solution1
+Traction to date1
+The ask1
+2. Company Overview1
+Our story1
+3. The Problem1
+The reporting gap1
+Why it matters now1
+4. Solution & Product1
+Overview1
+Key capabilities1
+What makes it different1
+5. Market Opportunity1
+Market sizing1
+Beachhead segment1
+6. Business Model1
+How we charge1
+Unit economics1
+7. Go-to-Market Strategy1
+Sales motion1
+Pilot approach1
+Expansion1
+8. Competitive Landscape1
+9. Technology, Data Security & Compliance1
+Architecture1
+Data security1
+Data residency & privacy1
+Responsible use1
+10. Traction & Roadmap1
+Traction so far1
+Roadmap1
+11. Team1
+Founders & core team1
+Advisors & mentors1
+12. Financial Plan1
+Assumptions1
+Three-year projection1
+Funding need (if any)1
+13. Risks & Mitigations1
+14. The Ask & Next Step1
+What we’re asking1
+What you get1
+Next step1
+15. Appendix1
+1. Executive Summary
+What we do
+Statera is a safety communication and ticketing platform for frontline workers and supervisors. We make reporting hazards, near misses, and incidents effortless for workers, and give supervisors AI tools to organize, prioritize, and act on what comes in, plus surface the trends behind it.
+The problem
+Across mining and its sister industries, construction and metals, there's a massive safety reporting gap: industry research suggests up to 90% of incidents, near misses, and hazards go unreported. The cause is simple, the systems in use today are slow, clunky, and outdated, so workers don't bother
+Our solution
+We make reporting effortless and ensure every issue is tracked to completion; nothing falls through the cracks. Supervisors can manage a high volume of reports with ease, and because near misses that once went unreported now surface, they can prevent incidents before they happen.
+Traction to date
+Concept → mock-up → working MVP → model testing
+Selected as a top 5 finalist (AI4SafeMines)
+Validated the problem and product through discovery calls
+Presenting at the ISSA Mining Safety Conference, Saskatoon
+The ask
+We'd like to invite you to be our founding pilot partner: a three-month trial at one of your sites, with success metrics we agree on up front and your data staying entirely yours.
+2. Company Overview
+Mission:  Our mission is to advance both the technology and the safety culture of mining, building a safer future for workers and the communities around them.
+Vision:  To set the standard for safety communication across mining, construction, metals, and beyond, redefining how every high-risk industry protects its people.
+Legal structure:  Not yet incorporated; operating as a founding team. Incorporation planned upon signing our first pilot agreement.
+Location: Remote team based in Saskatchewan
+Founded:  2026
+Our story
+Our journey over these four months at the AI4SafeMines competition has taken us further than we imagined. We started as ordinary high school students with a vision and the will to make our idea real, and today we're here with Statera, a working product and a plan to bring it to the industry. The next chapter is simple: put Statera to work at its first mine and prove that easier reporting means fewer workers going home hurt.
+3. The Problem
+On most sites today, hazards, near misses, and incidents are logged on paper forms, whiteboards, or generic systems built for the office rather than the field. A worker who spots a hazard must stop, find a form or a computer, and fill out paperwork, often at the end of a shift, if at all. The reports that do get filed then sit in binders or disconnected spreadsheets where supervisors can't easily triage them, track them to resolution, or learn from them. The result is a reporting gap where the most valuable early-warning signals, near misses and hazards, are the least likely to be captured.
+The reporting gap
+On most sites today, hazards, near misses, and incidents are logged on paper forms, whiteboards, or generic systems built for the office rather than the field. A worker who spots a hazard must stop, find a form or a computer, and fill out paperwork, often at the end of a shift, if at all. The reports that do get filed then sit in binders or disconnected spreadsheets where supervisors can't easily triage them, track them to resolution, or learn from them. The result is a reporting gap where the most valuable early-warning signals, near misses and hazards, are the least likely to be captured.
+Underreporting: Industry research and decades of safety practice consistently find that the majority of near misses and hazards go unreported, and those are exactly the early-warning signals that precede serious incidents. Some EHS-software studies estimate up to ~90% go unreported.
+Why it happens: reporting is hard in the field (no quick tool at the face or in the pit), workers fear blame, paper and legacy systems are slow, and safety data ends up scattered across disconnected systems.
+Why it matters now
+Workforce shortage: MiHR's 2026 Canadian Mining Labour Market Outlook projects the industry needs about 246,000 hires through 2035 (baseline), with roughly 86% replacing retiring workers and nearly half of the need arriving by 2027. Experienced workers are leaving and being replaced by newer, less-experienced ones, which makes reliable hazard reporting and knowledge capture more critical, not less.
+Cost of incidents: a single serious incident can mean downtime, regulatory fines, higher insurance premiums, and lasting reputational damage, often hundreds of thousands to millions of dollars, dwarfing the cost of prevention.
+Regulatory and ESG pressure: regulators and investors increasingly judge operators on safety performance, so strong safety reporting and transparency are becoming table stakes for permits, ESG ratings, and social licence to operate.
+4. Solution & Product
+Overview
+Statera is a safety communication and ticketing platform for frontline mine workers and their supervisors. A worker captures a hazard, near miss, or incident in seconds from a phone or tablet; each report becomes a tracked ticket that AI helps supervisors’ triage and prioritize; the platform keeps the right people informed as the issue moves to resolution; and it turns the accumulated reports into insight, surfacing recurring risks and trends before they become incidents. In short: capture → triage → communication → insight, with nothing falling through the cracks.
+Key capabilities
+Fast, field-friendly reporting (few taps, photo, works in tough conditions) → more hazards and near misses get captured, closing the reporting gap.
+Ticketing with closed-loop tracking and communication → every issue is assigned, tracked to completion, and everyone stays informed, so nothing slips and workers see their reports acted on.
+AI-assisted triage and analytics → supervisors handle a high volume of reports with less effort and catch recurring risks early, preventing incidents before they happen.
+What makes it different
+Statera is built for the field, not the office: reporting takes seconds in real mine conditions, so workers will report more often. It's mining-specific and pairs AI-assisted triage with closed-loop tracking, so supervisors act on more issues with less effort instead of drowning in them. And it runs entirely in a Canadian data region, meeting the residency and privacy expectations mining operator’s demand.
+5. Market Opportunity
+Market sizing
+We size the market bottom-up (target mines × a realistic per-site licence) and anchor it against the top-down EHS software market. Base case assumes a ~$25K per-site annual licence, a figure to validate in pilots (working range $15K–$50K).
+Measure
+Definition
+Estimate
+Basis / source
+TAM (top-down)
+Global EHS software market; “Mining & Metals” is a named vertical
+~$2.5B (2026) → ~$3.9B (2031), 9.6% CAGR
+Mordor Intelligence, 2026
+TAM (bottom-up, mining)
+~5,000 larger industrial mines worldwide × ~$25K/yr
+~$125M / yr
+~35,000 active mines globally; pricing assumption
+SAM (Canada)
+~200 principal producing Canadian mines × ~$25K/yr
+~$5M / yr (~$37M incl. ~6,500 quarries)
+Natural Resources Canada; pricing assumption
+SOM (beachhead, yrs 1–3)
+Western Canadian mines, starting Saskatchewan; land 8–12 sites
+~$200K–$300K ARR
+Sask. Mining Assoc.; pricing assumption
+Definitions: TAM = total addressable market, SAM = serviceable available market, SOM = serviceable obtainable market.
+Beachhead segment
+We win Western Canadian mines first, starting in Saskatchewan; roughly 15 large mines (potash, uranium, gold, coal) and 40–50 across Western Canada. Why this segment:
+Access: we present in Saskatoon (AI4SafeMines / IMII), so our network and first warm introductions are here, and a reference customer travels fast in a tight industry.
+Concentration: a few large, well-capitalized operators own most of these sites, so a small number of sales cycles covers much of the market.
+Stakes and budget: potash and especially uranium are high-consequence, heavily regulated, and carry safety budgets.
+Expansion path: Western Canada → rest of Canada → sister industries (construction, metals) → International.
+6. Business Model
+How we charge
+We land with a low-risk pilot at a single site, then convert it to an annual per-site licence and expand across the operator's other sites. Pricing is per site, not per user: every field worker can report for free, and the licence covers the supervisor and admin seats. This is a deliberate decision to make sure costs don’t discourage more reporting, which is the whole point of Statera. Each licence includes Canadian-region hosting, security, support, and ongoing updates.
+These pricing offers are for Site licence will be talked about more in detail once the Pilot Period is over.
+Offering
+What’s included
+Price (from)
+Term
+Pilot
+One site, full platform, unlimited field reporters, onboarding and support, success metrics agreed up front
+From $2,500 (1000 for founding partners)
+3 months
+Site Licence
+Subscription Plan after Pilot Period has ended.
+From $24,000 / site / yr (~$2,000/mo)
+12 months
+Enterprise
+Multiple sites, org-wide analytics, SSO, priority support, integrations
+Custom (volume discount)
+Annual / multi-year
+Unit economics
+Our target annual licence is ~$24,000 per site. The direct cost to serve one site, secure Canadian-region database, LLM API usage, monitoring, and backups, is roughly $4,000–$6,000 per year, giving a gross margin of about 75–80%. That leaves healthy room for onboarding, support, and sales as we grow. Right now, the licence price is introductory and will be validated in pilots, and AI API cost will most likely scales with usage (long reports, photos, video) so we will monitor and plan the payment accordingly depending on the results we see in the Pilot.
+7. Go-to-Market Strategy
+We sell directly to mine operators! We will start in our own backyard and then grow by turning one proven site into many. Mining is a tight, relationship-driven industry, so our motion is built on warm introductions and reference customers.
+Sales motion
+Source: industry conferences (AEAC / ISSA), IMII and mentor/advisor introductions, and the Saskatchewan Mining Association network.
+Qualify: We have already done, and will do, more discovery calls to prove industry approval.
+Prove: a three-month pilot at one site with success metrics agreed up front.
+Convert: pilot → annual per-site licence.
+Expand: add the operator's other sites, then earn referrals to peer operators. [Channels: industry conferences (e.g. ISSA), mentor and advisor introductions, associations.]
+Pilot approach
+First, we will start at one site with a defined group of supervisors and field workers. We will give them our Pilot Plan for three months, with success metrics we agree on before we start:  number of reports submitted, time from hazard to action, and worker adoption. The mine owns its data, hosting stays in a Canadian region, and there's no long-term commitment. Founding partners get preferred terms in exchange for acting as a reference.
+Expansion
+Each successful site is the wedge. One site proves value, we roll out across that operator's other sites, then use their results as the reference that wins the next operator. The path moves outward: Saskatchewan → Western Canada → rest of Canada → sister industries (construction, metals) → Internation). In a small industry, referrals and case studies compound fast.
+8. Competitive Landscape
+Solution
+Strengths
+Gaps
+Stateras edge
+Paper forms / whiteboards (status quo)
+No cost, no training, works anywhere, no connectivity needed
+Slow, easily lost, no tracking to completion, no analytics, invisible to management
+Same speed to fill out, but digital; every report captured, tracked, and analyzed automatically.
+Spreadsheets & email
+Cheap, familiar, flexible
+Manual, siloed, no real-time triage, no accountability or closure, no field capture
+A purpose-built pipeline (submit → triage → close) with an audit trail and AI prioritization.
+Enterprise EHS suites (e.g. Cority, Intelex, VelocityEHS, Enablon)
+Comprehensive compliance modules, established, enterprise-grade
+Expensive, complex, slow to deploy, built for the EHS office. Workers underuse them.
+Frontline-first: dead-simple field reporting convenient for workers use, plus AI triage for supervisors; fast and affordable to deploy
+Generic form / ticketing apps (Google Forms, SharePoint, etc.)
+Cheap, quick to spin up
+Not mining-specific, no safety workflow, no AI triage, no closed-loop tracking, no data-residency guarantees
+Mining-specific workflow (hazard / near-miss / incident types + ranking), closed-loop ticketing, AI prioritization, Canadian data residency
+Today most sites still run on paper forms, spreadsheets, or a generic EHS tool built for the compliance office. Because none of these make reporting fast and frictionless for the frontline worker, the majority of hazards and near misses never get logged.
+9. Technology, Data Security & Compliance
+Architecture
+Statera is a cloud-hosted web and mobile platform. Field workers submit hazard, near-miss, and incident reports from a phone or tablet; those reports flow into a central, secure database where supervisors triage, track, and analyze them through a web/phone dashboard. The AI features (report classification, prioritization, and trend detection) run as a separate service that processes report data on demand. Everything is hosted in a Canadian cloud region, so data stays in Canada from capture through storage and processing.
+Data security
+Encryption: all data encrypted in transit (TLS/HTTPS) and at rest (AES-256).
+Access controls & audit logging: role-based access (field worker, supervisor, admin) on a least-privilege basis, with an audit log of who viewed or changed each record; optional single sign-on for enterprise customers.
+Backups & recovery: automated, encrypted daily backups with point-in-time recovery and a tested restore process.
+Data residency & privacy
+Canadian residency: all data is stored and processed in a Canadian cloud region (e.g., AWS Canada Central, Montréal), and AI processing uses a provider that keeps data in-region and does not use it to train models.
+PIPEDA-aligned handling: we collect only the worker information needed, the mine owns its data, access is restricted and logged, and we honour defined retention and deletion policies.
+Responsible use
+Statera assists safety reporting and communication; it supports, and does not replace, a site's own safety procedures, supervisor judgment, or regulatory obligations. AI outputs (such as prioritization and trend flags) are decision-support only and remain reviewable by a person.
+10. Traction & Roadmap
+Traction so far
+Concept → mock-up → working MVP → model testing
+Selected as a top 5 finalist (AI4SafeMines)
+Validated the problem and product through discovery calls
+Presenting at the ISSA Mining Safety Conference, Saskatoon
+Roadmap
+Timeframe
+Milestone
+Success measure
+Late 2025 – mid 2026
+Concept → mock-up → working MVP → model testing
+A functioning, tested product ready to demo
+March 2026
+Selected as a top 5 finalist (AI4SafeMines)
+Independent recognition; gained industry interest
+July–August 2026
+Validated the problem and product through discovery calls
+Mining professionals confirmed the need and validated Statera
+September 2026 (now)
+Presenting at the ISSA Mining Safety Conference, Saskatoon
+Direct operator feedback; new pilot conversations started
+11. Team
+Founders & core team
+Nitish Joson Terance Joe Heston – Team Lead – Started this competition in high school and is in First Year Engineering at UBC.
+Tim Li – Domain Lead - Started this competition in high school and is in First Year Engineering at USASK
+Princess – Software Lead - Started this competition in 3rd Year Computer Science at USASK and is now in 4th year Computer Science at Singapore.
+We are looking to expand this team moving forward with more innovate, young people.
+Advisors & mentors
+Sean Wise -> Sean Wise is the Professor of Entrepreneurship at Ted Rogers School of Management at Toronto Metropolitan University.  Dr. Wise has mentored hundreds of innovation focused startups, including teams on the popular Dragons’ Den business reality show series.  Sean Wise taught our team how to pitch an innovative product to the industry by talking to us about the importance of discovery calls and seeking industry validation.
+Adam Dashney and Ryley Schentag -> Sr. Reliability Engineers working for Cameco who gave us feedback during our development process and provided us contacts with supervisors in the mining industry to conduct discovery calls with. We got valuable feedback for our project thanks to them!
+Dr. Terry Peckham -> Terry Peckham is the Director Digital Integration Centre of Excellence at Saskatchewan Polytechnic. Terry helped us understand the technical considerations of our AI, such as data and costs, and even helped us with pitching the AI as well.
+12. Financial Plan
+Assumptions
+We assume 2 pilots in Year 1 converting to 2 paid site licences, then land-and-expand to ~6 sites in Year 2 and ~15 in Year 3 (within operators and via referrals). Blended average annual licence ~$25,000 (introductory, to be validated in pilots), rising modestly as we add larger sites. Direct cost to serve ~$5,000 per site/year (Canadian-region hosting, AI API, monitoring, backups). Founders take minimal or no salary in Year 1. All figures CAD.
+Three-year projection
+Line item
+Year 1 (2027-2028)
+Year 2 (2028-2029)
+Year 3 (2029-2030)
+Paid site licences (end of year)
+2
+6
+15
+Revenue
+$40,000
+$165,000
+$450,000
+Cost to serve (hosting + AI + monitoring)
+$10,000
+$30,000
+$75,000
+Gross profit
+$30,000
+$135,000
+$375,000
+Operating expenses
+$25,000
+$90,000
+$300,000
+Net income (pre-tax)
+$5,000
+$45,000
+$75,000
+(Gross margin holds around 75–83%, consistent with the unit economics in the Business Model section.)
+Funding need
+We can reach first revenue without outside funding: pilots, early licences, and non-dilutive grants (student-entrepreneurship programs, IMII, and provincial/federal innovation funding) cover our lean early costs, and founders draw minimal salary in Year 1. An optional pre-seed of ~$100,000–$150,000 would accelerate the plan, funding a third-party security audit and SOC 2 readiness, a first part-time hire, and faster multi-site expansion, compressing the Year 2–3 ramp. If we don't raise, the plan above is self-funding on a slower timeline.
+13. Risks & Mitigations
+Risk
+Likelihood / impact
+Our mitigation
+Long, slow enterprise sales cycles (mining procurement takes months)
+High / Medium
+Lead with low-risk paid pilots; build warm intros via conferences and IMII; target a concentrated set of Western Canadian operators;
+Data-security / privacy concerns block adoption
+Medium / High
+Canadian-region hosting, encryption, access controls, PIPEDA-aligned handling; third-party penetration test and SOC 2 readiness on the roadmap; provide security documentation up front.
+Frontline workers don't adopt it (behaviour change is hard)
+Medium / High
+Reporting takes seconds; no-blame design; close the loop so workers see action taken; on-site champion + onboarding; measure adoption during pilots
+Competition from established EHS suites
+Medium / Medium
+Focus on the frontline-capture niche incumbents underserve; mining-specific and affordable; complement (not replace) existing suites; move faster than large vendor
+Small student team, capacity and continuity
+Medium / Medium
+Lean scope and one beachhead; incorporate with clear IP assignment; advisors and mentors; fund a first hire from early revenue and grants
+AI mis-prioritizes a report
+Low / Medium
+Supervisors stay in control — they can override any AI ranking, and the model learns from each correction.
+Bounded error — in testing, the model shifts severity by at most one level (e.g. medium→high), not across the full range.
+Keeps improving — pilot data trains it to rank more accurately over time. AI is decision-support only; it never replaces supervisor judgment.
+14. The Ask & Next Step
+What we’re asking
+We're asking one mine to become our founding pilot partner: a three-month trial of Statera at a single site.
+What you get
+A low-risk way to close your reporting gap. The pilot runs three months at one site, with success metrics we agree on up front, your data hosted in Canada and owned entirely by you, and no long-term commitment. You come away with more hazards and near misses captured, supervisors who can act on them faster, and real data on what better reporting is worth at your operation.
+Next step
+A 30-minute discovery call to see if it's a fit and scope the pilot. Reach us at the contact in the title page!
+15. Appendix
+Detailed financial model
+Statera 3-Year Financial Model
+All figures CAD. Blue = input you can change · Yellow = key lever · Black = calculated. Estimates/targets to validate in pilots.
+INPUTS
+Year
+2027
+2028
+2029
+Paid site licences (end of year)
+2
+6
+15
+Blended annual licence ($/site)
+$25,000
+$27,500
+$30,000
+Revenue realization (Yr 1 partial)
+80.0%
+100.0%
+100.0%
+Cost to serve ($/site/yr)
+$5,000
+$5,000
+$5,000
+Operating expenses ($)
+$25,000
+$90,000
+$300,000
+PROJECTION  (P&L)
+Year
+2027
+2028
+2029
+Revenue
+$40,000
+$165,000
+$450,000
+Cost to serve
+$10,000
+$30,000
+$75,000
+Gross profit
+$30,000
+$135,000
+$375,000
+Gross margin %
+75.0%
+81.8%
+83.3%
+Operating expenses
+$25,000
+$90,000
+$300,000
+Net income (pre-tax)
+$5,000
+$45,000
+$75,000
+Net margin %
+12.5%
+27.3%
+16.7%
+Cumulative net income
+$5,000
+$50,000
+$125,000
+PER-SITE UNIT ECONOMICS  (steady state, Yr 3)
+Annual licence ($/site)
+$30,000
+Cost to serve ($/site)
+$5,000
+Gross profit ($/site)
+$25,000
+Gross margin %
+83.3%
+Legend:  blue = input you can change  ·  yellow = key lever  ·  black = calculated. Figures are estimates/targets to validate in pilots.
+Product screenshots / diagrams
+Full list of sources and citations
+Figures are drawn from the sources below; where a statistic is contested (e.g. the ~90% underreporting figure), it is attributed and used qualitatively
+The reporting gap (underreporting)
+Enhancing Safety in Mining Using Near-Miss Reports — CDC / NIOSH
+Underreporting and the implications for serious injury management — AusIMM
+Why Are Workers Silent About Safety Risks? — EHS Today
+The Problem of Incident Underreporting — EHS.com
+Research: ~90% of incidents, hazards & near misses underreported — Work Safety 24/7 (vendor-sourced — attribute if you cite the 90%)
+Why now, workforce shortage
+Canadian Mining Labour Market Outlook — MiHR
+Canada Mining Needs 246,000 Hires Through 2035 — Streetwise Reports (citing MiHR)
+71% of Mining Leaders Say Skills Shortages Are Hitting Output — Discovery Alert
+Market size
+EHS Software Market Size & Forecast — Mordor Intelligence
+Mining industry & mine count (Canada)
+Minerals and the Economy (≈200 mines + 6,500 quarries) — Natural Resources Canada
+Facts & Figures 2025 — Mining Association of Canada
+Mining in Saskatchewan — Saskatchewan Mining Association
+Safety impact / injury statistics
+2024 Mining Statistics — WorkSafe Saskatchewan
+Mining Statistics — Workplace Safety North
+Work Injury, Disease & Fatality Statistics — CCOHS
+Pricing benchmarks
+Safety Management Software Pricing 2026 — Make Safety Easy
+Health & Safety Software Cost — iTacit
+Data security & privacy
+PIPEDA — Office of the Privacy Commissioner of Canada
+What Data Residency Actually Costs — Digital Applied

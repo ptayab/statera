@@ -15,7 +15,7 @@ const stateraBody = Inter({
 export const metadata: Metadata = {
   title: "Statera | Safety reporting for mine sites",
   description:
-    "Workers report mine-site hazards in about a minute, even offline. Supervisors see what is urgent first and follow every report through to done.",
+    "Workers report hazards, near misses, and incidents from the field. Supervisors get a ranked queue and close every ticket. Data stays in Canada.",
   applicationName: "Statera",
   icons: {
     icon: "/logo.png",
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Statera | Keeping mines safe starts with a report",
     description:
-      "Safety reporting for mine sites, built for underground and remote crews.",
+      "Safety reporting for mine sites. Field reporting, closed tickets, and data hosted in Canada.",
     siteName: "Statera",
     images: [{ url: "/og.png" }],
   },

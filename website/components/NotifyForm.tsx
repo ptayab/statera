@@ -4,9 +4,18 @@ import { FormEvent, useState } from "react";
 
 type FormState = "idle" | "submitting" | "success" | "error" | "unconfigured";
 
-export function NotifyForm() {
+type NotifyFormProps = {
+  submitLabel?: string;
+  showOrganization?: boolean;
+};
+
+export function NotifyForm({
+  submitLabel = "Notify me",
+  showOrganization = false,
+}: NotifyFormProps) {
   const formId = process.env.NEXT_PUBLIC_FORMSPREE_FORM_ID;
   const [email, setEmail] = useState("");
+  const [organization, setOrganization] = useState("");
   const [state, setState] = useState<FormState>("idle");
   const [error, setError] = useState<string | null>(null);
 
@@ -30,7 +39,10 @@ export function NotifyForm() {
         },
         body: JSON.stringify({
           email,
-          _subject: "Statera enquiry",
+          organization: organization.trim() || undefined,
+          _subject: showOrganization
+            ? "Statera pilot enquiry"
+            : "Statera enquiry",
         }),
       });
 
@@ -40,6 +52,7 @@ export function NotifyForm() {
 
       setState("success");
       setEmail("");
+      setOrganization("");
     } catch {
       setState("error");
       setError("Could not send that just now. Try again.");
@@ -49,14 +62,23 @@ export function NotifyForm() {
   if (state === "success") {
     return (
       <p className="rounded-xl bg-white px-4 py-4 text-sm font-medium text-statera-ink shadow-sm ring-1 ring-black/5">
-        Thanks. We’ll be in touch.
+        Thanks. We’ll follow up about a conversation.
       </p>
     );
   }
 
+  const fieldClass =
+    "w-full rounded-xl border-0 bg-white px-4 py-3 text-base text-statera-ink shadow-sm ring-1 ring-black/10 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-statera-orange sm:text-sm";
+
   return (
     <form onSubmit={onSubmit} className="w-full">
-      <div className="flex flex-col gap-2.5 sm:flex-row">
+      <div
+        className={
+          showOrganization
+            ? "flex flex-col gap-2.5"
+            : "flex flex-col gap-2.5 sm:flex-row"
+        }
+      >
         <label className="flex-1">
           <span className="sr-only">Email</span>
           <input
@@ -68,15 +90,29 @@ export function NotifyForm() {
             onChange={(event) => setEmail(event.target.value)}
             placeholder="Enter your email"
             /* 16px on mobile: anything smaller makes iOS Safari zoom on focus. */
-            className="w-full rounded-xl border-0 bg-white px-4 py-3 text-base text-statera-ink shadow-sm ring-1 ring-black/10 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-statera-orange sm:text-sm"
+            className={fieldClass}
           />
         </label>
+        {showOrganization ? (
+          <label className="flex-1">
+            <span className="sr-only">Site or company</span>
+            <input
+              type="text"
+              name="organization"
+              autoComplete="organization"
+              value={organization}
+              onChange={(event) => setOrganization(event.target.value)}
+              placeholder="Site or company (optional)"
+              className={fieldClass}
+            />
+          </label>
+        ) : null}
         <button
           type="submit"
           disabled={state === "submitting"}
           className="rounded-xl bg-statera-orange px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#bd7509] disabled:opacity-60"
         >
-          {state === "submitting" ? "Sending…" : "Notify me"}
+          {state === "submitting" ? "Sending…" : submitLabel}
         </button>
       </div>
       {state === "error" && error ? (

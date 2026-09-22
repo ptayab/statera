@@ -241,8 +241,8 @@ export default function HomePage() {
               <div className="mt-7 max-w-xl scroll-mt-24 sm:mt-9">
                 <NotifyForm submitLabel="Talk to us" />
                 <p className="mt-3 text-xs text-zinc-500">
-                  Leave your email and we will follow up about your pilot
-                  interest on our product.
+                  Leave your email and site, and we will follow up about a
+                  pilot.
                 </p>
               </div>
             </div>
@@ -724,10 +724,7 @@ export default function HomePage() {
                 Tell us who you are. We’ll follow up to scope a pilot.
               </p>
               <div className="mt-7">
-                <NotifyForm
-                  submitLabel="Request a conversation"
-                  showOrganization
-                />
+                <NotifyForm submitLabel="Request a conversation" />
               </div>
               <a
                 href={BUSINESS_PLAN.href}

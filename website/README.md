@@ -16,13 +16,15 @@ Runs on [http://localhost:3001](http://localhost:3001).
 
 ## Formspree (notify form)
 
+Both notify forms collect the same two fields: email and site/company.
+
 1. Create a form at [formspree.io](https://formspree.io).
 2. Copy the form id (the segment after `/f/` in the endpoint).
-3. Set `NEXT_PUBLIC_FORMSPREE_FORM_ID` in `website/.env.local` and later in Vercel.
+3. Set `FORMSPREE_FORM_ID` in `website/.env.local` and later in Vercel.
 
-The form posts from the browser to `https://formspree.io/f/{id}`. There is no Statera waitlist database.
+The browser posts to a Next.js server action, which forwards the enquiry to Formspree. There is no Statera waitlist database.
 
-Until the id is set, the page still renders; submit shows a short “not connected yet” note.
+`NEXT_PUBLIC_FORMSPREE_FORM_ID` still works if it is already set on Vercel. Prefer the server-only name for new setups.
 
 ## Vercel (later)
 
@@ -30,7 +32,7 @@ Create a **separate** Vercel project from this GitHub repo (do not replace the p
 
 - Production branch: `marketing`
 - **Root Directory:** `website`
-- Environment variable: `NEXT_PUBLIC_FORMSPREE_FORM_ID`
+- Environment variable: `FORMSPREE_FORM_ID` (or existing `NEXT_PUBLIC_FORMSPREE_FORM_ID`)
 
 No Supabase or Anthropic keys are required.
 

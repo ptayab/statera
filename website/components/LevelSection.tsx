@@ -36,11 +36,11 @@ export function LevelSection({
   return (
     <section
       id={id}
-      className={`relative scroll-mt-20 ${tone} ${dark ? "text-white" : "text-statera-ink"}`}
+      className={`relative scroll-mt-28 ${tone} ${dark ? "text-white" : "text-statera-ink"}`}
     >
       <div className={`pointer-events-none absolute inset-0 ${texture}`} aria-hidden />
 
-      <div className="relative mx-auto flex max-w-7xl px-5 py-14 sm:px-6 sm:py-20 lg:px-10 lg:py-24">
+      <div className="relative mx-auto flex max-w-7xl px-4 py-12 sm:px-6 sm:py-20 lg:px-10 lg:py-24">
         {/* Shaft rail: fixed width so the line stays plumb between levels. */}
         <div className="relative hidden w-28 shrink-0 lg:block" aria-hidden>
           <div className={`absolute inset-y-0 left-6 w-px ${line} bg-current`} />

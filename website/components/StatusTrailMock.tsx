@@ -12,7 +12,7 @@ export function StatusTrailMock() {
         Report STR-1184
       </p>
       <p className="mt-1 font-display text-base font-bold tracking-[-0.01em]">
-        Followed through to done
+        Followed through to completion
       </p>
 
       <ol className="mt-4 space-y-3.5">

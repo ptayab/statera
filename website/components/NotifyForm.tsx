@@ -110,7 +110,7 @@ export function NotifyForm({
         <button
           type="submit"
           disabled={state === "submitting"}
-          className="rounded-xl bg-statera-orange px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#bd7509] disabled:opacity-60"
+          className="w-full rounded-xl bg-statera-orange px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#bd7509] disabled:opacity-60 sm:w-auto"
         >
           {state === "submitting" ? "Sending…" : submitLabel}
         </button>

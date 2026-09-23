@@ -19,132 +19,132 @@ const TRACTION = [
 const STEPS = [
   {
     number: "01",
-    title: "Capture it.",
-    body: "A photo, a category, a few words. Hazard, near miss, or incident. It works offline and sends when you’re back in range.",
+    title: "Capture",
+    body: "Workers log a hazard, near miss, or incident with a photo, a category, and a brief description. Reports save offline and send automatically once a connection is available.",
   },
   {
     number: "02",
-    title: "Triage it.",
-    body: "AI ranks the queue so urgent reports rise to the top. Supervisors still decide what happens next.",
+    title: "Prioritize",
+    body: "AI ranks incoming reports by urgency so critical issues surface first. Supervisors retain full authority over every decision.",
   },
   {
     number: "03",
-    title: "Close it out.",
-    body: "Every report is assigned, tracked to completion, and the worker hears at each step. Nothing sits in a binder.",
+    title: "Resolve",
+    body: "Every report is assigned an owner and tracked to completion, and the worker who filed it is kept informed at each stage. No report is left sitting in a binder.",
   },
   {
     number: "04",
-    title: "Learn from it.",
-    body: "Recurring risks and the year-end summary are already built from the reports your crew filed.",
+    title: "Analyze",
+    body: "Recurring risks and year-end summaries are generated directly from the reports your crews submit.",
   },
 ];
 
 const SILENCE = [
-  "49% too slow or clunky",
-  "44% still on paper, email, or verbal",
-  "38% fear backlash",
+  "49% find reporting too slow or cumbersome",
+  "44% still rely on paper, email, or verbal reports",
+  "38% fear retaliation",
 ];
 
 const HAZARD_RETURNS = [
   {
     number: "01",
     title: "No early warning",
-    body: "Near misses never surface. 39% of sites miss the early signals.",
+    body: "Near misses go unrecorded, and 39% of sites miss the early warning signs.",
   },
   {
     number: "02",
-    title: "People stop bothering",
-    body: "Paper, email, or verbal reports lose information easily. People have lost trust that speaking up changes anything, so they stop bothering. 54% stay quiet after nothing happens.",
+    title: "Trust erodes",
+    body: "Information is easily lost in paper, email, and verbal reports. When concerns go unaddressed, workers lose confidence that speaking up makes a difference. 54% stop reporting once they see no action taken.",
   },
   {
     number: "03",
-    title: "No one has time",
-    body: "Short-staffed crews skip the paperwork. 45% say that is why they do not file. This is going to be especially true as the global workforce shortage begins.",
+    title: "No time to report",
+    body: "Short-staffed crews skip the paperwork, and 45% cite time and staffing pressures as the reason they do not report. This is especially true amid the industry’s global workforce shortage.",
   },
 ];
 
 const COMPARE = [
   {
-    today: "Issues logged, not resolved",
-    statera: "Action driven to completion",
-    impact: "More hazards are fixed",
+    today: "Issues logged but not resolved",
+    statera: "Actions driven to completion",
+    impact: "More hazards addressed",
   },
   {
     today: "No clear ownership",
-    statera: "Assigned and tracked ownership",
-    impact: "Accountability on every issue",
+    statera: "Assigned, tracked ownership",
+    impact: "Accountability for every issue",
   },
   {
     today: "90% of issues go unreported",
-    statera: "2–3x more reports captured",
-    impact: "Full visibility of site risk",
+    statera: "2–3× more reports captured",
+    impact: "Full visibility into site risk",
   },
   {
     today: "Patterns go unnoticed",
-    statera: "AI detects patterns",
-    impact: "Minutes, not weeks",
+    statera: "AI identifies recurring patterns",
+    impact: "Insights in minutes, not weeks",
   },
   {
-    today: "React late",
-    statera: "Act early",
+    today: "Late, reactive response",
+    statera: "Early, proactive action",
     impact: "Fewer accidents",
   },
 ];
 
 const WORKING_TODAY = [
-  "1-minute worker reporting with photos",
-  "AI priority ranking, with its reasoning shown",
-  "Similar reports grouped into one issue",
-  "Two-way messaging and a full audit history",
+  "One-minute field reporting with photos",
+  "AI priority ranking with transparent reasoning",
+  "Related reports grouped into a single issue",
+  "Two-way messaging with a complete audit history",
 ];
 
 const UNDER_DEVELOPMENT = [
-  "Mobile app, with occurrence capture and voice capture",
-  "More analytical features, including future predictions",
-  "Assign a ticket to the supervisor who is the best fit",
-  "Site-ready accounts, roles, and security",
+  "Mobile app with occurrence and voice capture",
+  "Advanced analytics, including predictive insights",
+  "Ticket assignment to the best-suited supervisor",
+  "Site-ready accounts, roles, and security controls",
 ];
 
 const DEPLOY = [
   {
-    title: "Easy to implement",
-    body: "Fits the workflow mines already run. It sits beside official reporting procedures. It does not replace them.",
+    title: "Straightforward to implement",
+    body: "Fits the workflows your site already runs and complements official reporting procedures rather than replacing them.",
   },
   {
-    title: "Existing devices",
-    body: "Runs on the phones, tablets, and computers already on site. No new hardware. No new IT stack.",
+    title: "Works across devices",
+    body: "Runs in the web browser on phones, tablets, and computers, with nothing to install or maintain.",
   },
   {
-    title: "Scales easily",
-    body: "One crew, then one site, then many sites on the same platform.",
+    title: "Scales with your operation",
+    body: "Start with a single crew, expand to a full site, and grow to multiple sites on one platform.",
   },
 ];
 
 const PILOT = [
   {
     title: "One site, three months",
-    body: "Full platform, unlimited field reporters, onboarding included. No long-term lock-in.",
+    body: "Full platform access, unlimited field reporters, and onboarding included.",
   },
   {
-    title: "Success you define",
-    body: "We agree the metrics up front: reports filed, time to action, and crew adoption.",
+    title: "Clear success criteria",
+    body: "We agree on metrics up front, such as reports filed, time to action, and crew adoption.",
   },
   {
-    title: "Your data, in Canada",
-    body: "Hosted in a Canadian region. You own it. Access is role-based and logged.",
+    title: "Canadian data residency",
+    body: "Hosted in a Canadian region. You own your data, and all access is role-based and logged.",
   },
 ];
 
 const TRUST = [
   "Encrypted in transit and at rest",
-  "Role-based access and an audit trail",
-  "AI ranks reports. A named person takes every action",
-  "Supports your procedures. It does not replace them.",
+  "Role-based access with a full audit trail",
+  "AI ranks reports, but every action is taken by a named person",
+  "Supports your procedures rather than replacing them",
 ];
 
 const QUICK_FACTS = [
-  "Open a link. Nothing to install.",
-  "Works underground, offline",
+  "Browser-based, nothing to install",
+  "Works offline, including underground",
   "Unlimited reporters per site",
   "Data hosted in Canada",
 ];
@@ -191,7 +191,7 @@ export default function HomePage() {
               className="rounded-lg bg-statera-orange px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-[#bd7509] sm:px-4 sm:py-2.5 sm:text-[12px]"
             >
               <span className="sm:hidden">Pilot</span>
-              <span className="hidden sm:inline">Start a pilot</span>
+              <span className="hidden sm:inline">Request a pilot</span>
             </a>
           </div>
         </div>
@@ -205,7 +205,7 @@ export default function HomePage() {
           <a className="shrink-0 transition hover:text-statera-ink" href="#compare">
             Compare
           </a>
-          <a className="shrink-0 transition hover:text-statera-ink" href="#pilot">
+          <a className="shrink-0 transition hover:text-statera-ink max-[374px]:hidden" href="#pilot">
             Pilot
           </a>
         </nav>
@@ -225,24 +225,24 @@ export default function HomePage() {
                 Safety reporting for mine sites
               </p>
 
-              <h1 className="mt-5 font-display text-[30px] font-extrabold leading-[1.08] tracking-[-0.03em] sm:mt-7 sm:text-5xl md:text-6xl xl:text-[68px]">
+              <h1 className="mt-5 font-display text-[30px] font-extrabold leading-[1.08] tracking-[-0.03em] sm:mt-7 sm:text-5xl md:text-6xl lg:text-[length:clamp(40px,5.2vw_-_13px,54px)]">
                 Keeping mines safe
                 <br />
                 starts with a report
               </h1>
 
               <p className="mt-5 max-w-xl text-base leading-7 text-statera-slate sm:mt-6 sm:text-lg sm:leading-8">
-                Workers capture a hazard, near miss, or incident in about a
-                minute, even with no signal. Supervisors see what’s urgent
-                first, follows every ticket through to completion, and catch
-                the pattern before it becomes an incident.
+                Workers report a hazard, near miss, or incident in about a
+                minute, even without a signal. Supervisors see the most urgent
+                issues first, track every ticket through to resolution, and
+                identify emerging patterns before they escalate.
               </p>
 
               <div className="mt-7 max-w-xl scroll-mt-24 sm:mt-9">
-                <NotifyForm submitLabel="Talk to us" />
+                <NotifyForm submitLabel="Request a pilot" />
                 <p className="mt-3 text-xs text-zinc-500">
-                  Leave your email and site, and we will follow up about a
-                  pilot.
+                  Share your email and site, and our team will follow up to
+                  discuss a pilot.
                 </p>
               </div>
             </div>
@@ -295,11 +295,12 @@ export default function HomePage() {
         >
           <p className="text-sm font-semibold text-statera-orange">The problem</p>
           <h2 className="mt-3 max-w-3xl font-display text-[26px] font-extrabold leading-[1.12] tracking-[-0.025em] sm:text-4xl lg:text-5xl">
-            Leaders are flying blind.
+            Leaders lack visibility into site risk.
           </h2>
           <p className="mt-5 max-w-2xl text-[15px] leading-7 text-statera-slate sm:text-base">
-            What doesn’t get logged can’t be fixed, and almost nothing gets
-            logged. Decisions get made on a sliver of what happens on the floor.
+            What is not recorded cannot be addressed, and the vast majority of
+            hazards are never recorded. As a result, safety decisions rest on a
+            small fraction of what actually happens on site.
           </p>
 
           <div className="mt-9 grid gap-4 sm:mt-12 lg:grid-cols-[1.15fr_0.85fr]">
@@ -329,7 +330,7 @@ export default function HomePage() {
                 </div>
               </div>
               <p className="mt-6 text-sm leading-6 text-statera-slate">
-                Hazards have to be reported before they can be fixed.
+                A hazard must be reported before it can be addressed.
               </p>
             </article>
 
@@ -344,7 +345,7 @@ export default function HomePage() {
           </div>
 
           <p className="mt-8 text-[11px] font-semibold uppercase tracking-[0.14em] text-statera-slate">
-            Why workers stay silent
+            Barriers to reporting
           </p>
           <div className="mt-3 grid gap-2 sm:flex sm:flex-wrap">
             {SILENCE.map((item) => (
@@ -358,7 +359,7 @@ export default function HomePage() {
           </div>
 
           <h3 className="mt-12 font-display text-2xl font-extrabold tracking-[-0.02em] sm:text-3xl">
-            The same hazard comes back.
+            Unreported hazards keep returning.
           </h3>
           <div className="mt-6 grid gap-4 sm:grid-cols-3">
             {HAZARD_RETURNS.map((item) => (
@@ -380,12 +381,12 @@ export default function HomePage() {
           </div>
 
           <p className="mt-8 max-w-3xl text-sm leading-6 text-statera-slate">
-            Companies that do not adequately respond to issues see 53–75% higher
-            odds of a subsequent serious accident.
+            Organizations that do not respond adequately to reported issues face
+            53–75% higher odds of a subsequent serious accident.
           </p>
           <p className="mt-3 max-w-3xl text-[11px] leading-5 text-statera-slate/80">
-            Sources: 2026 EHS Benchmarking Report, Benchmark Gensuite (260+ EHS
-            professionals). Journal of Occupational Health, 2024.
+            Sources: Benchmark Gensuite, 2026 EHS Benchmarking Report (260+ EHS
+            professionals); Journal of Occupational Health, 2024.
           </p>
         </LevelSection>
 
@@ -404,9 +405,10 @@ export default function HomePage() {
             From the first report to the pattern behind it.
           </h2>
           <p className="mt-5 max-w-2xl text-[15px] leading-7 text-white/75 sm:text-base">
-            Statera turns a one-minute field report into a ticket with an owner,
-            a status, and a history. Urgent work rises first. Similar reports
-            group together. The crew hears back at each step.
+            Statera turns a one-minute field report into a tracked ticket with a
+            clear owner, status, and history. Urgent issues rise to the top,
+            related reports are grouped together, and workers receive updates at
+            every stage.
           </p>
 
           <div className="mt-9 grid gap-4 sm:mt-12 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
@@ -429,7 +431,7 @@ export default function HomePage() {
           </div>
 
           <p className="mt-12 text-sm font-semibold text-statera-orange">
-            A quick look at the workflow
+            Product walkthrough
           </p>
           <h3 className="mt-3 max-w-2xl font-display text-2xl font-extrabold tracking-[-0.02em] sm:text-3xl">
             Watch how a report moves through Statera.
@@ -442,27 +444,27 @@ export default function HomePage() {
             In the product today
           </p>
           <h3 className="mt-3 max-w-2xl font-display text-2xl font-extrabold tracking-[-0.02em] sm:text-3xl">
-            Live reports, then a briefing you can export.
+            Live reporting and exportable AI briefings.
           </h3>
           <p className="mt-4 max-w-2xl text-[15px] leading-7 text-white/75">
-            Supervisors get a live picture of open work: what is still unresolved,
-            what has sat too long, and where the risk is clustering. The AI
-            briefing is written from those live counts. It does not invent
-            numbers.
+            Supervisors get a real-time view of open work: what remains
+            unresolved, what has been idle too long, and where risk is
+            concentrated. The AI briefing is generated from these live counts
+            and does not invent numbers.
           </p>
 
           <div className="mt-8 grid gap-6">
             <ProductShot
               title="statera · reports"
               src="/screenshots/reports.png"
-              alt="Statera reports page showing live counts for open work, weekly volume, categories, and AI ranking mix."
+              alt="Statera reports page showing live counts of open work, weekly report volume, categories, and the AI ranking mix."
               width={1024}
               height={766}
             />
             <ProductShot
               title="statera · exportable briefing"
               src="/screenshots/briefing.png"
-              alt="Statera AI briefing written from live open reports, with highlights and concerns a supervisor can export."
+              alt="Statera AI briefing generated from live open reports, with highlights and concerns that a supervisor can export."
               width={1024}
               height={705}
             />
@@ -480,14 +482,14 @@ export default function HomePage() {
           dark
         >
           <p className="text-sm font-semibold text-statera-orange">
-            Before vs after
+            Before and after
           </p>
           <h2 className="mt-3 max-w-3xl font-display text-[26px] font-extrabold leading-[1.12] tracking-[-0.025em] sm:text-4xl lg:text-5xl">
-            Disconnected tools versus a closed loop.
+            From disconnected tools to a closed loop.
           </h2>
           <p className="mt-5 max-w-2xl text-[15px] leading-7 text-white/75 sm:text-base">
-            Today, issues get logged and stall. With Statera, someone owns them
-            until they are done.
+            Today, issues are logged and then stall. With Statera, every issue
+            has an owner until it is resolved.
           </p>
 
           <div className="mt-9 overflow-hidden rounded-2xl bg-white text-statera-ink ring-1 ring-black/10 sm:mt-12">
@@ -539,21 +541,21 @@ export default function HomePage() {
           dark
         >
           <p className="text-sm font-semibold text-statera-orange">
-            Built vs building
+            Development status
           </p>
           <h2 className="mt-3 max-w-3xl font-display text-[26px] font-extrabold leading-[1.12] tracking-[-0.025em] sm:text-4xl lg:text-5xl">
-            What works today, and what is next.
+            What is available today, and what comes next.
           </h2>
           <p className="mt-5 max-w-2xl text-[15px] leading-7 text-white/75 sm:text-base">
-            The core loop is live: capture, rank, group, message, and close.
-            The next layer is a mobile app, tighter assignment, and site-ready
-            accounts.
+            The core workflow is live: capture, prioritization, grouping,
+            messaging, and resolution. The next phase adds a mobile app, smarter
+            ticket assignment, and site-ready account management.
           </p>
 
           <div className="mt-9 grid gap-4 sm:mt-12 lg:grid-cols-2">
             <article className="rounded-2xl bg-white p-5 text-statera-ink ring-1 ring-black/10 sm:p-8">
               <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-statera-slate">
-                Working today
+                Available now
               </p>
               <ul className="mt-5 space-y-3">
                 {WORKING_TODAY.map((item) => (
@@ -566,7 +568,7 @@ export default function HomePage() {
             </article>
             <article className="rounded-2xl bg-white/[0.07] p-5 ring-1 ring-white/15 sm:p-8">
               <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-statera-orange">
-                Under development
+                In development
               </p>
               <ul className="mt-5 space-y-3">
                 {UNDER_DEVELOPMENT.map((item) => (
@@ -591,14 +593,14 @@ export default function HomePage() {
           dark
         >
           <p className="text-sm font-semibold text-statera-orange">
-            Easy to deploy
+            Simple deployment
           </p>
           <h2 className="mt-3 max-w-3xl font-display text-[26px] font-extrabold leading-[1.12] tracking-[-0.025em] sm:text-4xl lg:text-5xl">
-            Runs on what mines already have.
+            Runs on the devices your site already uses.
           </h2>
           <p className="mt-5 max-w-2xl text-[15px] leading-7 text-white/75 sm:text-base">
-            No new hardware. No new IT project. Open a link on the devices
-            already at the site.
+            There is no new hardware to purchase and no IT project to manage.
+            Crews access Statera through a web link.
           </p>
 
           <div className="mt-9 grid gap-4 sm:mt-12 md:grid-cols-3">
@@ -629,28 +631,28 @@ export default function HomePage() {
           <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
             <div>
               <p className="text-sm font-semibold text-statera-orange">
-                Why pilot with us
+                Pilot program
               </p>
               <h2 className="mt-3 font-display text-[26px] font-extrabold leading-[1.12] tracking-[-0.025em] sm:text-4xl lg:text-5xl">
-                One prevented injury pays for years of Statera.
+                One prevented injury can pay for years of Statera.
               </h2>
               <p className="mt-5 max-w-xl text-[15px] leading-7 text-white/70 sm:mt-6 sm:text-base">
-                We are looking for one mine to be our founding pilot partner. A
-                90-day trial at a single site, with success metrics we agree on
-                before we start, and no long-term commitment.
+                We are seeking one mine to become our founding pilot partner: a
+                90-day trial at a single site, with success metrics agreed in
+                advance and no long-term commitment.
               </p>
 
               <div className="mt-8 grid gap-4 sm:grid-cols-[1fr_auto_1fr] sm:items-stretch">
                 <article className="rounded-2xl bg-white/[0.07] p-5 ring-1 ring-white/12">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/50">
-                    Cost of one injury
+                    Cost of a single injury
                   </p>
                   <p className="mt-2 font-display text-4xl font-extrabold tracking-[-0.03em] text-rose-400">
                     ~$48,000
                   </p>
                   <p className="mt-2 text-sm leading-6 text-white/65">
-                    Average cost of one medically consulted injury: medical care,
-                    lost wages, and admin.
+                    Average cost of a medically consulted injury, including
+                    medical care, lost wages, and administrative expenses.
                   </p>
                 </article>
                 <div className="flex items-center justify-center py-1 sm:py-0">
@@ -666,19 +668,20 @@ export default function HomePage() {
                     ~$1,000
                   </p>
                   <p className="mt-2 text-sm leading-6 text-white/65">
-                    90-day pilot, scaled to mine size.
+                    90-day pilot, priced according to the size of the operation.
                   </p>
                 </article>
               </div>
 
               <p className="mt-6 rounded-xl bg-white/10 px-5 py-4 text-sm font-medium leading-6 ring-1 ring-white/15">
-                If Statera helps prevent even one incident, the pilot pays for
-                itself about 48x over.
+                If Statera helps prevent a single incident, the pilot returns
+                roughly 48 times its cost.
               </p>
               <p className="mt-3 text-xs leading-5 text-white/45">
-                Indirect costs add about 1.3x more. A mid-size site absorbs
-                roughly $290K a year. Sources: National Safety Council, Injury
-                Facts 2024; OSHA indirect-cost guidance.
+                Indirect costs add roughly 1.3 times the direct cost. A mid-sized
+                site absorbs approximately $290,000 in injury costs each year.
+                Sources: National Safety Council, Injury Facts 2024; OSHA
+                indirect-cost guidance.
               </p>
 
               <div className="mt-8 grid gap-4 sm:grid-cols-3">
@@ -697,7 +700,7 @@ export default function HomePage() {
 
               <div className="mt-10">
                 <p className="text-sm font-semibold text-statera-orange">
-                  Statera flags the issue. A person decides what to do.
+                  Statera flags the issue. A person always makes the decision.
                 </p>
                 <ul className="mt-4 space-y-2.5">
                   {TRUST.map((item) => (
@@ -718,13 +721,13 @@ export default function HomePage() {
                 Next step
               </p>
               <p className="mt-3 font-display text-2xl font-bold tracking-[-0.015em]">
-                A 30-minute call to see if this works for your site.
+                A 30-minute call to assess whether Statera fits your site.
               </p>
               <p className="mt-3 text-sm leading-6 text-white/65">
-                Tell us who you are. We’ll follow up to scope a pilot.
+                Share your details, and our team will follow up to scope a pilot.
               </p>
               <div className="mt-7">
-                <NotifyForm submitLabel="Request a conversation" />
+                <NotifyForm submitLabel="Request a call" />
               </div>
               <a
                 href={BUSINESS_PLAN.href}
@@ -743,11 +746,12 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-7xl flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-x-6">
           <div className="max-w-xl">
             <p className="text-xs text-white/45">
-              © 2026 Statera Mine Systems. Saskatchewan. All rights reserved.
+              © 2026 Statera Mine Systems, Saskatchewan, Canada. All rights
+              reserved.
             </p>
             <p className="mt-2 text-xs leading-5 text-white/35">
-              Statera assists safety reporting and communication. It does not
-              replace a site’s own procedures, supervisor judgment, or
+              Statera supports safety reporting and communication. It does not
+              replace a site’s own procedures, supervisory judgment, or
               regulatory obligations.
             </p>
           </div>
@@ -757,13 +761,13 @@ export default function HomePage() {
               download={BUSINESS_PLAN.filename}
               className="text-xs font-semibold text-white/70 underline-offset-4 transition hover:text-white hover:underline"
             >
-              Download business plan
+              Download the business plan
             </a>
             <a
               href="#top"
               className="text-xs font-semibold text-white/70 underline-offset-4 transition hover:text-white hover:underline"
             >
-              Return to surface ↑
+              Back to top ↑
             </a>
           </div>
         </div>

@@ -30,15 +30,18 @@ export async function submitEnquiry(
   const organization = String(formData.get("organization") ?? "").trim();
 
   if (!EMAIL_PATTERN.test(email) || email.length > 254) {
-    return { ok: false, error: "Enter a valid email address." };
+    return { ok: false, error: "Please enter a valid email address." };
   }
 
   if (organization.length < 2) {
-    return { ok: false, error: "Enter your site or company." };
+    return { ok: false, error: "Please enter your company or site name." };
   }
 
   if (organization.length > 200) {
-    return { ok: false, error: "Site or company name is too long." };
+    return {
+      ok: false,
+      error: "Company or site name must be 200 characters or fewer.",
+    };
   }
 
   const id = formId();
@@ -51,7 +54,7 @@ export async function submitEnquiry(
       error:
         process.env.NODE_ENV === "development"
           ? "Set FORMSPREE_FORM_ID in website/.env.local (see website/.env.example)."
-          : "Could not send that just now. Try again in a moment.",
+          : "We could not send your request. Please try again shortly.",
     };
   }
 
@@ -84,7 +87,7 @@ export async function submitEnquiry(
       console.error("Formspree rejected the enquiry.", response.status, detail);
       return {
         ok: false,
-        error: detail || "Could not send that just now. Try again.",
+        error: detail || "We could not send your request. Please try again shortly.",
       };
     }
 
@@ -93,7 +96,7 @@ export async function submitEnquiry(
     console.error("Enquiry submit failed.", error);
     return {
       ok: false,
-      error: "Could not send that just now. Try again.",
+      error: "We could not send your request. Please try again shortly.",
     };
   }
 }

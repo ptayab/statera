@@ -47,6 +47,15 @@ html {
   scroll-behavior: smooth;
 }
 
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+}
+
 /* Daylight at the surface, above the first strata line. */
 .wash {
   background:

@@ -16,7 +16,7 @@ export function NotifyForm({ submitLabel = "Notify me" }: NotifyFormProps) {
   if (state?.ok) {
     return (
       <p className="rounded-xl bg-white px-4 py-4 text-sm font-medium text-statera-ink shadow-sm ring-1 ring-black/5">
-        Thanks. We’ll follow up about a conversation.
+        Thank you. Our team will be in touch shortly.
       </p>
     );
   }
@@ -28,25 +28,25 @@ export function NotifyForm({ submitLabel = "Notify me" }: NotifyFormProps) {
     <form action={formAction} className="w-full">
       <div className="flex flex-col gap-2.5">
         <label className="flex-1">
-          <span className="sr-only">Email</span>
+          <span className="sr-only">Work email</span>
           <input
             type="email"
             name="email"
             required
             autoComplete="email"
-            placeholder="Enter your email"
+            placeholder="Work email"
             /* 16px on mobile: anything smaller makes iOS Safari zoom on focus. */
             className={fieldClass}
           />
         </label>
         <label className="flex-1">
-          <span className="sr-only">Site or company</span>
+          <span className="sr-only">Company or site</span>
           <input
             type="text"
             name="organization"
             required
             autoComplete="organization"
-            placeholder="Site or company"
+            placeholder="Company or site"
             className={fieldClass}
           />
         </label>

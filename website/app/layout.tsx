@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     apple: "/logo.png",
   },
   openGraph: {
-    title: "Statera | Keeping mines safe starts with a report",
+    title: "Statera | Bring every hazard to the surface",
     description:
       "Safety reporting for mine sites, with fast field reporting, tickets tracked to resolution, and data hosted in Canada.",
     siteName: "Statera",

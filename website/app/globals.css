@@ -92,6 +92,40 @@ html {
   );
 }
 
+/* Headline statistic: counts up from 00 to its --stat-count value.
+   UnreportedGrid mirrors this timing; keep the two in step. */
+@property --stat-count {
+  syntax: "<integer>";
+  inherits: false;
+  initial-value: 0;
+}
+
+.stat-count {
+  counter-reset: stat-count var(--stat-count);
+  animation: stat-count 1.7s cubic-bezier(0.5, 1, 0.89, 1) 0.25s both;
+}
+
+.stat-count::after {
+  content: counter(stat-count, decimal-leading-zero);
+}
+
+@keyframes stat-count {
+  from {
+    --stat-count: 0;
+  }
+}
+
+/* Unreported cells start lit and sink to dark as the count climbs. */
+.gap-cell {
+  animation: gap-cell 0.6s ease-out both;
+}
+
+@keyframes gap-cell {
+  from {
+    background-color: #d4840a;
+  }
+}
+
 ::selection {
   background: rgba(212, 132, 10, 0.24);
 }
@@ -106,5 +140,10 @@ html {
   *::after {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
+  }
+
+  .stat-count,
+  .gap-cell {
+    animation: none;
   }
 }

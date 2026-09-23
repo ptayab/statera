@@ -3,10 +3,12 @@ import { DemoVideo } from "@/components/DemoVideo";
 import { Headframe } from "@/components/Headframe";
 import { LevelSection } from "@/components/LevelSection";
 import { NotifyForm } from "@/components/NotifyForm";
+import { PlayWhenVisible } from "@/components/PlayWhenVisible";
 import { ProductShot } from "@/components/ProductShot";
 import { StatusTrailMock } from "@/components/StatusTrailMock";
 import { StrataDivider } from "@/components/StrataDivider";
 import { SupervisorQueueMock } from "@/components/SupervisorQueueMock";
+import { UnreportedGrid } from "@/components/UnreportedGrid";
 import { WindowChrome } from "@/components/WindowChrome";
 import { WorkerReportMock } from "@/components/WorkerReportMock";
 
@@ -225,10 +227,10 @@ export default function HomePage() {
                 Safety reporting for mine sites
               </p>
 
-              <h1 className="mt-5 font-display text-[30px] font-extrabold leading-[1.08] tracking-[-0.03em] sm:mt-7 sm:text-5xl md:text-6xl lg:text-[length:clamp(40px,5.2vw_-_13px,54px)]">
-                Keeping mines safe
+              <h1 className="mt-5 font-display text-[length:clamp(30px,10vw_-_2px,40px)] font-extrabold leading-[1.08] tracking-[-0.03em] sm:mt-7 sm:text-5xl md:text-6xl lg:text-[length:clamp(40px,5.2vw_-_13px,54px)]">
+                Bring every hazard
                 <br />
-                starts with a report
+                to the surface.
               </h1>
 
               <p className="mt-5 max-w-xl text-base leading-7 text-statera-slate sm:mt-6 sm:text-lg sm:leading-8">
@@ -237,14 +239,6 @@ export default function HomePage() {
                 issues first, track every ticket through to resolution, and
                 identify emerging patterns before they escalate.
               </p>
-
-              <div className="mt-7 max-w-xl scroll-mt-24 sm:mt-9">
-                <NotifyForm submitLabel="Request a pilot" />
-                <p className="mt-3 text-xs text-zinc-500">
-                  Share your email and site, and our team will follow up to
-                  discuss a pilot.
-                </p>
-              </div>
             </div>
 
             <div className="relative mx-auto flex w-full max-w-[280px] flex-col gap-5 sm:max-w-md lg:mx-0 lg:block lg:max-w-none lg:min-h-[560px]">
@@ -303,48 +297,35 @@ export default function HomePage() {
             small fraction of what actually happens on site.
           </p>
 
-          <div className="mt-9 grid gap-4 sm:mt-12 lg:grid-cols-[1.15fr_0.85fr]">
-            <article className="rounded-2xl bg-white p-5 ring-1 ring-black/10 sm:p-8">
-              <div className="space-y-5">
-                <div>
-                  <div className="mb-2 flex items-end justify-between gap-3">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-400">
-                      Reported
-                    </p>
-                    <p className="text-sm font-bold text-statera-ink">10%</p>
-                  </div>
-                  <div className="h-3 overflow-hidden rounded-full bg-zinc-100">
-                    <div className="h-full w-[10%] rounded-full bg-statera-orange" />
-                  </div>
-                </div>
-                <div>
-                  <div className="mb-2 flex items-end justify-between gap-3">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-400">
-                      Unreported
-                    </p>
-                    <p className="text-sm font-bold text-statera-ink">90%</p>
-                  </div>
-                  <div className="h-3 overflow-hidden rounded-full bg-zinc-100">
-                    <div className="h-full w-[90%] rounded-full bg-zinc-700" />
-                  </div>
-                </div>
-              </div>
-              <p className="mt-6 text-sm leading-6 text-statera-slate">
-                A hazard must be reported before it can be addressed.
+          <PlayWhenVisible className="relative mt-9 overflow-hidden rounded-3xl bg-statera-ink text-white shadow-[0_30px_70px_-30px_rgba(0,0,0,0.5)] sm:mt-12">
+            <div
+              className="pointer-events-none absolute inset-0 bg-[radial-gradient(640px_circle_at_12%_18%,rgba(212,132,10,0.16),transparent_70%)]"
+              aria-hidden
+            />
+            <div className="dust-deep pointer-events-none absolute inset-0" aria-hidden />
+            <div className="relative grid gap-10 p-6 sm:p-10 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-12 lg:gap-16 lg:p-12">
+              <p>
+                <span className="sr-only">90% </span>
+                <span
+                  aria-hidden
+                  className="flex items-start font-display font-extrabold leading-[0.8] tracking-[-0.05em] text-statera-orange"
+                >
+                  <span className="stat-count text-[112px] tabular-nums [--stat-count:90] sm:text-[168px] lg:text-[208px]" />
+                  <span className="mt-[0.06em] text-[60px] sm:text-[88px] lg:text-[108px]">
+                    %
+                  </span>
+                </span>
+                <span className="mt-6 block max-w-md text-balance text-xl font-semibold leading-8 text-white/70 sm:mt-8 sm:text-2xl sm:leading-9">
+                  of workplace incidents, hazards, and near&nbsp;misses{" "}
+                  <span className="text-white">go unreported.</span>
+                </span>
               </p>
-            </article>
 
-            <article className="rounded-2xl bg-statera-ink p-5 text-white ring-1 ring-black/10 sm:p-8">
-              <p className="font-display text-5xl font-extrabold leading-none tracking-[-0.04em] text-statera-orange sm:text-6xl">
-                90%
-              </p>
-              <p className="mt-4 text-[15px] leading-7 text-white/80">
-                of workplace incidents, hazards, and near misses go unreported.
-              </p>
-            </article>
-          </div>
+              <UnreportedGrid />
+            </div>
+          </PlayWhenVisible>
 
-          <p className="mt-8 text-[11px] font-semibold uppercase tracking-[0.14em] text-statera-slate">
+          <p className="mt-10 text-[11px] font-semibold uppercase tracking-[0.14em] text-statera-slate sm:mt-12">
             Barriers to reporting
           </p>
           <div className="mt-3 grid gap-2 sm:flex sm:flex-wrap">

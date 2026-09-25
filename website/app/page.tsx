@@ -294,7 +294,7 @@ export default function HomePage() {
           </ul>
 
           <h3 className="mt-10 font-display text-3xl font-medium tracking-[-0.02em]">
-            Unreported hazards keep returning.
+            Consequences of the reporting gap
           </h3>
           <div className="mt-6 grid gap-px overflow-hidden rounded-lg border border-black/10 bg-black/10 sm:grid-cols-3">
             {HAZARD_RETURNS.map((item) => (

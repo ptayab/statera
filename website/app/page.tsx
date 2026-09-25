@@ -357,7 +357,7 @@ export default function HomePage() {
             Supervisors get a real-time view of open work: what remains
             unresolved, what has been idle too long, and where risk is
             concentrated. The AI briefing is generated from these live counts
-            and does not invent numbers.
+            and past tickets.
           </p>
           <div className="mt-8 grid gap-4">
             <WindowChrome title="Reports">

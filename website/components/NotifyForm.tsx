@@ -22,7 +22,7 @@ export function NotifyForm({ submitLabel = "Notify me" }: NotifyFormProps) {
   }
 
   const fieldClass =
-    "w-full rounded-xl border-0 bg-white px-4 py-3 text-base text-statera-ink shadow-sm ring-1 ring-black/10 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-statera-orange sm:text-sm";
+    "w-full rounded-md border border-black/10 bg-white px-3.5 py-2.5 text-base text-statera-ink placeholder:text-zinc-400 focus:border-statera-ink focus:outline-none sm:text-sm";
 
   return (
     <form action={formAction} className="w-full">
@@ -59,7 +59,7 @@ export function NotifyForm({ submitLabel = "Notify me" }: NotifyFormProps) {
         <button
           type="submit"
           disabled={pending}
-          className="w-full rounded-xl bg-statera-orange px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#bd7509] disabled:opacity-60"
+          className="w-full rounded-md bg-statera-ink px-6 py-2.5 text-sm font-medium text-white transition hover:bg-black disabled:opacity-60"
         >
           {pending ? "Sending…" : submitLabel}
         </button>

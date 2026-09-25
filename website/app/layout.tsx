@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import { Inter, Newsreader } from "next/font/google";
 import "./globals.css";
 
-const stateraDisplay = Plus_Jakarta_Sans({
+const stateraDisplay = Newsreader({
   subsets: ["latin"],
   variable: "--font-statera-display",
+  weight: ["500", "600", "700"],
 });
 
 const stateraBody = Inter({
@@ -17,10 +18,6 @@ export const metadata: Metadata = {
   description:
     "Workers report hazards, near misses, and incidents from the field. Supervisors receive a prioritized queue and track every ticket to resolution. Data is hosted in Canada.",
   applicationName: "Statera",
-  icons: {
-    icon: "/logo.png",
-    apple: "/logo.png",
-  },
   openGraph: {
     title: "Statera | Bring every hazard to the surface",
     description:

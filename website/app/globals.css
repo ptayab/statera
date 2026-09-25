@@ -17,10 +17,10 @@
   --color-hairline: var(--hairline);
   --color-hairline-strong: var(--hairline-strong);
 
-  --color-statera-orange: #d4840a;
-  --color-statera-ink: #141414;
-  --color-statera-slate: #5f5f5f;
-  --color-statera-mist: #efefef;
+  --color-statera-orange: #9c6b1a;
+  --color-statera-ink: #161513;
+  --color-statera-slate: #5c5852;
+  --color-statera-mist: #f0ece6;
 
   /* Strata: daylight at the surface down to black rock at the bottom. */
   --color-level-0: #fafafa;
@@ -122,12 +122,12 @@ html {
 
 @keyframes gap-cell {
   from {
-    background-color: #d4840a;
+    background-color: #9c6b1a;
   }
 }
 
 ::selection {
-  background: rgba(212, 132, 10, 0.24);
+  background: rgba(156, 107, 26, 0.22);
 }
 
 @media (prefers-reduced-motion: reduce) {

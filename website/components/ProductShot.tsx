@@ -24,8 +24,8 @@ export function ProductShot({
           alt={alt}
           width={width}
           height={height}
+          unoptimized
           className="h-auto w-full"
-          sizes="(min-width: 1024px) 960px, 100vw"
         />
       </WindowChrome>
     </figure>

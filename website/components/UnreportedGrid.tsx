@@ -24,7 +24,7 @@ export function UnreportedGrid() {
         {Array.from({ length: COLUMNS }, (_, i) => (
           <span
             key={i}
-            className="aspect-square rounded-[3px] bg-statera-orange shadow-[0_0_14px_rgba(212,132,10,0.5)]"
+            className="aspect-square rounded-[2px] bg-statera-orange"
           />
         ))}
       </div>

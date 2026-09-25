@@ -9,7 +9,7 @@ type WindowChromeProps = {
 export function WindowChrome({ title, children, className = "" }: WindowChromeProps) {
   return (
     <div
-      className={`overflow-hidden rounded-xl bg-white shadow-[0_26px_60px_-24px_rgba(0,0,0,0.35)] ring-1 ring-black/5 ${className}`}
+      className={`overflow-hidden rounded-lg bg-white shadow-[0_18px_50px_-28px_rgba(22,21,19,0.45)] ring-1 ring-black/10 ${className}`}
     >
       <div className="flex items-center gap-2 border-b border-zinc-100 bg-white px-3 py-2">
         <span className="flex gap-1.5" aria-hidden>

@@ -142,11 +142,6 @@ const QUICK_FACTS = [
   "Data hosted in Canada",
 ];
 
-const BUSINESS_PLAN = {
-  href: "/Statera_Business_Plan.docx",
-  filename: "Statera_Business_Plan.docx",
-};
-
 const NAV = [
   { href: "#level-01", label: "The gap" },
   { href: "#how-it-works", label: "How it works" },
@@ -184,13 +179,6 @@ export default function HomePage() {
           </nav>
 
           <div className="flex shrink-0 items-center gap-4">
-            <a
-              href={BUSINESS_PLAN.href}
-              download={BUSINESS_PLAN.filename}
-              className="hidden text-sm text-statera-slate transition hover:text-statera-ink sm:inline"
-            >
-              Business plan
-            </a>
             <a
               href="#pilot"
               className="rounded-md bg-statera-ink px-3.5 py-2 text-sm font-medium text-white transition hover:bg-black"
@@ -529,17 +517,11 @@ export default function HomePage() {
               </p>
               <p className="mt-3 text-sm leading-6 text-statera-slate">
                 Share your details, and our team will follow up to scope a pilot.
+                If you would like a business plan, we will send one.
               </p>
               <div className="mt-6">
                 <NotifyForm submitLabel="Request a call" />
               </div>
-              <a
-                href={BUSINESS_PLAN.href}
-                download={BUSINESS_PLAN.filename}
-                className="mt-5 inline-block text-sm font-medium underline decoration-black/20 underline-offset-4 hover:decoration-black"
-              >
-                Download the business plan
-              </a>
             </div>
           </div>
         </LevelSection>
@@ -560,12 +542,8 @@ export default function HomePage() {
             </p>
           </div>
           <div className="flex flex-col gap-2 text-sm">
-            <a
-              href={BUSINESS_PLAN.href}
-              download={BUSINESS_PLAN.filename}
-              className="text-white/80 hover:text-white"
-            >
-              Download the business plan
+            <a href="#pilot" className="text-white/80 hover:text-white">
+              Contact us for the business plan
             </a>
             <a href="#top" className="text-white/80 hover:text-white">
               Back to top

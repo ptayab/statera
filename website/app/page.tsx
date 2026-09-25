@@ -135,13 +135,6 @@ const PILOT = [
   },
 ];
 
-const TRUST = [
-  "Encrypted in transit and at rest",
-  "Role-based access with a full audit trail",
-  "AI ranks reports, but every action is taken by a named person",
-  "Supports your procedures rather than replacing them",
-];
-
 const QUICK_FACTS = [
   "Easily integrable",
   "Works offline, including underground",
@@ -525,15 +518,6 @@ export default function HomePage() {
                   </article>
                 ))}
               </div>
-
-              <ul className="mt-10 space-y-2.5">
-                {TRUST.map((item) => (
-                  <li key={item} className="flex gap-3 text-sm leading-6 text-white/70">
-                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#e7c27a]" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
             </div>
 
             <div className="rounded-lg bg-white p-6 text-statera-ink sm:p-8">

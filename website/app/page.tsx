@@ -2,7 +2,6 @@ import { BrandLogo } from "@/components/BrandLogo";
 import { DemoVideo } from "@/components/DemoVideo";
 import { LevelSection } from "@/components/LevelSection";
 import { NotifyForm } from "@/components/NotifyForm";
-import { PlayWhenVisible } from "@/components/PlayWhenVisible";
 import { BriefingMock } from "@/components/BriefingMock";
 import { ReportsMock } from "@/components/ReportsMock";
 import { StatusTrailMock } from "@/components/StatusTrailMock";
@@ -41,9 +40,9 @@ const STEPS = [
 ];
 
 const SILENCE = [
-  "Workers find reporting slow and cumbersome",
-  "Workers rely on paper, email, and verbal communication",
-  "Workers fear retaliation",
+  "Workers find reporting slow and cumbersome.",
+  "Workers rely on paper, email, and verbal communication.",
+  "Workers fear retaliation.",
 ];
 
 const HAZARD_RETURNS = [
@@ -113,7 +112,7 @@ const DEPLOY = [
   },
   {
     title: "Works across devices",
-    body: "Runs in the web browser on phones, tablets, and computers, with nothing to install or maintain.",
+    body: "Runs in the web browser and mobile apps on phones, tablets, and computers, with nothing to integrate or maintain.",
   },
   {
     title: "Scales with your operation",
@@ -266,7 +265,7 @@ export default function HomePage() {
             small fraction of what actually happens on site.
           </p>
 
-          <PlayWhenVisible className="relative mt-8 overflow-hidden rounded-lg bg-[#141311] text-white">
+          <div className="relative mt-8 overflow-hidden rounded-lg bg-[#141311] text-white">
             <div className="grid gap-10 p-6 sm:p-10 md:grid-cols-[minmax(0,1fr)_auto] md:items-center lg:p-12">
               <p>
                 <span className="flex items-start font-display leading-none font-medium tracking-[-0.04em] text-statera-orange">
@@ -280,7 +279,7 @@ export default function HomePage() {
               </p>
               <UnreportedGrid />
             </div>
-          </PlayWhenVisible>
+          </div>
 
           <h3 className="mt-10 font-display text-2xl font-medium tracking-[-0.02em]">
             Major causes of the reporting gap
@@ -457,7 +456,7 @@ export default function HomePage() {
           </h2>
           <p className="mt-5 max-w-2xl text-base leading-7 text-statera-slate">
             There is no new hardware to purchase and no IT project to manage.
-            Crews access Statera through a web link.
+            Crews can access Statera through a web link or mobile app.
           </p>
           <div className="mt-10 grid gap-8 md:grid-cols-3">
             {DEPLOY.map((item) => (
@@ -527,19 +526,14 @@ export default function HomePage() {
                 ))}
               </div>
 
-              <div className="mt-10">
-                <p className="text-sm font-medium text-white">
-                  Statera flags the issue. A person always makes the decision.
-                </p>
-                <ul className="mt-4 space-y-2.5">
-                  {TRUST.map((item) => (
-                    <li key={item} className="flex gap-3 text-sm leading-6 text-white/70">
-                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#e7c27a]" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <ul className="mt-10 space-y-2.5">
+                {TRUST.map((item) => (
+                  <li key={item} className="flex gap-3 text-sm leading-6 text-white/70">
+                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#e7c27a]" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
             </div>
 
             <div className="rounded-lg bg-white p-6 text-statera-ink sm:p-8">

@@ -142,6 +142,19 @@ const QUICK_FACTS = [
   "Data hosted in Canada",
 ];
 
+const CONTACTS = [
+  {
+    email: "njoson@student.ubc.ca",
+    phone: "306-229-0735",
+    tel: "+13062290735",
+  },
+  {
+    email: "tim.li@usask.ca",
+    phone: "639-480-7619",
+    tel: "+16394807619",
+  },
+];
+
 const NAV = [
   { href: "#level-01", label: "The gap" },
   { href: "#how-it-works", label: "How it works" },
@@ -522,6 +535,24 @@ export default function HomePage() {
               <div className="mt-6">
                 <NotifyForm submitLabel="Request a call" />
               </div>
+              <ul className="mt-6 space-y-3 border-t border-black/10 pt-5 text-sm leading-6">
+                {CONTACTS.map((person) => (
+                  <li key={person.email}>
+                    <a
+                      href={`mailto:${person.email}`}
+                      className="font-medium text-statera-ink underline decoration-black/20 underline-offset-4 hover:decoration-black"
+                    >
+                      {person.email}
+                    </a>
+                    <a
+                      href={`tel:${person.tel}`}
+                      className="mt-0.5 block text-statera-slate hover:text-statera-ink"
+                    >
+                      {person.phone}
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </LevelSection>
@@ -541,10 +572,26 @@ export default function HomePage() {
               regulatory obligations.
             </p>
           </div>
-          <div className="flex flex-col gap-2 text-sm">
-            <a href="#pilot" className="text-white/80 hover:text-white">
-              Contact us for the business plan
-            </a>
+          <div className="flex flex-col gap-4 text-sm">
+            <div className="flex flex-col gap-3">
+              <p className="text-white/80">Contact us</p>
+              {CONTACTS.map((person) => (
+                <p key={person.email}>
+                  <a
+                    href={`mailto:${person.email}`}
+                    className="text-white/80 hover:text-white"
+                  >
+                    {person.email}
+                  </a>
+                  <a
+                    href={`tel:${person.tel}`}
+                    className="mt-0.5 block text-white/55 hover:text-white"
+                  >
+                    {person.phone}
+                  </a>
+                </p>
+              ))}
+            </div>
             <a href="#top" className="text-white/80 hover:text-white">
               Back to top
             </a>

@@ -374,10 +374,6 @@ export default function HomePage() {
           <h2 className="mt-3 max-w-3xl font-display text-4xl leading-[1.1] font-medium tracking-[-0.03em] sm:text-5xl">
             From disconnected tools to a closed loop.
           </h2>
-          <p className="mt-5 max-w-2xl text-base leading-7 text-statera-slate">
-            Today, issues are logged and then stall. With Statera, every issue
-            has an owner until it is resolved.
-          </p>
 
           <div className="mt-10 overflow-hidden rounded-lg border border-black/10">
             <div className="hidden grid-cols-[1.1fr_1.1fr_0.9fr] border-b border-black/10 bg-[#f6f4f0] px-6 py-3 text-xs font-semibold tracking-wide text-statera-slate uppercase sm:grid">

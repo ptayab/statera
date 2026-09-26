@@ -196,7 +196,7 @@ export default function HomePage() {
               href="#pilot"
               className="rounded-md bg-statera-ink px-3.5 py-2 text-sm font-medium text-white transition hover:bg-black"
             >
-              Request a pilot
+              Request a call
             </a>
           </div>
         </div>
@@ -480,7 +480,7 @@ export default function HomePage() {
                   <p className="text-xs font-semibold tracking-[0.12em] text-white/50 uppercase">
                     Cost of a single injury
                   </p>
-                  <p className="mt-2 font-display text-4xl font-medium tracking-[-0.03em]">
+                  <p className="mt-2 font-display text-4xl font-medium tracking-[-0.03em] text-red-400">
                     ~$48,000
                   </p>
                   <p className="mt-2 text-sm leading-6 text-white/65">
@@ -529,7 +529,7 @@ export default function HomePage() {
                 A 30-minute call to assess whether Statera fits your site.
               </p>
               <p className="mt-3 text-sm leading-6 text-statera-slate">
-                Share your details, and our team will follow up to scope a pilot.
+                Share your details, and our team will follow up with you.
                 If you would like a business plan, we will send one.
               </p>
               <div className="mt-6">

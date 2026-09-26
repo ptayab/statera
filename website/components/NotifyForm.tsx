@@ -59,7 +59,7 @@ export function NotifyForm({ submitLabel = "Notify me" }: NotifyFormProps) {
         <button
           type="submit"
           disabled={pending}
-          className="w-full rounded-md bg-statera-ink px-6 py-2.5 text-sm font-medium text-white transition hover:bg-black disabled:opacity-60"
+          className="w-full cursor-pointer rounded-md bg-statera-ink px-6 py-2.5 text-sm font-medium text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
         >
           {pending ? "Sending…" : submitLabel}
         </button>
